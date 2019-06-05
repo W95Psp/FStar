@@ -590,6 +590,35 @@ let e_univ_name =
 
 let e_univ_names = e_list e_univ_name
 
+
+let e_eff_decl_view =
+    let e_name = e_string_list in
+    let e_tscheme_view = e_tuple2 e_univ_names e_term in
+    let embed_eff_decl_view (rng: Range.range) (efv:eff_decl_view) : t =
+        S.mk_Tm_app ref_Mk_eff_decl_view.t [] [
+            s.as_arg (embed e_name          rng efv.efv_mname  );           
+            s.as_arg (embed e_binders       rng efv.efv_binders      );
+            s.as_arg (embed e_term          rng efv.efv_signature    );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_ret_wp       );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_bind_wp      );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_if_then_else );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_ite_wp       );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_stronger     );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_close_wp     );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_assert_p     );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_assume_p     );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_null_wp      );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_trivial      );
+            s.as_arg (embed e_term          rng efv.efv_repr         );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_return_repr  );
+            s.as_arg (embed e_tscheme_view  rng efv.efv_bind_repr    )
+            ]
+    in
+    let unembed_eff_decl_view cb (t:t) : option<eff_decl_view> =
+         Err.log_issue Range.dummyRange (Err.Warning_NotEmbedded, (BU.format1 "Try tio unembed a eff_decl_view %s" (t_to_string t)));
+    in
+    mk_emb embed_eff_decl_view unembed_eff_decl_view fstar_refl_eff_decl_view
+
 let e_sigelt_view =
     let embed_sigelt_view (rng:Range.range) (sev:sigelt_view) : term =
         match sev with
@@ -618,6 +647,9 @@ let e_sigelt_view =
                         None rng
 
         | Unk ->
+            { ref_Unk.t with pos = rng }
+            
+        | _ ->
             { ref_Unk.t with pos = rng }
     in
     let unembed_sigelt_view w (t:term) : option<sigelt_view> =

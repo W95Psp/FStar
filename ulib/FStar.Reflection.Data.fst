@@ -80,6 +80,61 @@ type comp_view =
   | C_Lemma     : term -> term -> comp_view // pre & post
   | C_Unknown   : comp_view
 
+
+(* *almost* copy/pasted types (from FStar.Syntax.Syntax.fs)  *)
+type tscheme_view = list univ_name * typ
+noeq
+type action_view = {
+    av_action_name:name;
+    // action_unqualified_name: ident; // necessary for effect redefinitions, this name shall not contain the name of the effect
+    // action_univs:univ_names;
+    av_action_params: list binder;
+    av_action_defn:term;
+    av_action_typ: typ
+}
+noeq
+type eff_decl_view = {
+    // cattributes :list<cflag>;
+    efv_mname       :name;
+    // univs       :univ_names;
+    efv_binders     :list binder;
+    efv_signature   :term;
+    efv_ret_wp      :tscheme_view;
+    efv_bind_wp     :tscheme_view;
+    efv_if_then_else:tscheme_view;
+    efv_ite_wp      :tscheme_view;
+    efv_stronger    :tscheme_view;
+    efv_close_wp    :tscheme_view;
+    efv_assert_p    :tscheme_view;
+    efv_assume_p    :tscheme_view;
+    efv_null_wp     :tscheme_view;
+    efv_trivial     :tscheme_view;
+    //NEW FIELDS
+    //representation of the effect as pure type
+    efv_repr        :term;
+    //operations on the representation
+    efv_return_repr :tscheme_view;
+    efv_bind_repr   :tscheme_view;
+    //actions for the effect
+    // actions     :list<action>;
+    // eff_attrs   :list<attribute>;
+}
+noeq
+type sub_eff_view = {
+  sev_source: name;
+  sev_target: name;
+  sev_lift_wp: option tscheme_view;
+  sev_lift: option tscheme_view
+}
+
+
+// type sigelt_view =
+//     | Sg_Let of bool * fv * list<univ_name> * typ * term
+//     | Sg_Inductive of name * list<univ_name> * list<binder> * typ * list<name> // name, params, type, constructors
+//     | Sg_Constructor of name * typ
+//     | Unk
+
+
 noeq
 type sigelt_view =
   | Sg_Let :
@@ -107,6 +162,16 @@ type sigelt_view =
       (typ:typ) ->
       sigelt_view
 
+  | Sg_new_effect : eff_decl_view -> sigelt_view
+  | Sg_new_effect_f_free : eff_decl_view -> sigelt_view
+  | Sg_sub_effect : sub_eff_view -> sigelt_view
+  | Sg_effect_abbrev : name -> list univ_name  -> list binder -> comp -> sigelt_view
+  | UnkDEBUG_bundle
+  | UnkDEBUG_declare_typ
+  | UnkDEBUG_main
+  | UnkDEBUG_assume
+  | UnkDEBUG_pragma
+  | UnkDEBUG_splice
   | Unk
 
 let var : eqtype = nat

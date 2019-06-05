@@ -564,7 +564,40 @@ let e_univ_name =
 let e_univ_names = e_list e_univ_name
 let e_string_list = e_list e_string
 
+let e_eff_decl_view =
+    let e_name = e_string_list in
+    let e_tscheme_view = e_tuple2 e_univ_names e_term in
+    // let embed_tscheme_view cb (i:list<univ_name> * typ) : t =
+    //     embed e_tscheme_view cb i
+    // in
+    let embed_eff_decl_view cb (efv:eff_decl_view) : t =
+        mkConstruct ref_Mk_eff_decl_view.fv [] [
+                              as_arg (embed e_name          cb efv.efv_mname  );           
+                              as_arg (embed e_binders       cb efv.efv_binders      );
+                              as_arg (embed e_term          cb efv.efv_signature    );
+                              as_arg (embed e_tscheme_view  cb efv.efv_ret_wp       );
+                              as_arg (embed e_tscheme_view  cb efv.efv_bind_wp      );
+                              as_arg (embed e_tscheme_view  cb efv.efv_if_then_else );
+                              as_arg (embed e_tscheme_view  cb efv.efv_ite_wp       );
+                              as_arg (embed e_tscheme_view  cb efv.efv_stronger     );
+                              as_arg (embed e_tscheme_view  cb efv.efv_close_wp     );
+                              as_arg (embed e_tscheme_view  cb efv.efv_assert_p     );
+                              as_arg (embed e_tscheme_view  cb efv.efv_assume_p     );
+                              as_arg (embed e_tscheme_view  cb efv.efv_null_wp      );
+                              as_arg (embed e_tscheme_view  cb efv.efv_trivial      );
+                              as_arg (embed e_term          cb efv.efv_repr         );
+                              as_arg (embed e_tscheme_view  cb efv.efv_return_repr  );
+                              as_arg (embed e_tscheme_view  cb efv.efv_bind_repr    )
+                              ]
+    in
+    let unembed_eff_decl_view cb (t:t) : option<eff_decl_view> =
+         Err.log_issue Range.dummyRange (Err.Warning_NotEmbedded, (BU.format1 "Try tio unembed a eff_decl_view %s" (t_to_string t)));
+    in
+    mk_emb' embed_eff_decl_view unembed_eff_decl_view fstar_refl_eff_decl_view_fv
+
 let e_sigelt_view =
+    // type tscheme_view = list<univ_name> * typ
+    
     let embed_sigelt_view cb (sev:sigelt_view) : t =
         match sev with
         | Sg_Let (r, fv, univs, ty, t) ->
@@ -584,8 +617,12 @@ let e_sigelt_view =
                                          as_arg (embed e_binders cb bs);
                                          as_arg (embed e_term cb t);
                                          as_arg (embed (e_list e_string_list) cb dcs)]
-
+        | Sg_new_effect ed -> 
+            mkConstruct ref_Sg_new_effect.fv [] [embed embed_eff_decl_view cb ed]
+        // | Sg_new_effect ed -> 
         | Unk ->
+            mkConstruct ref_Unk.fv [] []
+        | _ ->
             mkConstruct ref_Unk.fv [] []
     in
     let unembed_sigelt_view cb (t:t) : option<sigelt_view> =

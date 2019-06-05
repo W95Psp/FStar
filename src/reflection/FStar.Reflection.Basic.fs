@@ -334,6 +334,19 @@ let lookup_attr (attr:term) (env:Env.env) : list<fv> =
                                   | Some l -> [S.lid_as_fv l (S.Delta_constant_at_level 999) None]) ses
     | _ -> []
 
+let all_defs_in_env (env:Env.env) : list<fv> =
+    List.map (fun l -> S.lid_as_fv l (S.Delta_constant_at_level 999) None) (Env.lidents env) // |> take 10
+
+let defs_in_module (env:Env.env) (modul:name) : list <fv> =
+    List.concatMap
+        (fun l ->
+                (* must succeed, ids_of_lid always returns a non-empty list *)
+                let ns = Ident.ids_of_lid l |> init |> List.map Ident.string_of_ident in
+                if ns = modul
+                then [S.lid_as_fv l (S.Delta_constant_at_level 999) None]
+                else [])
+        (Env.lidents env)
+
 let lookup_typ (env:Env.env) (ns:list<string>) : option<sigelt> =
     let lid = PC.p2l ns in
     Env.lookup_sigelt env lid
@@ -344,6 +357,39 @@ let sigelt_attrs (se : sigelt) : list<attribute> =
 let set_sigelt_attrs (attrs : list<attribute>) (se : sigelt) : sigelt =
     { se with sigattrs = attrs }
 
+
+// type sub_eff_view = {
+//   sev_source: name;
+//   sev_target: name;
+//   sev_lift_wp: option<tscheme_view>;
+//   sev_lift: option<tscheme_view>
+// }
+
+let sub_eff__to__sub_eff_view (se: sub_eff): sub_eff_view =
+  { sev_source = Ident.path_of_lid se.source
+  ; sev_target = Ident.path_of_lid se.target
+  ; sev_lift_wp = se.lift_wp
+  ; sev_lift = se.lift
+  }
+
+let eff_decl__to__eff_decl_view (ed: eff_decl): eff_decl_view =
+    { efv_mname        = Ident.path_of_lid ed.mname       
+    ; efv_binders      = ed.binders      
+    ; efv_signature    = ed.signature    
+    ; efv_ret_wp       = ed.ret_wp       
+    ; efv_bind_wp      = ed.bind_wp      
+    ; efv_if_then_else = ed.if_then_else 
+    ; efv_ite_wp       = ed.ite_wp       
+    ; efv_stronger     = ed.stronger     
+    ; efv_close_wp     = ed.close_wp     
+    ; efv_assert_p     = ed.assert_p     
+    ; efv_assume_p     = ed.assume_p     
+    ; efv_null_wp      = ed.null_wp      
+    ; efv_trivial      = ed.trivial      
+    ; efv_repr         = ed.repr         
+    ; efv_return_repr  = ed.return_repr  
+    ; efv_bind_repr    = ed.bind_repr    
+    }
 let inspect_sigelt (se : sigelt) : sigelt_view =
     match se.sigel with
     | Sig_let ((r, [lb]), _) ->
@@ -369,8 +415,18 @@ let inspect_sigelt (se : sigelt) : sigelt_view =
         (* TODO: return universes *)
         Sg_Constructor (Ident.path_of_lid lid, ty)
 
-    | _ ->
-        Unk
+    | Sig_new_effect ed -> Sg_new_effect (eff_decl__to__eff_decl_view ed)
+    | Sig_new_effect_for_free ed -> Sg_new_effect_for_free (eff_decl__to__eff_decl_view ed)
+    | Sig_sub_effect se -> Sg_sub_effect (sub_eff__to__sub_eff_view se)
+    | Sig_effect_abbrev (lidentt, muniv_names, mbinders, mcomp, mcflags) -> Sg_effect_abbrev ((Ident.path_of_lid lidentt), muniv_names, mbinders, mcomp)
+    | Sig_bundle         _  -> UnkDEBUG_bundle // ("Sig_bundle       ")
+    | Sig_declare_typ    _  -> UnkDEBUG_declare_typ// ("Sig_declare_typ  ")
+    | Sig_main           _  -> UnkDEBUG_main       //("Sig_main         ")
+    | Sig_assume         _  -> UnkDEBUG_assume //("Sig_assume       ")
+    | Sig_pragma         _  -> UnkDEBUG_pragma //("Sig_pragma       ")
+    | Sig_splice         _  -> UnkDEBUG_splice //("Sig_splice       ")
+    | _ -> failwith "ERROR: pattern maching on sigelt error in FStar.Reflection.Basic"
+        // Unk
 
 let pack_sigelt (sv:sigelt_view) : sigelt =
     match sv with
@@ -389,6 +445,9 @@ let pack_sigelt (sv:sigelt_view) : sigelt =
 
     | Unk ->
         failwith "packing Unk, sorry"
+        
+    | _ -> // TODO HERE
+        failwith "packing effect things #TODO, sorry"
 
 let inspect_bv (bv:bv) : bv_view =
     {

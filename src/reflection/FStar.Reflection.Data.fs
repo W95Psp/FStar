@@ -66,10 +66,65 @@ type comp_view =
     | C_Lemma of term * term
     | C_Unknown
 
+(* *almost* copy/pasted types (from FStar.Syntax.Syntax.fs)  *)
+type tscheme_view = list<univ_name> * typ
+type action_view = {
+    av_action_name:name;
+    // action_unqualified_name: ident; // necessary for effect redefinitions, this name shall not contain the name of the effect
+    // action_univs:univ_names;
+    av_action_params : list<binder>;
+    av_action_defn:term;
+    av_action_typ: typ
+}
+type eff_decl_view = {
+    // cattributes :list<cflag>;
+    // univs       :univ_names;
+    efv_mname       :name;
+    efv_binders     :list<binder>;
+    efv_signature   :term;
+    efv_ret_wp      :tscheme_view;
+    efv_bind_wp     :tscheme_view;
+    efv_if_then_else:tscheme_view;
+    efv_ite_wp      :tscheme_view;
+    efv_stronger    :tscheme_view;
+    efv_close_wp    :tscheme_view;
+    efv_assert_p    :tscheme_view;
+    efv_assume_p    :tscheme_view;
+    efv_null_wp     :tscheme_view;
+    efv_trivial     :tscheme_view;
+    efv_repr        :term;
+    efv_return_repr :tscheme_view;
+    efv_bind_repr   :tscheme_view;
+    //NEW FIELDS
+    //representation of the effect as pure type
+    //operations on the representation
+    //actions for the effect
+    // actions     :list<action>;
+    // eff_attrs   :list<attribute>;
+}
+
+
+type sub_eff_view = {
+  sev_source: name;
+  sev_target: name;
+  sev_lift_wp: option<tscheme_view>;
+  sev_lift: option<tscheme_view>
+}
+
 type sigelt_view =
     | Sg_Let of bool * fv * list<univ_name> * typ * term
     | Sg_Inductive of name * list<univ_name> * list<binder> * typ * list<name> // name, params, type, constructors
     | Sg_Constructor of name * typ
+    | Sg_new_effect of eff_decl_view
+    | Sg_new_effect_for_free of eff_decl_view
+    | Sg_sub_effect of sub_eff_view
+    | Sg_effect_abbrev of name * list<univ_name> * list<binder> * comp
+    | UnkDEBUG_bundle
+    | UnkDEBUG_declare_typ
+    | UnkDEBUG_main
+    | UnkDEBUG_assume
+    | UnkDEBUG_pragma
+    | UnkDEBUG_splice
     | Unk
 
 type var = Z.t
@@ -163,6 +218,8 @@ let fstar_refl_vconst           = mk_refl_data_lid_as_term "vconst"
 let fstar_refl_vconst_fv        = mk_refl_data_lid_as_fv "vconst"
 let fstar_refl_sigelt_view      = mk_refl_data_lid_as_term "sigelt_view"
 let fstar_refl_sigelt_view_fv   = mk_refl_data_lid_as_fv "sigelt_view"
+let fstar_refl_eff_decl_view    = mk_refl_data_lid_as_term "eff_decl_view"
+let fstar_refl_eff_decl_view_fv = mk_refl_data_lid_as_fv "eff_decl_view"
 let fstar_refl_exp              = mk_refl_data_lid_as_term "exp"
 let fstar_refl_exp_fv           = mk_refl_data_lid_as_fv "exp"
 
@@ -179,6 +236,32 @@ let ref_Mk_bv =
     ; fv  = fv
     ; t   = fv_to_tm fv
     }
+
+let ref_Mk_eff_decl_view =
+    let lid = fstar_refl_data_lid "Mkeff_decl_view" in
+    let attr = Record_ctor (fstar_refl_data_lid "bv_view", [
+                            Ident.mk_ident ("efv_mname", Range.dummyRange);
+                            Ident.mk_ident ("efv_binders", Range.dummyRange);
+                            Ident.mk_ident ("efv_signature", Range.dummyRange);
+                            Ident.mk_ident ("efv_ret_wp", Range.dummyRange);
+                            Ident.mk_ident ("efv_bind_wp", Range.dummyRange);
+                            Ident.mk_ident ("efv_if_then_else", Range.dummyRange);
+                            Ident.mk_ident ("efv_ite_wp", Range.dummyRange);
+                            Ident.mk_ident ("efv_stronger", Range.dummyRange);
+                            Ident.mk_ident ("efv_close_wp", Range.dummyRange);
+                            Ident.mk_ident ("efv_assert_p", Range.dummyRange);
+                            Ident.mk_ident ("efv_assume_p", Range.dummyRange);
+                            Ident.mk_ident ("efv_null_wp", Range.dummyRange);
+                            Ident.mk_ident ("efv_trivial", Range.dummyRange);
+                            Ident.mk_ident ("efv_repr", Range.dummyRange);
+                            Ident.mk_ident ("efv_return_repr", Range.dummyRange);
+                            Ident.mk_ident ("efv_bind_repr", Range.dummyRange)]) in
+    let fv = lid_as_fv lid delta_constant (Some attr) in
+    { lid = lid
+    ; fv  = fv
+    ; t   = fv_to_tm fv
+    }
+  
 
 (* quals *)
 let ref_Q_Explicit = fstar_refl_data_const "Q_Explicit"
@@ -228,6 +311,19 @@ let ref_C_Unknown = fstar_refl_data_const "C_Unknown"
 let ref_Sg_Let         = fstar_refl_data_const "Sg_Let"
 let ref_Sg_Inductive   = fstar_refl_data_const "Sg_Inductive"
 let ref_Sg_Constructor = fstar_refl_data_const "Sg_Constructor"
+let ref_Sg_new_effect  = fstar_refl_data_const "Sg_new_effect"
+let ref_Sg_new_effect_for_free = fstar_refl_data_const "Sg_new_effect_for_free"
+
+let ref_Sg_sub_effect  = fstar_refl_data_const "Sg_sub_effect"
+let ref_Sg_effect_abbrev = fstar_refl_data_const "Sg_effect_abbrev"
+
+let ref_UnkDEBUG_bundle      = fstar_refl_data_const "ref_UnkDEBUG_bundle"  
+let ref_UnkDEBUG_declare_typ = fstar_refl_data_const "ref_UnkDEBUG_declare_typ"  
+let ref_UnkDEBUG_main        = fstar_refl_data_const "ref_UnkDEBUG_main"  
+let ref_UnkDEBUG_assume      = fstar_refl_data_const "ref_UnkDEBUG_assume" 
+let ref_UnkDEBUG_pragma      = fstar_refl_data_const "ref_UnkDEBUG_pragma" 
+let ref_UnkDEBUG_splice      = fstar_refl_data_const "ref_UnkDEBUG_splice" 
+
 let ref_Unk            = fstar_refl_data_const "Unk"
 
 (* exp *)
