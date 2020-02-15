@@ -63,7 +63,7 @@ type binder_view = bv * aqualv
 
 type comp_view =
     | C_Total of typ * option<term> //optional decreases clause
-    | C_Lemma of term * term
+    | C_Lemma of term * term * term
     | C_Unknown
 
 (* *almost* copy/pasted types (from FStar.Syntax.Syntax.fs)  *)

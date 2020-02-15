@@ -515,7 +515,7 @@ let rec apply_squash_or_lem d t =
     let ty = tc t in
     let tys, c = collect_arr ty in
     match inspect_comp c with
-    | C_Lemma pre post ->
+    | C_Lemma pre post _ ->
        begin
        (* What I would really like to do here is unify `mk_squash post` and the goal,
         * but it didn't work on a first try, so just doing this for now *)
