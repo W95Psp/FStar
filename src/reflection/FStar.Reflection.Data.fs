@@ -95,6 +95,12 @@ type bv_view = {
     bv_sort : typ;
 }
 
+type rng_view = {
+    file_name: string;
+    start_pos: Z.t * Z.t;
+    end_pos:   Z.t * Z.t;
+}
+
 type binder_view = bv * (aqualv * list<term>)
 
 type comp_view =
@@ -199,6 +205,8 @@ let fstar_refl_branch           = mk_refl_data_lid_as_term "branch"
 let fstar_refl_branch_fv        = mk_refl_data_lid_as_fv   "branch"
 let fstar_refl_bv_view          = mk_refl_data_lid_as_term "bv_view"
 let fstar_refl_bv_view_fv       = mk_refl_data_lid_as_fv   "bv_view"
+let fstar_refl_rng_view         = mk_refl_data_lid_as_term "rng_view"
+let fstar_refl_rng_view_fv      = mk_refl_data_lid_as_fv   "rng_view"
 let fstar_refl_vconst           = mk_refl_data_lid_as_term "vconst"
 let fstar_refl_vconst_fv        = mk_refl_data_lid_as_fv   "vconst"
 let fstar_refl_sigelt_view      = mk_refl_data_lid_as_term "sigelt_view"
@@ -218,6 +226,18 @@ let ref_Mk_bv =
                                 Ident.mk_ident ("bv_ppname", Range.dummyRange);
                                 Ident.mk_ident ("bv_index" , Range.dummyRange);
                                 Ident.mk_ident ("bv_sort"  , Range.dummyRange)]) in
+    let fv = lid_as_fv lid delta_constant (Some attr) in
+    { lid = lid
+    ; fv  = fv
+    ; t   = fv_to_tm fv
+    }
+
+let ref_Mk_rng =
+    let lid = fstar_refl_data_lid "Mkrng_view" in
+    let attr = Record_ctor (fstar_refl_data_lid "rng_view", [
+                                Ident.mk_ident ("file_name", Range.dummyRange);
+                                Ident.mk_ident ("start_pos" , Range.dummyRange);
+                                Ident.mk_ident ("end_pos"  , Range.dummyRange)]) in
     let fv = lid_as_fv lid delta_constant (Some attr) in
     { lid = lid
     ; fv  = fv

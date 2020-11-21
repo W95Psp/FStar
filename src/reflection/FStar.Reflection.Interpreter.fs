@@ -229,6 +229,15 @@ let reflection_primops : list<Cfg.primitive_step> = [
 
     mk2 "push_binder"           push_binder           E.e_env             E.e_binder        E.e_env
                                 push_binder           NRE.e_env           NRE.e_binder      NRE.e_env;
+
+    mk1 "inspect_range"         inspect_range         e_range             E.e_rng_view
+                                inspect_range         NBET.e_range        NRE.e_rng_view;
+
+    mk1 "range_of_term"         range_of_term        E.e_term            e_range
+                                range_of_term        NRE.e_term          NBET.e_range;
+
+    mk1 "range_of_sigelt"       range_of_sigelt      E.e_sigelt            e_range
+                                range_of_sigelt      NRE.e_sigelt          NBET.e_range;
 ]
 
 let _ = List.iter FStar.TypeChecker.Cfg.register_extra_step reflection_primops

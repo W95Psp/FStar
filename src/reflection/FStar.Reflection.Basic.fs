@@ -631,3 +631,21 @@ let push_binder e b = Env.push_binders e [b]
 
 let subst (x:bv) (n:term) (m:term) : term =
   SS.subst [NT(x,n)] m
+
+let mm_string_of_range (r: Range.range)
+  = Range.string_of_def_range r
+  ^ " && "
+  ^ Range.string_of_use_range r
+
+
+let inspect_range r
+   = let sp: Range.pos = Range.start_of_range r in
+     let ep: Range.pos = Range.end_of_range r in
+     let h p = Z.of_int_fs (Range.line_of_pos p), Z.of_int_fs (Range.col_of_pos p) in
+     { file_name = Range.file_of_range r
+     ; start_pos = h sp
+     ; end_pos   = h ep
+     }
+
+let range_of_term t = t.pos
+let range_of_sigelt t = FStar.Syntax.Util.range_of_sigelt t
