@@ -67,7 +67,7 @@ val reveal_hide (#a: Type) (x: a) : Lemma (ensures (reveal (hide x) == x)) [SMTP
 let tot_to_gtot (f: ('a -> Tot 'b)) (x: 'a) : GTot 'b = f x
 
 (** [erased]: Injecting a value into [erased]; just an alias of [hide] *)
-let return (#a: Type) (x: a) : erased a = hide x
+let return (#a: Type) (x: a) : Tot (erased a) = hide x
 
 (** Sequential composition of erased *)
 let bind (#a #b: Type) (x: erased a) (f: (a -> Tot (erased b))) : Tot (erased b) =

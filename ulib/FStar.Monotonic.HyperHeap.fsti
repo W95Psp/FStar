@@ -49,7 +49,7 @@ val root_is_not_freeable (_:unit) : Lemma (not (rid_freeable root))
 
 private val rid_length (r:rid) :GTot nat
 
-private val rid_tail (r:rid{rid_length r > 0}) :rid
+private val rid_tail (r:rid{rid_length r > 0}) : Tot rid
 
 val includes (r1:rid) (r2:rid) :GTot bool (decreases (reveal r2))
 
@@ -63,7 +63,7 @@ val lemma_disjoint_includes (i:rid) (j:rid) (k:rid)
 
 val extends (i:rid) (j:rid) :GTot bool
 
-val parent (r:rid{r =!= root}) :rid
+val parent (r:rid{r =!= root}) :Tot rid
 
 val lemma_includes_refl (i:rid)
   :Lemma (includes i i)
@@ -95,7 +95,7 @@ val lemma_extends_only_parent (i:rid) (j:rid{extends j i})
   :Lemma (i == parent j)
          [SMTPat (extends j i)]
 
-val mod_set (s:Set.set rid) :(Set.set rid)
+val mod_set (s:Set.set rid) :Tot (Set.set rid)
 assume Mod_set_def: forall (x:rid) (s:Set.set rid). {:pattern Set.mem x (mod_set s)}
                     Set.mem x (mod_set s) <==> (exists (y:rid). Set.mem y s /\ includes y x)
 
@@ -169,7 +169,7 @@ val root_is_root (s:rid)
          [SMTPat (includes s root)]
 
 unfold
-let extend_post (r:rid) (n:int) (c:int) (freeable:bool) : pure_post rid =
+let extend_post (r:rid) (n:int) (c:int) (freeable:bool) : Tot (pure_post rid) =
   fun s ->
   s `extends` r /\
   Cons? (reveal s) /\

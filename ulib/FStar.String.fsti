@@ -116,5 +116,5 @@ val get: string -> int -> Ex char
 val concat_length (s1 s2: string): Lemma
   (ensures length (s1 ^ s2) = length s1 + length s2)
 
-val list_of_concat (s1 s2: string): Lemma
-  (ensures list_of_string (s1 ^ s2) == list_of_string s1 @ list_of_string s2)
+// val list_of_concat (s1 s2: string): Lemma
+//   (ensures list_of_string (s1 ^ s2) == list_of_string s1 @ list_of_string s2)
