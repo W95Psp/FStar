@@ -23,35 +23,35 @@ include FStar.Monotonic.HyperHeap
 
 (****** Some predicates ******)
 
-unfold let is_in (r:rid) (h:hmap) = h `Map.contains` r
+unfold let is_in (r:rid) (h:hmap): Tot _ = h `Map.contains` r
 
-let is_stack_region r = color r > 0
-let is_heap_color c = c <= 0
+let is_stack_region r: GTot _ = color r > 0
+let is_heap_color c: Tot _= c <= 0
 
 [@@(deprecated "FStar.HyperStack.ST.is_eternal_region")]
-let is_eternal_region r  = is_heap_color (color r) && not (rid_freeable r)
+let is_eternal_region r : GTot _ = is_heap_color (color r) && not (rid_freeable r)
 
-unfold let is_eternal_region_hs r = is_heap_color (color r) && not (rid_freeable r)
+unfold let is_eternal_region_hs r: GTot _ = is_heap_color (color r) && not (rid_freeable r)
 
 type sid = r:rid{is_stack_region r} //stack region ids
 
 (*
  * AR: marking these unfolds, else I think there are pattern firing issues depending on which one we use
  *)
-unfold let is_above r1 r2          = r1 `includes` r2
-unfold let is_just_below r1 r2     = r1 `extends`  r2
-unfold let is_below r1 r2          = r2 `is_above` r1
-let is_strictly_below r1 r2 = r1 `is_below` r2 && r1 <> r2
-let is_strictly_above r1 r2 = r1 `is_above` r2 && r1 <> r2
+unfold let is_above r1 r2         : GTot _ = r1 `includes` r2
+unfold let is_just_below r1 r2    : GTot _ = r1 `extends`  r2
+unfold let is_below r1 r2         : GTot _ = r2 `is_above` r1
+let is_strictly_below r1 r2       : GTot _ = r1 `is_below` r2 && r1 <> r2
+let is_strictly_above r1 r2       : GTot _ = r1 `is_above` r2 && r1 <> r2
 
 
 [@@"opaque_to_smt"]
-unfold private let map_invariant_predicate (m:hmap) :Type0 =
+unfold private let map_invariant_predicate (m:hmap) : Tot Type0 =
   forall r. Map.contains m r ==>
       (forall s. includes s r ==> Map.contains m s)
 
 [@@"opaque_to_smt"]
-unfold private let downward_closed_predicate (h:hmap) :Type0 =
+unfold private let downward_closed_predicate (h:hmap) : Tot Type0 =
   forall (r:rid). r `is_in` h  //for any region in the memory
         ==> (r=root    //either is the root
             \/ (forall (s:rid). (r `is_above` s  //or, any region beneath it
@@ -60,7 +60,7 @@ unfold private let downward_closed_predicate (h:hmap) :Type0 =
                           ((is_heap_color (color r) /\ rid_freeable r) ==> s == r)))) //and if r is a freeable heap region, s can only be r (no regions strictly below r)
 
 [@@"opaque_to_smt"]
-unfold private let tip_top_predicate (tip:rid) (h:hmap) :Type0 =
+unfold private let tip_top_predicate (tip:rid) (h:hmap) : Tot Type0 =
   forall (r:sid). r `is_in` h <==> r `is_above` tip
 
 let rid_last_component (r:rid) :GTot int
@@ -70,27 +70,27 @@ let rid_last_component (r:rid) :GTot int
     else snd (hd r)
 
 [@@"opaque_to_smt"]
-unfold private let rid_ctr_pred_predicate (h:hmap) (n:int) :Type0 =
+unfold private let rid_ctr_pred_predicate (h:hmap) (n:int) :Tot Type0 =
   forall (r:rid). h `Map.contains` r ==> rid_last_component r < n
 
 
 (****** Mem definition ******)
 
 [@@ remove_unused_type_parameters [0]]
-val map_invariant (m:hmap) :Type0  //all regions above a contained region are contained
+val map_invariant (m:hmap) :Tot Type0  //all regions above a contained region are contained
 [@@ remove_unused_type_parameters [0]]
-val downward_closed (h:hmap) :Type0  //regions below a non-root region are of the same color
+val downward_closed (h:hmap) :Tot Type0  //regions below a non-root region are of the same color
 [@@ remove_unused_type_parameters [0;1]]
-val tip_top (tip:rid) (h:hmap) :Type0  //all contained stack regions are above tip
+val tip_top (tip:rid) (h:hmap) :Tot Type0  //all contained stack regions are above tip
 [@@ remove_unused_type_parameters [0;1]]
-val rid_ctr_pred (h:hmap) (n:int) :Type0  //all live regions have last component less than the rid_ctr
+val rid_ctr_pred (h:hmap) (n:int) :Tot Type0  //all live regions have last component less than the rid_ctr
 
-let is_tip (tip:rid) (h:hmap) =
+let is_tip (tip:rid) (h:hmap): Tot _ =
   (is_stack_region tip \/ tip = root) /\  //the tip is a stack region, or the root
   tip `is_in` h                      /\   //the tip is live
   tip_top tip h                          //any other sid activation is a above (or equal to) the tip
 
-let is_wf_with_ctr_and_tip (h:hmap) (ctr:int) (tip:rid)
+let is_wf_with_ctr_and_tip (h:hmap) (ctr:int) (tip:rid): Tot _
   = (not (rid_freeable root)) /\
     root `is_in` h /\
     tip `is_tip` h /\
@@ -100,11 +100,11 @@ let is_wf_with_ctr_and_tip (h:hmap) (ctr:int) (tip:rid)
 
 private val mem' :Type u#1
 
-private val mk_mem (rid_ctr:int) (h:hmap) (tip:rid) :mem'
+private val mk_mem (rid_ctr:int) (h:hmap) (tip:rid) :Tot mem'
 
-val get_hmap (m:mem') :hmap
-val get_rid_ctr (m:mem') :int
-val get_tip (m:mem') :rid
+val get_hmap (m:mem') :Tot hmap
+val get_rid_ctr (m:mem') :Tot int
+val get_tip (m:mem') :Tot rid
 
 private val lemma_mk_mem'_projectors (rid_ctr:int) (h:hmap) (tip:rid)
   :Lemma (requires True)
@@ -192,18 +192,18 @@ let heap_region_does_not_overlap_with_tip
           (ensures (~ (r `is_in` get_hmap m)))
   = root_has_color_zero()
 
-let poppable (m:mem) = get_tip m =!= root
+let poppable (m:mem): Tot _ = get_tip m =!= root
 
-private let remove_elt (#a:eqtype) (s:Set.set a) (x:a) = Set.intersect s (Set.complement (Set.singleton x))
+private let remove_elt (#a:eqtype) (s:Set.set a) (x:a) : Tot _= Set.intersect s (Set.complement (Set.singleton x))
 
-let popped (m0 m1:mem) =
+let popped (m0 m1:mem): Tot _ =
   poppable m0 /\
   (let h0, tip0, h1, tip1 = get_hmap m0, get_tip m0, get_hmap m1, get_tip m1 in
    (parent tip0 = tip1 /\
     Set.equal (Map.domain h1) (remove_elt (Map.domain h0) tip0) /\
     Map.equal h1 (Map.restrict (Map.domain h1) h0)))
 
-let pop (m0:mem{poppable m0}) :mem =
+let pop (m0:mem{poppable m0}) : Tot mem =
   let h0, tip0, rid_ctr0 = get_hmap m0, get_tip m0, get_rid_ctr m0 in
   root_has_color_zero();
   lemma_is_wf_ctr_and_tip_elim m0;
@@ -224,20 +224,20 @@ private noeq
 type mreference' (a:Type) (rel:preorder a) =
   | MkRef : frame:rid -> ref:Heap.mref a rel -> mreference' a rel
 
-let mreference a rel = mreference' a rel
+let mreference a rel: Tot _ = mreference' a rel
 
 //TODO: rename to frame_of, avoiding the inconsistent use of camelCase
-let frameOf (#a:Type) (#rel:preorder a) (r:mreference a rel) :rid
+let frameOf (#a:Type) (#rel:preorder a) (r:mreference a rel) :Tot rid
   = r.frame
 
 let mk_mreference (#a:Type) (#rel:preorder a) (id:rid)
                   (r:Heap.mref a rel)
-  :mreference a rel
+  :Tot (mreference a rel)
   = MkRef id r
 
 //Hopefully we can get rid of this one
-val as_ref (#a:Type0) (#rel:preorder a) (x:mreference a rel)
-  :Heap.mref a rel
+val as_ref (#a: Type0) (#rel:preorder a) (x:mreference a rel)
+  :Tot (Heap.mref a rel)
 
 //And make this one abstract
 let as_addr #a #rel (x:mreference a rel)
@@ -256,27 +256,27 @@ let is_mm (#a:Type) (#rel:preorder a) (r:mreference a rel) :GTot bool =
 // src/extraction/FStar.Extraction.Kremlin.fs needs to be updated.
 
 //adding (not s.mm) to stackref and ref so as to keep their semantics as is
-let mstackref (a:Type) (rel:preorder a) =
+let mstackref (a:Type) (rel:preorder a): Tot _ =
   s:mreference a rel{ is_stack_region (frameOf s)  && not (is_mm s) }
 
-let mref (a:Type) (rel:preorder a) =
+let mref (a:Type) (rel:preorder a): Tot _ =
   s:mreference a rel{ is_eternal_region_hs (frameOf s) && not (is_mm s) }
 
-let mmmstackref (a:Type) (rel:preorder a) =
+let mmmstackref (a:Type) (rel:preorder a): Tot _ =
   s:mreference a rel{ is_stack_region (frameOf s) && is_mm s }
 
-let mmmref (a:Type) (rel:preorder a) =
+let mmmref (a:Type) (rel:preorder a): Tot _ =
   s:mreference a rel{ is_eternal_region_hs (frameOf s) && is_mm s }
 
 //NS: Why do we need this one?
-let s_mref (i:rid) (a:Type) (rel:preorder a) = s:mreference a rel{frameOf s = i}
+let s_mref (i:rid) (a:Type) (rel:preorder a): Tot _ = s:mreference a rel{frameOf s = i}
 
 (*
  * AR: this used to be (is_eternal_region i \/ i `is_above` m.tip) /\ Map.contains ...
  *     As far as the memory model is concerned, this should just be Map.contains
  *     The fact that an eternal region is always contained (because of monotonicity) should be used in the ST interface
  *)
-let live_region (m:mem) (i:rid) :bool = get_hmap m `Map.contains` i
+let live_region (m:mem) (i:rid) :Tot bool = get_hmap m `Map.contains` i
 
 let contains (#a:Type) (#rel:preorder a) (m:mem) (s:mreference a rel) :GTot bool =
   let i = frameOf s in
@@ -292,11 +292,11 @@ let contains_ref_in_its_region (#a:Type) (#rel:preorder a) (m:mem) (r:mreference
   let i = frameOf r in
   FStar.StrongExcludedMiddle.strong_excluded_middle (Heap.contains (get_hmap m `Map.sel` i) (as_ref r))
 
-let fresh_ref (#a:Type) (#rel:preorder a) (r:mreference a rel) (m0:mem) (m1:mem) :Type0 =
+let fresh_ref (#a:Type) (#rel:preorder a) (r:mreference a rel) (m0:mem) (m1:mem) :Tot Type0 =
   let i = frameOf r in
   Heap.fresh (as_ref r) (get_hmap m0 `Map.sel` i) (get_hmap m1 `Map.sel` i)
 
-let fresh_region (i:rid) (m0 m1:mem) =
+let fresh_region (i:rid) (m0 m1:mem): Tot _ =
   not (get_hmap m0 `Map.contains` i) /\ get_hmap m1 `Map.contains` i
 
 let sel (#a:Type) (#rel:preorder a) (m:mem) (s:mreference a rel) :GTot a
@@ -311,7 +311,7 @@ let upd (#a:Type) (#rel:preorder a) (m:mem) (s:mreference a rel{live_region m (f
     lemma_is_wf_ctr_and_tip_intro h rid_ctr tip;
     mk_mem rid_ctr h tip
 
-let alloc (#a:Type0) (rel:preorder a) (id:rid) (init:a) (mm:bool) (m:mem{get_hmap m `Map.contains` id})
+let alloc (#a: Type0) (rel:preorder a) (id:rid) (init:a) (mm:bool) (m:mem{get_hmap m `Map.contains` id})
   :Tot (p:(mreference a rel * mem){let (r, h) = Heap.alloc rel (get_hmap m `Map.sel` id) init mm in
                                    as_ref (fst p) == r /\
                                    get_hmap (snd p) == Map.upd (get_hmap m) id h})
@@ -348,7 +348,7 @@ let sel_tot (#a:Type) (#rel:preorder a) (m:mem) (r:mreference a rel{m `contains`
   :Tot a
   = Heap.sel_tot (get_hmap m `Map.sel` (frameOf r)) (as_ref r)
 
-let fresh_frame (m0:mem) (m1:mem) =
+let fresh_frame (m0:mem) (m1:mem): Tot _ =
   not (get_hmap m0 `Map.contains` get_tip m1) /\
   parent (get_tip m1) == get_tip m0  /\
   get_hmap m1 == Map.upd (get_hmap m0) (get_tip m1) Heap.emp
@@ -378,7 +378,7 @@ let new_eternal_region (m:mem) (parent:rid{is_eternal_region_hs parent /\ get_hm
 let new_freeable_heap_region
   (m:mem)
   (parent:rid{is_eternal_region_hs parent /\ get_hmap m `Map.contains` parent})  
-: t:(rid * mem){fresh_region (fst t) m (snd t) /\ rid_freeable (fst t)}
+: Tot (t:(rid * mem){fresh_region (fst t) m (snd t) /\ rid_freeable (fst t)})
 = let h, rid_ctr, tip = get_hmap m, get_rid_ctr m, get_tip m in
   lemma_is_wf_ctr_and_tip_elim m;
   let new_rid = extend_monochrome_freeable parent rid_ctr true in
@@ -392,7 +392,7 @@ let free_heap_region
     is_heap_color (color r) /\
     rid_freeable r /\
     get_hmap m0 `Map.contains` r})
-: mem
+: Tot mem
 = let h0, rid_ctr0 = get_hmap m0, get_rid_ctr m0 in
   lemma_is_wf_ctr_and_tip_elim m0;
   let dom = remove_elt (Map.domain h0) r in
@@ -424,21 +424,21 @@ val mreference_distinct_sel_disjoint
  *                  which seemed a bit misplaced
  *                  removing that conjunct required very few changes (one in HACL), since ST effect gives it already
  *)
-let modifies (s:Set.set rid) (m0:mem) (m1:mem) = modifies_just s (get_hmap m0) (get_hmap m1)
+let modifies (s:Set.set rid) (m0:mem) (m1:mem): Tot _ = modifies_just s (get_hmap m0) (get_hmap m1)
 
-let modifies_transitively (s:Set.set rid) (m0:mem) (m1:mem) = FStar.Monotonic.HyperHeap.modifies s (get_hmap m0) (get_hmap m1)
+let modifies_transitively (s:Set.set rid) (m0:mem) (m1:mem): Tot _ = FStar.Monotonic.HyperHeap.modifies s (get_hmap m0) (get_hmap m1)
 
-let heap_only (m0:mem) = get_tip m0 == root
+let heap_only (m0:mem): Tot _ = get_tip m0 == root
 
-let top_frame (m:mem) = get_hmap m `Map.sel` get_tip m
+let top_frame (m:mem): Tot _ = get_hmap m `Map.sel` get_tip m
 
 val modifies_drop_tip (m0:mem) (m1:mem) (m2:mem) (s:Set.set rid)
     : Lemma (fresh_frame m0 m1 /\ get_tip m1 == get_tip m2 /\
              modifies_transitively (Set.union s (Set.singleton (get_tip m1))) m1 m2 ==>
              modifies_transitively s m0 (pop m2))
 
-let modifies_one id h0 h1 = modifies_one id (get_hmap h0) (get_hmap h1)
-let modifies_ref (id:rid) (s:Set.set nat) (h0:mem) (h1:mem) =
+let modifies_one id h0 h1: Tot _ = modifies_one id (get_hmap h0) (get_hmap h1)
+let modifies_ref (id:rid) (s:Set.set nat) (h0:mem) (h1:mem): Tot _ =
   Heap.modifies s (get_hmap h0 `Map.sel` id) (get_hmap h1 `Map.sel` id)
 
 
@@ -534,7 +534,7 @@ val aref_equal (a1 a2: aref)
 
 (* Introduction rule *)
 
-val aref_of (#t: Type) (#rel: preorder t) (r: mreference t rel) :aref
+val aref_of (#t: Type) (#rel: preorder t) (r: mreference t rel) : Tot aref
 
 (* Operators lifted from reference *)
 
