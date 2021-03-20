@@ -31,16 +31,20 @@ open FStar.Const
    It is not stratified: a single type called "term" containing
    expressions, formulas, types, and so on
  *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type level = | Un | Expr | Type_level | Kind | Formula
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type let_qualifier =
   | NoLetQualifier
   | Rec
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type quote_kind =
   | Static
   | Dynamic
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type term' =
   | Wild
   | Const     of sconst
@@ -142,6 +146,9 @@ and imp =
     | HashBrace of term
     | Infix
     | Nothing
+
+// noextract
+assume val show_term: term -> string
 
 type knd = term
 type typ = term

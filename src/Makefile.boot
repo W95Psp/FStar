@@ -59,6 +59,7 @@ ocaml-output/%.ml:
 	@echo "[EXTRACT   $(notdir $@)]"
 	$(Q)$(BENCHMARK_PRE) $(FSTAR_C) $(SIL) $(notdir $(subst .checked.lax,,$<)) \
                    --codegen OCaml \
+	           --warn_error -342 \
                    --extract_module $(basename $(notdir $(subst .checked.lax,,$<)))
 
 # --------------------------------------------------------------------
