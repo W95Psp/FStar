@@ -33,6 +33,8 @@ module TcUtil = FStar.TypeChecker.Util
 module UF     = FStar.Syntax.Unionfind
 module U      = FStar.Syntax.Util
 module Z      = FStar.BigInt
+module ParseIt  = FStar.Parser.ParseIt
+module ToSyntax = FStar.ToSyntax.ToSyntax
 
 type name = bv
 type env = Env.env
@@ -1760,3 +1762,20 @@ let proofstate_of_all_implicits rng env imps =
     }
     in
     (ps, w)
+
+let string_to_term env str
+  = let frag_of_text s
+    = ParseIt.({ frag_fname= "<input>"
+               ; frag_text = s
+               ; frag_line = 1
+               ; frag_col  = 0
+               })
+    in
+    let string_to_AST_term (term: string): Parser.AST.term
+    = match ParseIt.parse (ParseIt.Fragment <| frag_of_text term) with
+      | ParseIt.Term x -> x
+      | _ -> failwith ("Could not parse term '"^term^"'")
+    in
+    let denv = FStar.Syntax.DsEnv.set_current_module env.dsenv (current_module env) in
+    ret <| ToSyntax.desugar_term denv (string_to_AST_term str)
+

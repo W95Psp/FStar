@@ -86,3 +86,7 @@ val lset                   : typ -> string -> term -> tac<unit>
 val curms                  : unit -> tac<Z.t>
 val set_urgency            : Z.t -> tac<unit>
 val t_commute_applied_match : unit -> tac<unit>
+
+val string_to_term         : env -> string -> tac<term>
+
+

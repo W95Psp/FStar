@@ -470,6 +470,10 @@ let () =
         t_commute_applied_match e_unit e_unit
         t_commute_applied_match NBET.e_unit NBET.e_unit;
 
+
+      mk_tac_step_2 0 "string_to_term"
+        string_to_term RE.e_env      e_string  RE.e_term
+        string_to_term NRE.e_env NBET.e_string NRE.e_term;
     ]
 
 let unembed_tactic_1_alt (ea:embedding<'a>) (er:embedding<'r>) (f:term) (ncb:norm_cb) : option<('a -> tac<'r>)> =
