@@ -556,7 +556,8 @@ let lookup_qname env (lid:lident) : qninfo =
                 in
                 begin match List.tryFind (lid_equals lid) lids with
                       | None -> None
-                      | Some l -> maybe_cache (Inr (s, None), Ident.range_of_lid l)
+                               // TODO: Why `Ident.range_of_lid l` was returned here, but `U.range_of_sigelt s` in the case of a bundle?
+                      | Some l -> maybe_cache (Inr (s, None), U.range_of_sigelt s)//Ident.range_of_lid l)
                 end))
       | se -> se
     else None
