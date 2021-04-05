@@ -17,6 +17,7 @@ open FStar.VConfig
 (* Primitives *)
 val compare_bv            : bv -> bv -> order
 val lookup_typ            : Env.env -> list<string> -> option<sigelt>
+val lookup_sigelt_range   : Env.env -> list<string> -> option<Range.range>
 val is_free               : bv -> term -> bool
 val free_bvs              : term -> list<bv>
 val free_uvars            : term -> list<Z.t>

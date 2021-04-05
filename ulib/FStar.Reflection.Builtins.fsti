@@ -57,6 +57,7 @@ val compare_string : string -> string -> int
 
 (* Primitives & helpers *)
 val lookup_typ            : env -> name -> option sigelt
+val lookup_sigelt_range   : env -> name -> option range
 val compare_bv            : bv -> bv -> order
 val binders_of_env        : env -> binders
 val moduleof              : env -> name

@@ -417,6 +417,12 @@ let lookup_typ (env:Env.env) (ns:list<string>) : option<sigelt> =
     let lid = PC.p2l ns in
     Env.lookup_sigelt env lid
 
+let lookup_sigelt_range (env:Env.env) (ns:list<string>) : option<Range.range> =
+    let lid = PC.p2l ns in
+    match Env.lookup_qname env lid with
+    | None -> None
+    | Some (_, rng) -> Some rng
+
 let sigelt_attrs (se : sigelt) : list<attribute> =
     se.sigattrs
 
