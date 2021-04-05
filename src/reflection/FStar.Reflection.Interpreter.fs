@@ -236,11 +236,16 @@ let reflection_primops : list<Cfg.primitive_step> = [
     mk1 "inspect_range"         inspect_range         e_range             E.e_rng_view
                                 inspect_range         NBET.e_range        NRE.e_rng_view;
 
-    mk1 "range_of_term"         range_of_term        E.e_term            e_range
-                                range_of_term        NRE.e_term          NBET.e_range;
+    mk1 "range_of_term"         range_of_term         E.e_term            e_range
+                                range_of_term         NRE.e_term          NBET.e_range;
 
-    mk1 "range_of_sigelt"       range_of_sigelt      E.e_sigelt            e_range
-                                range_of_sigelt      NRE.e_sigelt          NBET.e_range;
+    mk1 "range_of_sigelt"       range_of_sigelt       E.e_sigelt          e_range
+                                range_of_sigelt       NRE.e_sigelt        NBET.e_range;
+
+    mk1 "comments_of_module"    comments_of_module    e_string_list       (e_list (e_tuple2 e_string e_range))
+                                comments_of_module    NBET.e_string_list  (NBET.e_list (NBET.e_tuple2 NBET.e_string NBET.e_range));
 ]
+// val comments_of_module: list<string> -> list<(string*Range.range)>
+
 
 let _ = List.iter FStar.TypeChecker.Cfg.register_extra_step reflection_primops

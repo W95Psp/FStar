@@ -102,3 +102,5 @@ val subst : bv -> term -> term -> term
 val inspect_range: range -> rng_view
 val range_of_term: term -> range
 val range_of_sigelt: sigelt -> range
+val comments_of_module: name -> list (string * range)
+

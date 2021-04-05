@@ -423,6 +423,15 @@ let lookup_sigelt_range (env:Env.env) (ns:list<string>) : option<Range.range> =
     | None -> None
     | Some (_, rng) -> Some rng
 
+let comments_of_module (ns:list<string>): list<(string*Range.range)>
+  = let path = String.concat "." ns ^ ".fst" in // TODO: take care of
+                                                // search path +
+                                                // interfaces, I guess
+                                                // this already exist
+                                                // somewhere
+    let _,comments = FStar.Parser.Driver.parse_file path in
+    comments
+
 let sigelt_attrs (se : sigelt) : list<attribute> =
     se.sigattrs
 
