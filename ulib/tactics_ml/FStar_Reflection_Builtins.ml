@@ -28,6 +28,7 @@ let inspect_ln              = RB.inspect_ln
 let pack_ln                 = RB.pack_ln
 let inspect_comp            = RB.inspect_comp
 let pack_comp               = RB.pack_comp
+let comments_of_module      = RB.comments_of_module
 let inspect_sigelt          = RB.inspect_sigelt
 let pack_sigelt             = RB.pack_sigelt
 let inspect_bv              = RB.inspect_bv
