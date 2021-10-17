@@ -19,10 +19,10 @@ module FStar.Seq.Properties
 open FStar.Seq.Base
 module Seq = FStar.Seq.Base
 
-let lseq (a: Type) (l: nat) : Type =
+let lseq (a: Type) (l: nat) : Tot Type =
     s: Seq.seq a { Seq.length s == l }
 
-let indexable (#a:Type) (s:Seq.seq a) (j:int) = 0 <= j /\ j < Seq.length s
+let indexable (#a:Type) (s:Seq.seq a) (j:int): Tot _ = 0 <= j /\ j < Seq.length s
 
 val lemma_append_inj_l: #a:Type -> s1:seq a -> s2:seq a -> t1:seq a -> t2:seq a{length s1 = length t1 /\ equal (append s1 s2) (append t1 t2)} -> i:nat{i < length s1}
   -> Lemma (index s1 i == index t1 i)
@@ -738,7 +738,7 @@ val lemma_seq_sortwith_correctness (#a:eqtype) (f:a -> a -> Tot int) (s:seq a)
    is a sorted permutation of the input sequence with the same length
 *)
 let sort_lseq (#a:eqtype) #n (f:tot_ord a) (s:lseq a n)
-  : s':lseq a n{sorted f s' /\ permutation a s s'} =
+  : Tot (s':lseq a n{sorted f s' /\ permutation a s s'}) =
   lemma_seq_sortwith_correctness (L.compare_of_bool f) s;
   let s' = sortWith (L.compare_of_bool f) s in
   perm_len s s';

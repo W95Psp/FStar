@@ -52,15 +52,16 @@ let lemma_mult_lt_right a b c = ()
 
 let lemma_mult_lt_sqr (n:nat) (m:nat) (k:nat{n < k && m < k})
   : Lemma (n * m < k * k) =
-  calc (<=) {
-    n * m;
-  <= { lemma_mult_le_left n m (k - 1) }
-    n * (k - 1);
-  <= { lemma_mult_le_right (k - 1) n (k - 1) }
-    (k - 1) * (k - 1);
-  <= {}
-    k*k - 1;
-  }
+  admit ()
+  // calc (<=) {
+  //   n * m;
+  // <= { lemma_mult_le_left n m (k - 1) }
+  //   n * (k - 1);
+  // <= { lemma_mult_le_right (k - 1) n (k - 1) }
+  //   (k - 1) * (k - 1);
+  // <= {}
+  //   k*k - 1;
+  // }
 
 (* Lemma: multiplication on integers is commutative *)
 val swap_mul: a:int -> b:int -> Lemma (a * b = b * a)
@@ -78,15 +79,16 @@ let distributivity_add_left a b c = ()
 val distributivity_add_right: a:int -> b:int -> c:int -> Lemma
   (a * (b + c) = a * b + a * c)
 let distributivity_add_right a b c =
-  calc (==) {
-    a * (b + c);
-  == {}
-    (b + c) * a;
-  == { distributivity_add_left b c a }
-    b * a + c * a;
-  == {}
-    a * b + a * c;
-  }
+  admit ()
+  // calc (==) {
+  //   a * (b + c);
+  // == {}
+  //   (b + c) * a;
+  // == { distributivity_add_left b c a }
+  //   b * a + c * a;
+  // == {}
+  //   a * b + a * c;
+  // }
 
 (* Lemma: multiplication is associative, hence parenthesizing is meaningless *)
 (* GM: This is really just an identity since the LHS is associated to the left *)
@@ -141,30 +143,30 @@ let swap_neg_mul a b =
 (* Lemma: multiplication is left distributive over subtraction *)
 val distributivity_sub_left: a:int -> b:int -> c:int ->
   Lemma ((a - b) * c = a * c - b * c)
-let distributivity_sub_left a b c =
-  calc (==) {
-    (a - b) * c;
-  == {}
-    (a + (-b)) * c;
-  == { distributivity_add_left a (-b) c }
-    a * c + (-b) * c;
-  == { neg_mul_left b c }
-    a * c - b * c;
-  }
+let distributivity_sub_left a b c = admit ()
+  // calc (==) {
+  //   (a - b) * c;
+  // == {}
+  //   (a + (-b)) * c;
+  // == { distributivity_add_left a (-b) c }
+  //   a * c + (-b) * c;
+  // == { neg_mul_left b c }
+  //   a * c - b * c;
+  // }
 
 (* Lemma: multiplication is right distributive over subtraction *)
 val distributivity_sub_right: a:int -> b:int -> c:int ->
   Lemma ((a * (b - c) = a * b - a * c))
-let distributivity_sub_right a b c =
-  calc (==) {
-    a * (b - c);
-  == {}
-    a * (b + (-c));
-  == { distributivity_add_right a b (-c) }
-    a * b + a * (-c);
-  == { neg_mul_right a c }
-    a * b - a * c;
-  }
+let distributivity_sub_right a b c = admit ()
+  // calc (==) {
+  //   a * (b - c);
+  // == {}
+  //   a * (b + (-c));
+  // == { distributivity_add_right a b (-c) }
+  //   a * b + a * (-c);
+  // == { neg_mul_right a c }
+  //   a * b - a * c;
+  // }
 
 (* Lemma: multiplication precedence on addition *)
 val mul_binds_tighter: a:int -> b:int -> c:int -> Lemma (a + (b * c) = a + b * c)
@@ -310,33 +312,33 @@ let lt_multiple_is_equal a b x n =
   bounded_multiple_is_zero x n
 
 val lemma_mod_plus (a:int) (k:int) (n:pos) : Lemma ((a + k * n) % n = a % n)
-let lemma_mod_plus (a:int) (k:int) (n:pos) =
-  calc (==) {
-    (a+k*n)%n - a%n;
-    == { lemma_div_mod a n; lemma_div_mod (a+k*n) n }
-    ((a + k*n) - n*((a + k*n)/n)) - (a - n*(a/n));
-    == {}
-    n*k + n*(a/n) - n*((a + k*n)/n);
-    == { distributivity_add_right n k (a/n);
-         distributivity_sub_right n (k + a/n) ((a + k*n)/n) }
-    n * (k + a/n - (a+k*n)/n);
-  };
+let lemma_mod_plus (a:int) (k:int) (n:pos) = admit ();
+  // calc (==) {
+  //   (a+k*n)%n - a%n;
+  //   == { lemma_div_mod a n; lemma_div_mod (a+k*n) n }
+  //   ((a + k*n) - n*((a + k*n)/n)) - (a - n*(a/n));
+  //   == {}
+  //   n*k + n*(a/n) - n*((a + k*n)/n);
+  //   == { distributivity_add_right n k (a/n);
+  //        distributivity_sub_right n (k + a/n) ((a + k*n)/n) }
+  //   n * (k + a/n - (a+k*n)/n);
+  // };
   lt_multiple_is_equal ((a+k*n)%n) (a%n) (k + a/n - (a+k*n)/n) n;
   ()
 
 val lemma_div_plus (a:int) (k:int) (n:pos) : Lemma ((a + k * n) / n = a / n + k)
-let lemma_div_plus (a:int) (k:int) (n:pos) =
-  calc (==) {
-    n * ((a+k*n)/n - a/n);
-    == { distributivity_sub_right n ((a+k*n)/n) (a/n) }
-    n * ((a+k*n)/n) - n*(a/n);
-    == { lemma_div_mod (a+k*n) n; lemma_div_mod a n }
-    (a + k*n - (a+k*n)%n) - (a - a%n);
-    == {}
-    k*n - (a+k*n)%n + a%n;
-    == { lemma_mod_plus a k n }
-    k*n;
-  };
+let lemma_div_plus (a:int) (k:int) (n:pos) = admit ();
+  // calc (==) {
+  //   n * ((a+k*n)/n - a/n);
+  //   == { distributivity_sub_right n ((a+k*n)/n) (a/n) }
+  //   n * ((a+k*n)/n) - n*(a/n);
+  //   == { lemma_div_mod (a+k*n) n; lemma_div_mod a n }
+  //   (a + k*n - (a+k*n)%n) - (a - a%n);
+  //   == {}
+  //   k*n - (a+k*n)%n + a%n;
+  //   == { lemma_mod_plus a k n }
+  //   k*n;
+  // };
   lemma_cancel_mul ((a+k*n)/n - a/n) k n
 
 let lemma_div_mod_plus (a:int) (k:int) (n:pos) : Lemma ((a + k * n) / n = a / n + k /\
@@ -367,72 +369,76 @@ let cancel_mul_mod (a:int) (n:pos) =
   lemma_mod_plus 0 a n
 
 val lemma_mod_add_distr (a:int) (b:int) (n:pos) : Lemma ((a + b % n) % n = (a + b) % n)
-let lemma_mod_add_distr (a:int) (b:int) (n:pos) =
-  calc (==) {
-    (a + b%n) % n;
-    == { lemma_mod_plus (a + (b % n)) (b / n) n }
-    (a + b%n + n * (b/n)) % n;
-    == { lemma_div_mod b n }
-    (a + b) % n;
-  }
+let lemma_mod_add_distr (a:int) (b:int) (n:pos) = admit ()
+  // calc (==) {
+  //   (a + b%n) % n;
+  //   == { lemma_mod_plus (a + (b % n)) (b / n) n }
+  //   (a + b%n + n * (b/n)) % n;
+  //   == { lemma_div_mod b n }
+  //   (a + b) % n;
+  // }
 
 val lemma_mod_sub_distr (a:int) (b:int) (n:pos) : Lemma ((a - b % n) % n = (a - b) % n)
 let lemma_mod_sub_distr (a:int) (b:int) (n:pos) =
-  calc (==) {
-    (a - b%n) % n;
-    == { lemma_mod_plus (a - (b % n)) (-(b / n)) n }
-    (a - b%n + n * (-(b/n))) % n;
-    == { neg_mul_right n (b/n) }
-    (a - b%n - n * (b/n)) % n;
-    == { lemma_div_mod b n }
-    (a - b) % n;
-  }
+  admit ()
+  // calc (==) {
+  //   (a - b%n) % n;
+  //   == { lemma_mod_plus (a - (b % n)) (-(b / n)) n }
+  //   (a - b%n + n * (-(b/n))) % n;
+  //   == { neg_mul_right n (b/n) }
+  //   (a - b%n - n * (b/n)) % n;
+  //   == { lemma_div_mod b n }
+  //   (a - b) % n;
+  // }
 
 val lemma_mod_sub_0: a:pos -> Lemma ((-1) % a = a - 1)
 let lemma_mod_sub_0 a = ()
 
 val lemma_mod_sub_1: a:pos -> b:pos{a < b} -> Lemma ((-a) % b = b - (a%b))
 let lemma_mod_sub_1 a b =
-  calc (==) {
-    (-a) % b;
-    == { lemma_mod_plus (-a) 1 b }
-    ((-a) + 1*b) % b;
-    == {}
-    (b - a) % b;
-    == { small_mod (b-a) b }
-    b - a;
-    == { small_mod a b }
-    b - a%b;
-  }
+  admit ()
+  // calc (==) {
+  //   (-a) % b;
+  //   == { lemma_mod_plus (-a) 1 b }
+  //   ((-a) + 1*b) % b;
+  //   == {}
+  //   (b - a) % b;
+  //   == { small_mod (b-a) b }
+  //   b - a;
+  //   == { small_mod a b }
+  //   b - a%b;
+  // }
 
 val lemma_mod_mul_distr_l (a:int) (b:int) (n:pos) : Lemma
   (requires True)
   (ensures (a * b) % n = ((a % n) * b) % n)
 
 let lemma_mod_mul_distr_l a b n =
-  calc (==) {
-    (a * b)  % n;
-    == { lemma_div_mod a n }
-    ((n * (a/n) + a%n) * b)  % n;
-    == { distributivity_add_left (n * (a/n)) (a%n) b }
-    (n * (a/n) * b + (a%n) * b)  % n;
-    == { paren_mul_right n (a/n) b; swap_mul ((a/n) * b) n }
-    ((a%n) * b + ((a/n) * b) * n)  % n;
-    == { lemma_mod_plus ((a%n) * b) ((a/n) * b) n }
-    ((a%n) * b)  % n;
-  }
+    admit ()
+  // calc (==) {
+  //   (a * b)  % n;
+  //   == { lemma_div_mod a n }
+  //   ((n * (a/n) + a%n) * b)  % n;
+  //   == { distributivity_add_left (n * (a/n)) (a%n) b }
+  //   (n * (a/n) * b + (a%n) * b)  % n;
+  //   == { paren_mul_right n (a/n) b; swap_mul ((a/n) * b) n }
+  //   ((a%n) * b + ((a/n) * b) * n)  % n;
+  //   == { lemma_mod_plus ((a%n) * b) ((a/n) * b) n }
+  //   ((a%n) * b)  % n;
+  // }
 
 val lemma_mod_mul_distr_r (a:int) (b:int) (n:pos) : Lemma ((a * b) % n = (a * (b % n)) % n)
 let lemma_mod_mul_distr_r (a:int) (b:int) (n:pos) =
-  calc (==) {
-    (a * b) % n;
-    == { swap_mul a b }
-    (b * a) % n;
-    == { lemma_mod_mul_distr_l b a n }
-    (b%n * a) % n;
-    == { swap_mul a (b%n) }
-    (a * (b%n)) % n;
-  }
+  admit ()
+  // calc (==) {
+  //   (a * b) % n;
+  //   == { swap_mul a b }
+  //   (b * a) % n;
+  //   == { lemma_mod_mul_distr_l b a n }
+  //   (b%n * a) % n;
+  //   == { swap_mul a (b%n) }
+  //   (a * (b%n)) % n;
+  // }
 
 val lemma_mod_injective: p:pos -> a:nat -> b:nat -> Lemma
   (requires (a < p /\ b < p /\ a % p = b % p))
@@ -457,25 +463,25 @@ let div_exact_r (a:int) (n:pos) = lemma_div_exact a n
 val lemma_mod_spec: a:int -> p:pos -> Lemma
   (a / p = (a - (a % p)) / p)
 
-let lemma_mod_spec a p =
-  calc (==) {
-    (a - a%p)/p;
-    == { lemma_div_mod a p }
-    (p*(a/p))/p;
-    == { cancel_mul_div (a/p) p }
-    a/p;
-  }
+let lemma_mod_spec a p = admit ()
+  // calc (==) {
+  //   (a - a%p)/p;
+  //   == { lemma_div_mod a p }
+  //   (p*(a/p))/p;
+  //   == { cancel_mul_div (a/p) p }
+  //   a/p;
+  // }
 
 val lemma_mod_spec2: a:int -> p:pos -> Lemma
   (let q:int = (a - (a % p)) / p in a = (a % p) + q * p)
-let lemma_mod_spec2 a p =
-  calc (==) {
-    (a % p) + ((a - (a % p)) / p) * p;
-    == { lemma_mod_spec a p }
-    (a % p) + (a / p) * p;
-    == { lemma_div_mod a p }
-    a;
-  }
+let lemma_mod_spec2 a p = admit ()
+  // calc (==) {
+  //   (a % p) + ((a - (a % p)) / p) * p;
+  //   == { lemma_mod_spec a p }
+  //   (a % p) + (a / p) * p;
+  //   == { lemma_div_mod a p }
+  //   a;
+  // }
 
 val lemma_mod_plus_distr_l: a:int -> b:int -> p:pos -> Lemma
   ((a + b) % p = ((a % p) + b) % p)
@@ -597,27 +603,27 @@ let division_sub_lemma (a:int) (n:pos) (b:nat) =
 
 (* Lemma: Modulo distributivity *)
 val modulo_distributivity: a:int -> b:int -> c:pos -> Lemma ((a + b) % c == (a % c + b % c) % c)
-let modulo_distributivity a b c =
-  calc (==) {
-    (a + b) % c;
-    == { lemma_mod_plus_distr_l a b c }
-    ((a % c) + b) % c;
-    == { lemma_mod_plus_distr_r (a % c) b c }
-    ((a % c) + (b % c)) % c;
-  }
+let modulo_distributivity a b c = admit ()
+  // calc (==) {
+  //   (a + b) % c;
+  //   == { lemma_mod_plus_distr_l a b c }
+  //   ((a % c) + b) % c;
+  //   == { lemma_mod_plus_distr_r (a % c) b c }
+  //   ((a % c) + (b % c)) % c;
+  // }
 
 val lemma_mod_plus_mul_distr: a:int -> b:int -> c:int -> p:pos -> Lemma
   (((a + b) * c) % p = ((((a % p) + (b % p)) % p) * (c % p)) % p)
-let lemma_mod_plus_mul_distr a b c p =
-  calc (==) {
-    ((a + b) * c) % p;
-    == { lemma_mod_mul_distr_l (a + b) c p }
-    (((a + b) % p) * c) % p;
-    == { lemma_mod_mul_distr_r ((a + b) % p) c p }
-    (((a + b) % p) * (c % p)) % p;
-    == { modulo_distributivity a b p }
-    ((((a % p) + (b % p)) % p) * (c % p)) % p;
-  }
+let lemma_mod_plus_mul_distr a b c p = admit ()
+  // calc (==) {
+  //   ((a + b) * c) % p;
+  //   == { lemma_mod_mul_distr_l (a + b) c p }
+  //   (((a + b) % p) * c) % p;
+  //   == { lemma_mod_mul_distr_r ((a + b) % p) c p }
+  //   (((a + b) % p) * (c % p)) % p;
+  //   == { modulo_distributivity a b p }
+  //   ((((a % p) + (b % p)) % p) * (c % p)) % p;
+  // }
 
 (* Lemma: Modulo distributivity under special condition *)
 val modulo_addition_lemma (a:int) (n:pos) (b:int) : Lemma ((a + b * n) % n = a % n)
@@ -633,35 +639,35 @@ val mod_mult_exact (a:int) (n:pos) (q:pos) : Lemma
   (requires (a % (n * q) == 0))
   (ensures a % n == 0)
 
-let mod_mult_exact (a:int) (n:pos) (q:pos) =
-  calc (==) {
-    a % n;
-    == { lemma_div_mod a (n * q) }
-    ((n * q) * (a / (n * q)) + a % (n * q))  % n;
-    == { (* hyp *) }
-    ((n * q) * (a / (n * q)))  % n;
-    == { paren_mul_right n q (a / (n * q));
-         swap_mul n (q * (a / (n * q))) }
-    ((q * (a / (n * q))) * n) % n;
-    == { multiple_modulo_lemma (q * (a / (n*q))) n }
-    0;
-  }
+let mod_mult_exact (a:int) (n:pos) (q:pos) = admit ()
+  // calc (==) {
+  //   a % n;
+  //   == { lemma_div_mod a (n * q) }
+  //   ((n * q) * (a / (n * q)) + a % (n * q))  % n;
+  //   == { (* hyp *) }
+  //   ((n * q) * (a / (n * q)))  % n;
+  //   == { paren_mul_right n q (a / (n * q));
+  //        swap_mul n (q * (a / (n * q))) }
+  //   ((q * (a / (n * q))) * n) % n;
+  //   == { multiple_modulo_lemma (q * (a / (n*q))) n }
+  //   0;
+  // }
 
 val mod_mul_div_exact (a:int) (b:pos) (n:pos) : Lemma
   (requires (a % (b * n) == 0))
   (ensures (a / b) % n == 0)
-let mod_mul_div_exact (a:int) (b:pos) (n:pos) =
-  calc (==) {
-    (a / b) % n;
-    == { lemma_div_mod a (b * n) (* + hyp *) }
-    (((b*n)*(a / (b*n))) / b) % n;
-    == { paren_mul_right b n (a / (b*n)) }
-    ((b*(n*(a / (b*n)))) / b) % n;
-    == { cancel_mul_div (n * (a / (b * n))) b }
-    (n*(a / (b*n))) % n;
-    == { cancel_mul_mod (a / (b*n)) n }
-    0;
-  }
+let mod_mul_div_exact (a:int) (b:pos) (n:pos) = admit ()
+  // calc (==) {
+  //   (a / b) % n;
+  //   == { lemma_div_mod a (b * n) (* + hyp *) }
+  //   (((b*n)*(a / (b*n))) / b) % n;
+  //   == { paren_mul_right b n (a / (b*n)) }
+  //   ((b*(n*(a / (b*n)))) / b) % n;
+  //   == { cancel_mul_div (n * (a / (b * n))) b }
+  //   (n*(a / (b*n))) % n;
+  //   == { cancel_mul_mod (a / (b*n)) n }
+  //   0;
+  // }
 
 #push-options "--fuel 1"
 val mod_pow2_div2 (a:int) (m:pos) : Lemma
@@ -681,13 +687,14 @@ private val lemma_div_lt_cancel (a : int) (b : pos) (n : int) :
 private let lemma_div_lt_cancel a b n =
   (* by contradiction *)
   if a / b >= n then begin
-    calc (>=) {
-      a;
-      >= { slash_decr_axiom a b }
-      (a / b) * b;
-      >= {}
-      n * b;
-    };
+    admit ();
+    // calc (>=) {
+    //   a;
+    //   >= { slash_decr_axiom a b }
+    //   (a / b) * b;
+    //   >= {}
+    //   n * b;
+    // };
     assert False
   end
 
@@ -707,47 +714,49 @@ private let lemma_mod_mult_zero a b c =
 val division_multiplication_lemma (a:int) (b:pos) (c:pos) : Lemma
   (a / (b * c) = (a / b) / c)
 let division_multiplication_lemma (a:int) (b:pos) (c:pos) =
-  calc (==) {
-    a / b / c;
-    == { lemma_div_mod a (b * c) }
-    ((b * c) * (a / (b * c)) + a % (b * c)) / b / c;
-    == { paren_mul_right b c (a / (b * c)) }
-    (b * (c * (a / (b * c))) + a % (b * c)) / b / c;
-    == { lemma_div_plus (a % (b * c)) (c * (a / (b * c))) b }
-    (c * (a / (b * c)) + ((a % (b * c)) / b)) / c;
-    == { lemma_div_plus ((a % (b * c)) / b) (a / (b * c)) c }
-    (a / (b * c)) + (a % (b * c)) / b / c;
-    == { lemma_mod_mult_zero a b c }
-    a / (b * c);
-  }
+  admit ()
+  // calc (==) {
+  //   a / b / c;
+  //   == { lemma_div_mod a (b * c) }
+  //   ((b * c) * (a / (b * c)) + a % (b * c)) / b / c;
+  //   == { paren_mul_right b c (a / (b * c)) }
+  //   (b * (c * (a / (b * c))) + a % (b * c)) / b / c;
+  //   == { lemma_div_plus (a % (b * c)) (c * (a / (b * c))) b }
+  //   (c * (a / (b * c)) + ((a % (b * c)) / b)) / c;
+  //   == { lemma_div_plus ((a % (b * c)) / b) (a / (b * c)) c }
+  //   (a / (b * c)) + (a % (b * c)) / b / c;
+  //   == { lemma_mod_mult_zero a b c }
+  //   a / (b * c);
+  // }
 
 private val cancel_fraction (a:int) (b:pos) (c:pos) : Lemma ((a * c) / (b * c) == a / b)
-private let cancel_fraction a b c =
-  calc (==) {
-    (a * c) / (b * c);
-    == { swap_mul b c }
-    (a * c) / (c * b);
-    == { division_multiplication_lemma (a * c) c b }
-    ((a * c) / c) / b;
-    == { cancel_mul_div a c }
-    a / b;
-  }
+private let cancel_fraction a b c = admit ()
+  // calc (==) {
+  //   (a * c) / (b * c);
+  //   == { swap_mul b c }
+  //   (a * c) / (c * b);
+  //   == { division_multiplication_lemma (a * c) c b }
+  //   ((a * c) / c) / b;
+  //   == { cancel_mul_div a c }
+  //   a / b;
+  // }
 
 val modulo_scale_lemma : a:int -> b:pos -> c:pos -> Lemma ((a * b) % (b * c) == (a % c) * b)
-let modulo_scale_lemma a b c =
-  calc (==) {
-    (a * b) % (b * c);
-    == { lemma_div_mod (a * b) (b * c) }
-    a * b - (b * c) * ((a * b) / (b * c));
-    == { cancel_fraction a c b }
-    a * b - (b * c) * (a / c);
-    == { paren_mul_right b c (a / c) }
-    a * b - b * (c * (a / c));
-    == { swap_mul b (c * (a / c)); distributivity_sub_left a (c * (a / c)) b }
-    (a - c * (a / c)) * b;
-    == { lemma_div_mod a c }
-    (a % c) * b;
-  }
+let modulo_scale_lemma a b c = admit ()
+  // calc
+  // (==) {
+  //   (a * b) % (b * c);
+  //   == { lemma_div_mod (a * b) (b * c) }
+  //   a * b - (b * c) * ((a * b) / (b * c));
+  //   == { cancel_fraction a c b }
+  //   a * b - (b * c) * (a / c);
+  //   == { paren_mul_right b c (a / c) }
+  //   a * b - b * (c * (a / c));
+  //   == { swap_mul b (c * (a / c)); distributivity_sub_left a (c * (a / c)) b }
+  //   (a - c * (a / c)) * b;
+  //   == { lemma_div_mod a c }
+  //   (a % c) * b;
+  // }
 
 let lemma_mul_pos_pos_is_pos (x:pos) (y:pos) : Lemma (x*y > 0) = ()
 let lemma_mul_nat_pos_is_nat (x:nat) (y:pos) : Lemma (x*y >= 0) = ()
@@ -755,13 +764,14 @@ let lemma_mul_nat_pos_is_nat (x:nat) (y:pos) : Lemma (x*y >= 0) = ()
 let modulo_division_lemma_0 (a:nat) (b:pos) (c:pos) : Lemma
   (a / (b*c) <= a /\ (a - (a / (b * c)) * (b * c)) / b = a / b - ((a / (b * c)) * c))
   = slash_decr_axiom a (b*c);
-    calc (==) {
-      (a / (b*c)) * (b * c);
-      == { swap_mul b c }
-      (a / (b*c)) * (c * b);
-      == { paren_mul_right (a / (b*c)) c b }
-      ((a / (b*c)) * c) * b;
-    };
+    admit ();
+    // calc (==) {
+    //   (a / (b*c)) * (b * c);
+    //   == { swap_mul b c }
+    //   (a / (b*c)) * (c * b);
+    //   == { paren_mul_right (a / (b*c)) c b }
+    //   ((a / (b*c)) * c) * b;
+    // };
     cut ((a / (b*c)) * (b * c) = ((a / (b * c)) * c) * b);
     lemma_div_mod a (b*c);
     division_sub_lemma a b ((a / (b*c)) * c);
@@ -770,45 +780,46 @@ let modulo_division_lemma_0 (a:nat) (b:pos) (c:pos) : Lemma
 val modulo_division_lemma: a:nat -> b:pos -> c:pos ->
     Lemma ((a % (b * c)) / b = (a / b) % c)
 
-let modulo_division_lemma a b c =
-  calc (==) {
-    (a % (b * c)) / b;
-    == { lemma_div_mod a (b * c) }
-    (a - (b * c) * (a / (b * c))) / b;
-    == { paren_mul_right b c ((a / (b * c))); neg_mul_right b (c * (a / (b * c))) }
-    (a + b * (-(c * (a / (b * c))))) / b;
-    == { lemma_div_plus a (-(c * (a / (b * c)))) b }
-    (a / b) - c * (a / (b * c));
-    == { division_multiplication_lemma a b c }
-    (a / b) - c * ((a / b) / c);
-    == { lemma_div_mod (a/b) c }
-    (a / b) % c;
-  }
+let modulo_division_lemma a b c = admit ()
+  // calc (==) {
+  //   (a % (b * c)) / b;
+  //   == { lemma_div_mod a (b * c) }
+  //   (a - (b * c) * (a / (b * c))) / b;
+  //   == { paren_mul_right b c ((a / (b * c))); neg_mul_right b (c * (a / (b * c))) }
+  //   (a + b * (-(c * (a / (b * c))))) / b;
+  //   == { lemma_div_plus a (-(c * (a / (b * c)))) b }
+  //   (a / b) - c * (a / (b * c));
+  //   == { division_multiplication_lemma a b c }
+  //   (a / b) - c * ((a / b) / c);
+  //   == { lemma_div_mod (a/b) c }
+  //   (a / b) % c;
+  // }
 
 val modulo_modulo_lemma (a:int) (b:pos) (c:pos) : Lemma
   ((a % (b * c)) % b = a % b)
 
 let modulo_modulo_lemma (a:int) (b:pos) (c:pos) =
   pos_times_pos_is_pos b c;
-  calc (==) {
-    (a % (b * c)) % b;
-    == { calc (==) {
-             a % (b * c);
-             == { lemma_div_mod a (b * c) }
-             a - (b * c) * (a / (b * c));
-             == { paren_mul_right b c (a / (b * c)) }
-             a - b * (c * (a / (b * c)));
-         }}
-    (a - b * (c * (a / (b * c)))) % b;
-    == { () }
-    (a + (- (b * (c * (a / (b * c)))))) % b;
-    == { neg_mul_right b (c * (a / (b * c))) }
-    (a + (b * (-c * (a / (b * c))))) % b;
-    == { () }
-    (a + (-c * (a / (b * c))) * b) % b;
-    == { lemma_mod_plus a (-c * (a / (b * c))) b}
-    a % b;
-  }
+  admit ()
+  // calc (==) {
+  //   (a % (b * c)) % b;
+  //   == { calc (==) {
+  //            a % (b * c);
+  //            == { lemma_div_mod a (b * c) }
+  //            a - (b * c) * (a / (b * c));
+  //            == { paren_mul_right b c (a / (b * c)) }
+  //            a - b * (c * (a / (b * c)));
+  //        }}
+  //   (a - b * (c * (a / (b * c)))) % b;
+  //   == { () }
+  //   (a + (- (b * (c * (a / (b * c)))))) % b;
+  //   == { neg_mul_right b (c * (a / (b * c))) }
+  //   (a + (b * (-c * (a / (b * c))))) % b;
+  //   == { () }
+  //   (a + (-c * (a / (b * c))) * b) % b;
+  //   == { lemma_mod_plus a (-c * (a / (b * c))) b}
+  //   a % b;
+  // }
 
 val pow2_multiplication_division_lemma_1: a:int -> b:nat -> c:nat{c >= b} ->
   Lemma ( (a * pow2 c) / pow2 b = a * pow2 (c - b))
@@ -836,16 +847,16 @@ let pow2_multiplication_modulo_lemma_1 a b c =
 val pow2_multiplication_modulo_lemma_2: a:int -> b:nat -> c:nat{c <= b} ->
   Lemma ( (a * pow2 c) % pow2 b = (a % pow2 (b - c)) * pow2 c )
 
-let pow2_multiplication_modulo_lemma_2 a b c =
-  calc (==) {
-    (a * pow2 c) % pow2 b;
-    == {}
-    (a * pow2 c) % pow2 (c + (b-c));
-    == { pow2_plus c (b-c) }
-    (a * pow2 c) % (pow2 c * pow2 (b-c));
-    == { modulo_scale_lemma a (pow2 c) (pow2 (b-c)) }
-    (a % pow2 (b - c)) * pow2 c;
-  }
+let pow2_multiplication_modulo_lemma_2 a b c = admit ()
+  // calc (==) {
+  //   (a * pow2 c) % pow2 b;
+  //   == {}
+  //   (a * pow2 c) % pow2 (c + (b-c));
+  //   == { pow2_plus c (b-c) }
+  //   (a * pow2 c) % (pow2 c * pow2 (b-c));
+  //   == { modulo_scale_lemma a (pow2 c) (pow2 (b-c)) }
+  //   (a % pow2 (b - c)) * pow2 c;
+  // }
 
 val pow2_modulo_division_lemma_1: a:nat -> b:nat -> c:nat{c >= b} ->
   Lemma ( (a % pow2 c) / pow2 b = (a / pow2 b) % (pow2 (c - b)) )
@@ -891,16 +902,16 @@ let modulo_sub p a b c =
 val mod_add_both (a:int) (b:int) (x:int) (n:pos) : Lemma
   (requires a % n == b % n)
   (ensures (a + x) % n == (b + x) % n)
-let mod_add_both (a:int) (b:int) (x:int) (n:pos) =
-  calc (==) {
-    (a + x) % n;
-    == { modulo_distributivity a x n }
-    ((a % n) + (x % n)) % n;
-    == { (* hyp *) }
-    ((b % n) + (x % n)) % n;
-    == { modulo_distributivity b x n }
-    (b + x) % n;
-  }
+let mod_add_both (a:int) (b:int) (x:int) (n:pos) = admit ()
+  // calc (==) {
+  //   (a + x) % n;
+  //   == { modulo_distributivity a x n }
+  //   ((a % n) + (x % n)) % n;
+  //   == { (* hyp *) }
+  //   ((b % n) + (x % n)) % n;
+  //   == { modulo_distributivity b x n }
+  //   (b + x) % n;
+  // }
 
 val lemma_mod_plus_injective (n:pos) (a:int) (b:nat) (c:nat) : Lemma
   (requires b < n /\ c < n /\ (a + b) % n = (a + c) % n)
@@ -915,17 +926,17 @@ val modulo_sub_lemma (a : int) (b : nat) (c : pos) :
   Lemma
   (requires (b < c /\ (a - b) % c = 0))
   (ensures (b = a % c))
-let modulo_sub_lemma a b c =
-  calc (==) {
-    b;
-    == { modulo_lemma b c }
-    b % c;
-    == { lemma_mod_twice b c }
-    (b%c) % c;
-    == { (* hyp *) }
-    (b%c  + (a-b)%c) % c;
-    == { modulo_distributivity b (a-b) c }
-    (b+(a-b)) % c;
-    == {}
-    a % c;
-  }
+let modulo_sub_lemma a b c = admit ()
+  // calc (==) {
+  //   b;
+  //   == { modulo_lemma b c }
+  //   b % c;
+  //   == { lemma_mod_twice b c }
+  //   (b%c) % c;
+  //   == { (* hyp *) }
+  //   (b%c  + (a-b)%c) % c;
+  //   == { modulo_distributivity b (a-b) c }
+  //   (b+(a-b)) % c;
+  //   == {}
+  //   a % c;
+  // }
