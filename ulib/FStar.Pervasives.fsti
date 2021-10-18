@@ -684,11 +684,6 @@ val allow_inversion (a: Type) : Pure unit (requires True) (ensures (fun x -> inv
 val invertOption (a: Type)
     : Lemma (requires True) (ensures (forall (x: option a). None? x \/ Some? x)) [SMTPat (option a)]
 
-(** Values of type [a] or type [b] *)
-type either a b =
-  | Inl : v: a -> either a b
-  | Inr : v: b -> either a b
-
 (** Projections for the components of a dependent pair *)
 let dfst (#a: Type) (#b: a -> GTot Type) (t: dtuple2 a b)
     : Tot a
@@ -783,6 +778,12 @@ type __internal_ocaml_attributes =
   | CIfDef
   | CMacro (* KreMLin-only: on a given `val foo`, compile if foo with #ifdef. *)
 (* KreMLin-only: for a top-level `let v = e`, compile as a macro *)
+
+(** Values of type [a] or type [b] *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
+type either a b =
+  | Inl : v: a -> either a b
+  | Inr : v: b -> either a b
 
 (** The [inline_let] attribute on a local let-binding, instructs the
     extraction pipeline to inline the definition. This may be both to

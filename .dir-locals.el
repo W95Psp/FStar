@@ -1,12 +1,23 @@
 ((fstar-mode
   (fstar-subp-sloppy . nil)
-  (eval . (defun fstar-subp-prover-args-for-compiler-hacking-fixed ()
-	     "Compute arguments suitable for hacking on the F* compiler."
-	     `("--lax"
-	       ;; "--admit_smt_queries" "true"
-	       "--MLish" "--warn_error" "-272"
-	       "--include" "/home/lucas/FStar/fstar-missing-files/" 
-	       ,@(-mapcat (lambda (dir) `("--include" ,dir))
-			  (fstar-subp--prover-includes-for-compiler-hacking))))
-	   )
-  (fstar-subp-prover-args . fstar-subp-prover-args-for-compiler-hacking-fixed)))
+  (eval .
+	(progn (defun my-fstar-compute-prover-args-using-make ()
+		 "Construct arguments to pass to F* by calling make."
+		 (with-demoted-errors "Error when constructing arg string: %S"
+		   (split-string
+		    (car (last (process-lines "make"
+					      "-C" (append (getenv "FSTAR_SOURCES_ROOT") "/src")
+					      "-f" "Makefile.edit" "--quiet"
+					      (concat (file-name-nondirectory buffer-file-name) "-dev")
+					      )
+			       )
+			 )
+		    )
+		   )
+		 )
+	       (setq fstar-subp-prover-args #'my-fstar-compute-prover-args-using-make)
+	       )
+	)
+  )
+ )
+

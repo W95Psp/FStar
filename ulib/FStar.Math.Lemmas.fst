@@ -369,14 +369,14 @@ let cancel_mul_mod (a:int) (n:pos) =
   lemma_mod_plus 0 a n
 
 val lemma_mod_add_distr (a:int) (b:int) (n:pos) : Lemma ((a + b % n) % n = (a + b) % n)
-let lemma_mod_add_distr (a:int) (b:int) (n:pos) = admit ()
-  // calc (==) {
-  //   (a + b%n) % n;
-  //   == { lemma_mod_plus (a + (b % n)) (b / n) n }
-  //   (a + b%n + n * (b/n)) % n;
-  //   == { lemma_div_mod b n }
-  //   (a + b) % n;
-  // }
+let lemma_mod_add_distr (a:int) (b:int) (n:pos) = //admit ()
+  calc (==) {
+    (a + b%n) % n;
+    == { lemma_mod_plus (a + (b % n)) (b / n) n }
+    (a + b%n + n * (b/n)) % n;
+    == { lemma_div_mod b n }
+    (a + b) % n;
+  }
 
 val lemma_mod_sub_distr (a:int) (b:int) (n:pos) : Lemma ((a - b % n) % n = (a - b) % n)
 let lemma_mod_sub_distr (a:int) (b:int) (n:pos) =

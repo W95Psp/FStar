@@ -134,7 +134,10 @@ let op_GreaterThanOrEqual x y = x >= y
 let op_Equality x y = x = y
 let op_disEquality x y = x<>y
 
+
 type nonrec exn = exn
+let pp_exn (_: Format.formatter) (_: exn) = "<EXN>"
+
 type 'a array' = 'a array[@@deriving yojson,show]
 type 'a array = 'a array'[@@deriving yojson,show]
 let strcat x y = x ^ y
