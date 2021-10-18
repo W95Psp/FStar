@@ -1,7 +1,7 @@
 open Prims
 type 'a __result =
   | Success of ('a * FStar_Tactics_Types.proofstate) 
-  | Failed of (Prims.exn * FStar_Tactics_Types.proofstate) 
+  | Failed of (Prims.exn * FStar_Tactics_Types.proofstate) [@@deriving show]
 let uu___is_Success : 'a . 'a __result -> Prims.bool =
   fun projectee -> match projectee with | Success _0 -> true | uu___ -> false
 let __proj__Success__item___0 :

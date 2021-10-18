@@ -111,6 +111,16 @@ endif
 	                    -e '/%type.*->.*/d' \
 	                  | cat -s >> $@
 
+
+
+FSTAR_MAIN_BYTE=_build/src/fstar/ml/main.byte
+$(FSTAR_MAIN_BYTE): export OCAMLFIND_IGNORE_DUPS_IN = $(shell ocamlfind query compiler-libs)
+$(FSTAR_MAIN_BYTE): $(GENERATED_FILES)
+	@echo "[OCAMLBUILD]"
+	$(Q)$(OCAMLBUILD) $(notdir $(FSTAR_MAIN_BYTE)) FStar_Syntax_Syntax.inferred.mli
+../../bin/fstar.byte: $(FSTAR_MAIN_BYTE)
+	$(Q)cp $^ $@
+
 # https://stackoverflow.com/questions/38294095/ocaml-how-to-solve-findlib-warnings-of-multiple-cmis
 FSTAR_MAIN_NATIVE=_build/src/fstar/ml/main.native
 $(FSTAR_MAIN_NATIVE): export OCAMLFIND_IGNORE_DUPS_IN = $(shell ocamlfind query compiler-libs)

@@ -1,7 +1,10 @@
 open Prims
 type ident = {
   idText: Prims.string ;
-  idRange: FStar_Compiler_Range.range }[@@deriving yojson,show]
+  idRange: FStar_Compiler_Range.range }[@@deriving yojson]
+let pp_ident (f: Ppx_deriving_runtime.Format.formatter) i
+  = Prims.pp_string f i.idText
+
 let (__proj__Mkident__item__idText : ident -> Prims.string) =
   fun projectee -> match projectee with | { idText; idRange;_} -> idText
 let (__proj__Mkident__item__idRange : ident -> FStar_Compiler_Range.range) =
@@ -14,6 +17,10 @@ type lident =
   ident: ident ;
   nsstr: Prims.string ;
   str: Prims.string }[@@deriving yojson,show]
+(* let pp_lident (f: Ppx_deriving_runtime.Format.formatter) i
+ *   = Ppx_deriving_runtime.Format.pp_print_string f "l::";
+ *     Prims.pp_string f i.ident *)
+
 let (__proj__Mklident__item__ns : lident -> ipath) =
   fun projectee ->
     match projectee with | { ns; ident = ident1; nsstr; str;_} -> ns

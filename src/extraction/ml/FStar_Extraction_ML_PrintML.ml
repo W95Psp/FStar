@@ -424,6 +424,7 @@ let skip_type_defn (current_module:string) (type_name:string) :bool =
   current_module = "FStar_Pervasives" && type_name = "option"
 
 let type_metadata (md : metadata): attributes option =
+  let md = BatList.unique (BatList.append md [PpxDerivingShow]) in
   let deriving = BatList.filter_map (function
     | PpxDerivingShow | PpxDerivingShowConstant _ -> Some "show"
     | PpxDerivingYoJson -> Some "yojson"

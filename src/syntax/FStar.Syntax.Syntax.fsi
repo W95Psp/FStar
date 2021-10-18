@@ -36,6 +36,7 @@ open FStar.VConfig
 // fs without fsi, and move the helpers into syntaxhelpers.fs / syntaxhelpers.fsi
 
 (* Objects with metadata *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type withinfo_t<'a> = {
   v: 'a;
   p: Range.range;
@@ -44,8 +45,10 @@ type withinfo_t<'a> = {
 (* Free term and type variables *)
 type var  = withinfo_t<lident>
 (* Term language *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type sconst = FStar.Const.sconst
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type pragma =
   | SetOptions of string
   | ResetOptions of option<string>
@@ -60,16 +63,19 @@ type memo<'a> = ref<option<'a>>
 (* Simple types used in native compilation
  * to record the types of lazily embedded terms
  *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type emb_typ =
   | ET_abstract
   | ET_fun  of emb_typ * emb_typ
   | ET_app  of string * list<emb_typ>
 
 //versioning for unification variables
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type version = {
     major:int;
     minor:int
 }
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type universe =
   | U_zero
   | U_succ  of universe
@@ -85,25 +91,30 @@ type univ_names    = list<univ_name>
 type universes     = list<universe>
 type monad_name    = lident
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type quote_kind =
   | Quote_static
   | Quote_dynamic
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type maybe_set_use_range =
   | NoUseRange
   | SomeUseRange of range
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type delta_depth =
   | Delta_constant_at_level of int    //A symbol that can be unfolded n types to a term whose head is a constant, e.g., nat is (Delta_unfoldable 1) to int, level 0 is a constant
   | Delta_equational_at_level of int  //level 0 is a symbol that may be equated to another by extensional reasoning, n > 0 can be unfolded n times to a Delta_equational_at_level 0 term
   | Delta_abstract of delta_depth   //A symbol marked abstract whose depth is the argument d
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type should_check_uvar =
   | Allow_unresolved      (* Escape hatch for uvars in logical guards that are sometimes left unresolved *)
   | Allow_untyped         (* Escape hatch to not re-typecheck guards in WPs and types of pattern bound vars *)
   | Allow_ghost           (* Escape hatch used for dot patterns *)
   | Strict                (* Everything else is strict *)
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type term' =
   | Tm_bvar       of bv                //bound variable, referenced by de Bruijn index
   | Tm_name       of bv                //local constant, referenced by a unique name derived from bv.ppname and bv.index
@@ -329,6 +340,7 @@ val new_universe_names_set: unit -> set<univ_name>
 
 val eq_binding : binding -> binding -> bool
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type qualifier =
   | Assumption                             //no definition provided, just a declaration
   | New                                    //a fresh type constant, distinct from all prior type constructors
@@ -357,11 +369,14 @@ type qualifier =
                                            //is present only for name resolution and will be elaborated at typechecking
 
 type tycon = lident * binders * typ                   (* I (x1:t1) ... (xn:tn) : t *)
+
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type monad_abbrev = {
   mabbrev:lident;
   parms:binders;
   def:typ
   }
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type sub_eff = {
   source:lident;
   target:lident;
@@ -375,6 +390,7 @@ type sub_eff = {
     with return ....
   }
 *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type action = {
     action_name:lident;
     action_unqualified_name: ident; // necessary for effect redefinitions, this name shall not contain the name of the effect
@@ -397,7 +413,7 @@ type action = {
  *
  * We could add another boolean, elaborated somewhere
  *)
-
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type wp_eff_combinators = {
   ret_wp       : tscheme;
   bind_wp      : tscheme;
@@ -424,6 +440,7 @@ type wp_eff_combinators = {
  *
  * Similarly the base effect name is also "" after desugaring, and is set by the typechecker
  *)
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type layered_eff_combinators = {
   l_repr         : (tscheme * tscheme);
   l_return       : (tscheme * tscheme);
@@ -433,13 +450,14 @@ type layered_eff_combinators = {
 
 }
 
-
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type eff_combinators =
   | Primitive_eff of wp_eff_combinators
   | DM4F_eff of wp_eff_combinators
   | Layered_eff of layered_eff_combinators
 
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type eff_decl = {
   mname       : lident;      //STATE_h
 
@@ -458,6 +476,7 @@ type eff_decl = {
 }
 
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type sig_metadata = {
     sigmeta_active:bool;
     sigmeta_fact_db_ids:list<string>;
@@ -482,6 +501,8 @@ type sig_metadata = {
  * AR: we no longer have Sig_new_effect_for_free
  *     Sig_new_effect, with an eff_decl that has DM4F_eff combinators, with dummy wps plays its part
  *)
+ 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type sigelt' =
   | Sig_inductive_typ       of lident                   //type l forall u1..un. (x1:t1) ... (xn:tn) : t
                             * univ_names                //u1..un
@@ -537,6 +558,7 @@ and sigelt = {
 
 type sigelts = list<sigelt>
 
+[@@ PpxDerivingYoJson; PpxDerivingShow ]
 type modul = {
   name: lident;
   declarations: sigelts;

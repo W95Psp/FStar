@@ -51,7 +51,7 @@ let (run_tactic_on_all_implicits :
 type pol =
   | Pos 
   | Neg 
-  | Both 
+  | Both [@@deriving show]
 let (uu___is_Pos : pol -> Prims.bool) =
   fun projectee -> match projectee with | Pos -> true | uu___ -> false
 let (uu___is_Neg : pol -> Prims.bool) =
@@ -61,7 +61,7 @@ let (uu___is_Both : pol -> Prims.bool) =
 type 'a tres_m =
   | Unchanged of 'a 
   | Simplified of ('a * FStar_Tactics_Types.goal Prims.list) 
-  | Dual of ('a * 'a * FStar_Tactics_Types.goal Prims.list) 
+  | Dual of ('a * 'a * FStar_Tactics_Types.goal Prims.list) [@@deriving show]
 let uu___is_Unchanged : 'a . 'a tres_m -> Prims.bool =
   fun projectee ->
     match projectee with | Unchanged _0 -> true | uu___ -> false
@@ -78,7 +78,7 @@ let uu___is_Dual : 'a . 'a tres_m -> Prims.bool =
 let __proj__Dual__item___0 :
   'a . 'a tres_m -> ('a * 'a * FStar_Tactics_Types.goal Prims.list) =
   fun projectee -> match projectee with | Dual _0 -> _0
-type tres = FStar_Syntax_Syntax.term tres_m
+type tres = FStar_Syntax_Syntax.term tres_m[@@deriving show]
 let tpure : 'uuuuu . 'uuuuu -> 'uuuuu tres_m = fun x -> Unchanged x
 let (flip : pol -> pol) =
   fun p -> match p with | Pos -> Neg | Neg -> Pos | Both -> Both
@@ -167,35 +167,33 @@ let (by_tactic_interp :
              | (FStar_Syntax_Syntax.Tm_fvar fv,
                 (tactic, FStar_Pervasives_Native.None)::(typ,
                                                          FStar_Pervasives_Native.Some
-                                                         {
-                                                           FStar_Syntax_Syntax.aqual_implicit
-                                                             = true;
-                                                           FStar_Syntax_Syntax.aqual_attributes
-                                                             = uu___2;_})::
-                (tm, FStar_Pervasives_Native.None)::[]) when
+                                                         (FStar_Syntax_Syntax.Implicit
+                                                         (false)))::(tm,
+                                                                    FStar_Pervasives_Native.None)::[])
+                 when
                  FStar_Syntax_Syntax.fv_eq_lid fv
                    FStar_Parser_Const.rewrite_by_tactic_lid
                  ->
-                 let uu___3 =
+                 let uu___2 =
                    FStar_TypeChecker_Env.new_implicit_var_aux
                      "rewrite_with_tactic RHS" tm.FStar_Syntax_Syntax.pos e
                      typ FStar_Syntax_Syntax.Allow_untyped
                      FStar_Pervasives_Native.None in
-                 (match uu___3 with
-                  | (uvtm, uu___4, g_imp) ->
+                 (match uu___2 with
+                  | (uvtm, uu___3, g_imp) ->
                       let u = e.FStar_TypeChecker_Env.universe_of e typ in
                       let goal =
-                        let uu___5 = FStar_Syntax_Util.mk_eq2 u typ tm uvtm in
+                        let uu___4 = FStar_Syntax_Util.mk_eq2 u typ tm uvtm in
                         FStar_Syntax_Util.mk_squash
-                          FStar_Syntax_Syntax.U_zero uu___5 in
-                      let uu___5 =
+                          FStar_Syntax_Syntax.U_zero uu___4 in
+                      let uu___4 =
                         run_tactic_on_typ tactic.FStar_Syntax_Syntax.pos
                           tm.FStar_Syntax_Syntax.pos tactic e goal in
-                      (match uu___5 with
-                       | (gs, uu___6) ->
+                      (match uu___4 with
+                       | (gs, uu___5) ->
                            ((match gs with
                              | [] -> ()
-                             | uu___8 ->
+                             | uu___7 ->
                                  FStar_Errors.raise_error
                                    (FStar_Errors.Fatal_OpenGoalsInSynthesis,
                                      "rewrite_with_tactic left open goals")

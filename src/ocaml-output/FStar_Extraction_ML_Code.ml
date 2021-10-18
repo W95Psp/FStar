@@ -4,7 +4,7 @@ type assoc =
   | IRight 
   | Left 
   | Right 
-  | NonAssoc 
+  | NonAssoc [@@deriving show]
 let (uu___is_ILeft : assoc -> Prims.bool) =
   fun projectee -> match projectee with | ILeft -> true | uu___ -> false
 let (uu___is_IRight : assoc -> Prims.bool) =
@@ -18,7 +18,7 @@ let (uu___is_NonAssoc : assoc -> Prims.bool) =
 type fixity =
   | Prefix 
   | Postfix 
-  | Infix of assoc 
+  | Infix of assoc [@@deriving show]
 let (uu___is_Prefix : fixity -> Prims.bool) =
   fun projectee -> match projectee with | Prefix -> true | uu___ -> false
 let (uu___is_Postfix : fixity -> Prims.bool) =
@@ -27,8 +27,8 @@ let (uu___is_Infix : fixity -> Prims.bool) =
   fun projectee -> match projectee with | Infix _0 -> true | uu___ -> false
 let (__proj__Infix__item___0 : fixity -> assoc) =
   fun projectee -> match projectee with | Infix _0 -> _0
-type opprec = (Prims.int * fixity)
-type level = (opprec * assoc)
+type opprec = (Prims.int * fixity)[@@deriving show]
+type level = (opprec * assoc)[@@deriving show]
 let (t_prio_fun : (Prims.int * fixity)) =
   ((Prims.of_int (10)), (Infix Right))
 let (t_prio_tpl : (Prims.int * fixity)) =
@@ -64,7 +64,7 @@ let (min_op_prec : (Prims.int * fixity)) =
 let (max_op_prec : (Prims.int * fixity)) =
   (FStar_Compiler_Util.max_int, (Infix NonAssoc))
 type doc =
-  | Doc of Prims.string 
+  | Doc of Prims.string [@@deriving show]
 let (uu___is_Doc : doc -> Prims.bool) = fun projectee -> true
 let (__proj__Doc__item___0 : doc -> Prims.string) =
   fun projectee -> match projectee with | Doc _0 -> _0

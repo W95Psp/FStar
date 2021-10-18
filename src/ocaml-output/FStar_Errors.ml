@@ -14,7 +14,7 @@ type error_flag =
   | CAlwaysError 
   | CError 
   | CWarning 
-  | CSilent 
+  | CSilent [@@deriving show]
 let (uu___is_CFatal : error_flag -> Prims.bool) =
   fun projectee -> match projectee with | CFatal -> true | uu___ -> false
 let (uu___is_CAlwaysError : error_flag -> Prims.bool) =
@@ -372,7 +372,7 @@ type raw_error =
   | Error_ErasedCtor 
   | Error_RemoveUnusedTypeParameter 
   | Warning_NoMagicInFSharp 
-  | Error_BadLetOpenRecord 
+  | Error_BadLetOpenRecord [@@deriving show]
 let (uu___is_Error_DependencyAnalysisFailed : raw_error -> Prims.bool) =
   fun projectee ->
     match projectee with
@@ -1868,8 +1868,8 @@ let (uu___is_Warning_NoMagicInFSharp : raw_error -> Prims.bool) =
 let (uu___is_Error_BadLetOpenRecord : raw_error -> Prims.bool) =
   fun projectee ->
     match projectee with | Error_BadLetOpenRecord -> true | uu___ -> false
-type flag = error_flag
-type error_setting = (raw_error * error_flag * Prims.int)
+type flag = error_flag[@@deriving show]
+type error_setting = (raw_error * error_flag * Prims.int)[@@deriving show]
 let (default_settings : error_setting Prims.list) =
   [(Error_DependencyAnalysisFailed, CAlwaysError, Prims.int_zero);
   (Error_IDETooManyPops, CAlwaysError, Prims.int_one);
@@ -2180,7 +2180,7 @@ let (default_settings : error_setting Prims.list) =
   (Fatal_SplicedUndef, CFatal, (Prims.of_int (300)));
   (Fatal_SpliceUnembedFail, CFatal, (Prims.of_int (301)));
   (Warning_ExtractionUnexpectedEffect, CWarning, (Prims.of_int (302)));
-  (Error_DidNotFail, CError, (Prims.of_int (303)));
+  (Error_DidNotFail, CAlwaysError, (Prims.of_int (303)));
   (Warning_UnappliedFail, CWarning, (Prims.of_int (304)));
   (Warning_QuantifierWithoutPattern, CSilent, (Prims.of_int (305)));
   (Error_EmptyFailErrs, CAlwaysError, (Prims.of_int (306)));
@@ -2336,7 +2336,7 @@ let (update_flags :
     FStar_Compiler_List.op_At uu___ default_settings
 type error =
   (raw_error * Prims.string * FStar_Compiler_Range.range * Prims.string
-    Prims.list)
+    Prims.list)[@@deriving show]
 exception Err of (raw_error * Prims.string * Prims.string Prims.list) 
 let (uu___is_Err : Prims.exn -> Prims.bool) =
   fun projectee -> match projectee with | Err uu___ -> true | uu___ -> false
@@ -2365,7 +2365,7 @@ type issue_level =
   | ENotImplemented 
   | EInfo 
   | EWarning 
-  | EError 
+  | EError [@@deriving show]
 let (uu___is_ENotImplemented : issue_level -> Prims.bool) =
   fun projectee ->
     match projectee with | ENotImplemented -> true | uu___ -> false
@@ -2381,7 +2381,7 @@ type issue =
   issue_level: issue_level ;
   issue_range: FStar_Compiler_Range.range FStar_Pervasives_Native.option ;
   issue_number: Prims.int FStar_Pervasives_Native.option ;
-  issue_ctx: Prims.string Prims.list }
+  issue_ctx: Prims.string Prims.list }[@@deriving show]
 let (__proj__Mkissue__item__issue_msg : issue -> Prims.string) =
   fun projectee ->
     match projectee with
@@ -2414,7 +2414,7 @@ type error_handler =
   eh_add_one: issue -> unit ;
   eh_count_errors: unit -> Prims.int ;
   eh_report: unit -> issue Prims.list ;
-  eh_clear: unit -> unit }
+  eh_clear: unit -> unit }[@@deriving show]
 let (__proj__Mkerror_handler__item__eh_add_one :
   error_handler -> issue -> unit) =
   fun projectee ->
@@ -2646,7 +2646,7 @@ type error_context_t =
   push: Prims.string -> unit ;
   pop: unit -> Prims.string ;
   clear: unit -> unit ;
-  get: unit -> Prims.string Prims.list }
+  get: unit -> Prims.string Prims.list }[@@deriving show]
 let (__proj__Mkerror_context_t__item__push :
   error_context_t -> Prims.string -> unit) =
   fun projectee ->

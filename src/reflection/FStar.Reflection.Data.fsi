@@ -116,6 +116,8 @@ type sigelt_view =
         // Non-empty list of (possibly) mutually recursive let-bindings
     | Sg_Inductive of name * list<univ_name> * list<binder> * typ * list<ctor> // name, params, type, constructors
     | Sg_Val of name * list<univ_name> * typ
+    | Sg_New_Effect of name (* * list<cflag> *) * list<univ_name> * list<binder> * typ * list name * list name * list<attribute>
+                    // mname  cattributes         univs             binders  signature  combinators   actions    eff_attrs 
     | Unk
 
 type var = Z.t
@@ -298,6 +300,7 @@ let ref_C_Eff     = fstar_refl_data_const "C_Eff"
 let ref_Sg_Let         = fstar_refl_data_const "Sg_Let"
 let ref_Sg_Inductive   = fstar_refl_data_const "Sg_Inductive"
 let ref_Sg_Val         = fstar_refl_data_const "Sg_Val"
+let ref_Sg_New_Effect  = fstar_refl_data_const "Sg_New_Effect"
 let ref_Unk            = fstar_refl_data_const "Unk"
 
 (* qualifiers *)

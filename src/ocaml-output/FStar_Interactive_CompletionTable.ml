@@ -3,7 +3,7 @@ let (string_compare : Prims.string -> Prims.string -> Prims.int) =
   fun s1 -> fun s2 -> FStar_String.compare s1 s2
 type 'a heap =
   | EmptyHeap 
-  | Heap of ('a * 'a heap Prims.list) 
+  | Heap of ('a * 'a heap Prims.list) [@@deriving show]
 let uu___is_EmptyHeap : 'a . 'a heap -> Prims.bool =
   fun projectee -> match projectee with | EmptyHeap -> true | uu___ -> false
 let uu___is_Heap : 'a . 'a heap -> Prims.bool =
@@ -128,7 +128,7 @@ let merge_increasing_lists_rev :
           let uu___1 = heap_from_list cmp lists2 in aux uu___1 []
 type 'a btree =
   | StrEmpty 
-  | StrBranch of (Prims.string * 'a * 'a btree * 'a btree) 
+  | StrBranch of (Prims.string * 'a * 'a btree * 'a btree) [@@deriving show]
 let uu___is_StrEmpty : 'a . 'a btree -> Prims.bool =
   fun projectee -> match projectee with | StrEmpty -> true | uu___ -> false
 let uu___is_StrBranch : 'a . 'a btree -> Prims.bool =
@@ -251,7 +251,7 @@ let rec btree_remove : 'a . 'a btree -> Prims.string -> 'a btree =
 type prefix_match =
   {
   prefix: Prims.string FStar_Pervasives_Native.option ;
-  completion: Prims.string }
+  completion: Prims.string }[@@deriving show]
 let (__proj__Mkprefix_match__item__prefix :
   prefix_match -> Prims.string FStar_Pervasives_Native.option) =
   fun projectee -> match projectee with | { prefix; completion;_} -> prefix
@@ -261,7 +261,7 @@ let (__proj__Mkprefix_match__item__completion : prefix_match -> Prims.string)
     match projectee with | { prefix; completion;_} -> completion
 type path_elem = {
   imports: Prims.string Prims.list ;
-  segment: prefix_match }
+  segment: prefix_match }[@@deriving show]
 let (__proj__Mkpath_elem__item__imports :
   path_elem -> Prims.string Prims.list) =
   fun projectee -> match projectee with | { imports; segment;_} -> imports
@@ -308,13 +308,14 @@ let rec btree_fold :
         | StrBranch (k, v, lbt, rbt) ->
             let uu___ = let uu___1 = btree_fold rbt f acc in f k v uu___1 in
             btree_fold lbt f uu___
-type path = path_elem Prims.list
-type query = Prims.string Prims.list
+type path = path_elem Prims.list[@@deriving show]
+type query = Prims.string Prims.list[@@deriving show]
 let (query_to_string : Prims.string Prims.list -> Prims.string) =
   fun q -> FStar_String.concat "." q
 type 'a name_collection =
   | Names of 'a btree 
-  | ImportedNames of (Prims.string * 'a name_collection Prims.list) 
+  | ImportedNames of (Prims.string * 'a name_collection Prims.list) [@@deriving
+                                                                    show]
 let uu___is_Names : 'a . 'a name_collection -> Prims.bool =
   fun projectee -> match projectee with | Names _0 -> true | uu___ -> false
 let __proj__Names__item___0 : 'a . 'a name_collection -> 'a btree =
@@ -325,10 +326,10 @@ let uu___is_ImportedNames : 'a . 'a name_collection -> Prims.bool =
 let __proj__ImportedNames__item___0 :
   'a . 'a name_collection -> (Prims.string * 'a name_collection Prims.list) =
   fun projectee -> match projectee with | ImportedNames _0 -> _0
-type 'a names = 'a name_collection Prims.list
+type 'a names = 'a name_collection Prims.list[@@deriving show]
 type 'a trie = {
   bindings: 'a names ;
-  namespaces: 'a trie names }
+  namespaces: 'a trie names }[@@deriving show]
 let __proj__Mktrie__item__bindings : 'a . 'a trie -> 'a names =
   fun projectee ->
     match projectee with | { bindings; namespaces;_} -> bindings
@@ -543,7 +544,7 @@ let btree_find_all :
 type name_search_term =
   | NSTAll 
   | NSTNone 
-  | NSTPrefix of Prims.string 
+  | NSTPrefix of Prims.string [@@deriving show]
 let (uu___is_NSTAll : name_search_term -> Prims.bool) =
   fun projectee -> match projectee with | NSTAll -> true | uu___ -> false
 let (uu___is_NSTNone : name_search_term -> Prims.bool) =
@@ -620,7 +621,7 @@ let trie_find_prefix : 'a . 'a trie -> query -> (path * 'a) Prims.list =
   fun tr -> fun query1 -> trie_find_prefix' tr [] query1 []
 type ns_info = {
   ns_name: Prims.string ;
-  ns_loaded: Prims.bool }
+  ns_loaded: Prims.bool }[@@deriving show]
 let (__proj__Mkns_info__item__ns_name : ns_info -> Prims.string) =
   fun projectee -> match projectee with | { ns_name; ns_loaded;_} -> ns_name
 let (__proj__Mkns_info__item__ns_loaded : ns_info -> Prims.bool) =
@@ -630,7 +631,7 @@ type mod_info =
   {
   mod_name: Prims.string ;
   mod_path: Prims.string ;
-  mod_loaded: Prims.bool }
+  mod_loaded: Prims.bool }[@@deriving show]
 let (__proj__Mkmod_info__item__mod_name : mod_info -> Prims.string) =
   fun projectee ->
     match projectee with | { mod_name; mod_path; mod_loaded;_} -> mod_name
@@ -643,7 +644,7 @@ let (__proj__Mkmod_info__item__mod_loaded : mod_info -> Prims.bool) =
 let (mod_name : mod_info -> Prims.string) = fun md -> md.mod_name
 type mod_symbol =
   | Module of mod_info 
-  | Namespace of ns_info 
+  | Namespace of ns_info [@@deriving show]
 let (uu___is_Module : mod_symbol -> Prims.bool) =
   fun projectee -> match projectee with | Module _0 -> true | uu___ -> false
 let (__proj__Module__item___0 : mod_symbol -> mod_info) =
@@ -653,10 +654,10 @@ let (uu___is_Namespace : mod_symbol -> Prims.bool) =
     match projectee with | Namespace _0 -> true | uu___ -> false
 let (__proj__Namespace__item___0 : mod_symbol -> ns_info) =
   fun projectee -> match projectee with | Namespace _0 -> _0
-type lid_symbol = FStar_Ident.lid
+type lid_symbol = FStar_Ident.lid[@@deriving show]
 type symbol =
   | ModOrNs of mod_symbol 
-  | Lid of lid_symbol 
+  | Lid of lid_symbol [@@deriving show]
 let (uu___is_ModOrNs : symbol -> Prims.bool) =
   fun projectee -> match projectee with | ModOrNs _0 -> true | uu___ -> false
 let (__proj__ModOrNs__item___0 : symbol -> mod_symbol) =
@@ -667,7 +668,7 @@ let (__proj__Lid__item___0 : symbol -> lid_symbol) =
   fun projectee -> match projectee with | Lid _0 -> _0
 type table = {
   tbl_lids: lid_symbol trie ;
-  tbl_mods: mod_symbol trie }
+  tbl_mods: mod_symbol trie }[@@deriving show]
 let (__proj__Mktable__item__tbl_lids : table -> lid_symbol trie) =
   fun projectee -> match projectee with | { tbl_lids; tbl_mods;_} -> tbl_lids
 let (__proj__Mktable__item__tbl_mods : table -> mod_symbol trie) =
@@ -798,7 +799,7 @@ type completion_result =
   {
   completion_match_length: Prims.int ;
   completion_candidate: Prims.string ;
-  completion_annotation: Prims.string }
+  completion_annotation: Prims.string }[@@deriving show]
 let (__proj__Mkcompletion_result__item__completion_match_length :
   completion_result -> Prims.int) =
   fun projectee ->

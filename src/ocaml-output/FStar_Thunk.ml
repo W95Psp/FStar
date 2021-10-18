@@ -1,7 +1,8 @@
 open Prims
 type 'a thunk =
-  (unit -> 'a, 'a) FStar_Pervasives.either FStar_Compiler_Effect.ref
-type 'a t = 'a thunk
+  (unit -> 'a, 'a) FStar_Pervasives.either FStar_Compiler_Effect.ref[@@deriving
+                                                                    show]
+type 'a t = 'a thunk[@@deriving show]
 let mk : 'a . (unit -> 'a) -> 'a thunk =
   fun f -> FStar_Compiler_Effect.alloc (FStar_Pervasives.Inl f)
 let mkv : 'a . 'a -> 'a thunk =

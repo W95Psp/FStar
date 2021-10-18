@@ -4,7 +4,7 @@ type counter =
   cid: Prims.string ;
   total_time: Prims.int FStar_Compiler_Effect.ref ;
   running: Prims.bool FStar_Compiler_Effect.ref ;
-  undercount: Prims.bool FStar_Compiler_Effect.ref }
+  undercount: Prims.bool FStar_Compiler_Effect.ref }[@@deriving show]
 let (__proj__Mkcounter__item__cid : counter -> Prims.string) =
   fun projectee ->
     match projectee with | { cid; total_time; running; undercount;_} -> cid

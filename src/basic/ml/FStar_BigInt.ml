@@ -1,6 +1,8 @@
 type bigint = Z.t
 type t = bigint
 
+let pp _ _ = ()
+
 let zero = Z.zero
 let one = Z.one
 let two = Z.of_string "2"

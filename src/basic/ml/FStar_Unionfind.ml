@@ -5,10 +5,10 @@ open FStar_Compiler_Effect
 open FStar_Compiler_Util
 
 (* Persistent arrays *)
-type 'a pa_t = 'a data ref
+type 'a pa_t = 'a data ref [@@deriving show]
 and 'a data =
   | PArray of 'a array
-  | PDiff of int * 'a * 'a pa_t
+  | PDiff of int * 'a * 'a pa_t [@@deriving show]
 
 let pa_create n v = mk_ref (PArray (Array.make n v))
 
@@ -75,7 +75,7 @@ type 'a puf = {
   ranks: int pa_t;
   (* keep track of how many elements are allocated in the array *)
   count: int ref
-}
+  } [@@deriving show]
 type 'a p_uvar = P of int
   [@printer fun fmt x -> Format.pp_print_string fmt "!!!"]
   [@@deriving yojson,show]

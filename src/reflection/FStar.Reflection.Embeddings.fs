@@ -696,7 +696,17 @@ let e_sigelt_view =
                          S.as_arg (embed e_univ_names rng univs);
                          S.as_arg (embed e_term rng t)]
                         rng
-
+        | Sg_New_Effect (mname, (*cattributes,*) univs, binders, signature, combinators, actions, eff_attrs) ->
+            S.mk_Tm_app ref_Sg_New_Effect.t
+                        [S.as_arg (embed e_string_list rng mname);
+                         S.as_arg (embed e_univ_names rng univs);
+                            S.as_arg (embed e_binders rng binders);
+                            S.as_arg (embed e_term rng signature);
+                            S.as_arg (embed (e_list e_string_list) rng []);
+                            S.as_arg (embed (e_list e_string_list) rng []);
+                            S.as_arg (embed (e_list e_term) rng eff_attrs)
+                         ]
+                        rng
         | Unk ->
             { ref_Unk.t with pos = rng }
     in

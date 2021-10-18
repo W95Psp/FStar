@@ -424,7 +424,8 @@ let check_pattern_vars :
                  FStar_Errors.log_issue pos uu___3)
 type label =
   (FStar_SMTEncoding_Term.fv * Prims.string * FStar_Compiler_Range.range)
-type labels = label Prims.list
+[@@deriving show]
+type labels = label Prims.list[@@deriving show]
 type pattern =
   {
   pat_vars: (FStar_Syntax_Syntax.bv * FStar_SMTEncoding_Term.fv) Prims.list ;
@@ -434,7 +435,7 @@ type pattern =
   projections:
     FStar_SMTEncoding_Term.term ->
       (FStar_Syntax_Syntax.bv * FStar_SMTEncoding_Term.term) Prims.list
-    }
+    }[@@deriving show]
 let (__proj__Mkpattern__item__pat_vars :
   pattern -> (FStar_Syntax_Syntax.bv * FStar_SMTEncoding_Term.fv) Prims.list)
   =
@@ -1494,9 +1495,7 @@ and (encode_term :
                               FStar_TypeChecker_Env.enable_defer_to_tac =
                                 (uu___6.FStar_TypeChecker_Env.enable_defer_to_tac);
                               FStar_TypeChecker_Env.unif_allow_ref_guards =
-                                (uu___6.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                              FStar_TypeChecker_Env.erase_erasable_args =
-                                (uu___6.FStar_TypeChecker_Env.erase_erasable_args)
+                                (uu___6.FStar_TypeChecker_Env.unif_allow_ref_guards)
                             }) res in
                        (match uu___5 with
                         | (pre_opt, res_t) ->
@@ -3512,9 +3511,7 @@ and (encode_formula :
                | (a, q) ->
                    (match q with
                     | FStar_Pervasives_Native.Some
-                        { FStar_Syntax_Syntax.aqual_implicit = true;
-                          FStar_Syntax_Syntax.aqual_attributes = uu___1;_}
-                        -> false
+                        (FStar_Syntax_Syntax.Implicit uu___1) -> false
                     | uu___1 -> true)) args in
         if (FStar_Compiler_List.length rf) <> (Prims.of_int (2))
         then
@@ -3526,6 +3523,50 @@ and (encode_formula :
         else
           (let uu___1 = enc (bin_op FStar_SMTEncoding_Util.mkEq) in
            uu___1 r rf) in
+      let eq3_op r args =
+        let n = FStar_Compiler_List.length args in
+        if n = (Prims.of_int (4))
+        then
+          let uu___ =
+            enc
+              (fun terms ->
+                 match terms with
+                 | t0::t1::v0::v1::[] ->
+                     let uu___1 =
+                       let uu___2 = FStar_SMTEncoding_Util.mkEq (t0, t1) in
+                       let uu___3 = FStar_SMTEncoding_Util.mkEq (v0, v1) in
+                       (uu___2, uu___3) in
+                     FStar_SMTEncoding_Util.mkAnd uu___1
+                 | uu___1 -> failwith "Impossible") in
+          uu___ r args
+        else
+          (let uu___1 =
+             FStar_Compiler_Util.format1
+               "eq3_op: got %s non-implicit arguments instead of 4?"
+               (Prims.string_of_int n) in
+           failwith uu___1) in
+      let h_equals_op r args =
+        let n = FStar_Compiler_List.length args in
+        if n = (Prims.of_int (4))
+        then
+          let uu___ =
+            enc
+              (fun terms ->
+                 match terms with
+                 | t0::v0::t1::v1::[] ->
+                     let uu___1 =
+                       let uu___2 = FStar_SMTEncoding_Util.mkEq (t0, t1) in
+                       let uu___3 = FStar_SMTEncoding_Util.mkEq (v0, v1) in
+                       (uu___2, uu___3) in
+                     FStar_SMTEncoding_Util.mkAnd uu___1
+                 | uu___1 -> failwith "Impossible") in
+          uu___ r args
+        else
+          (let uu___1 =
+             FStar_Compiler_Util.format1
+               "eq3_op: got %s non-implicit arguments instead of 4?"
+               (Prims.string_of_int n) in
+           failwith uu___1) in
       let mk_imp r uu___ =
         match uu___ with
         | (lhs, uu___1)::(rhs, uu___2)::[] ->
@@ -3586,6 +3627,8 @@ and (encode_formula :
                   [uu___8;
                   (FStar_Parser_Const.eq2_lid, eq_op);
                   (FStar_Parser_Const.c_eq2_lid, eq_op);
+                  (FStar_Parser_Const.eq3_lid, eq3_op);
+                  (FStar_Parser_Const.c_eq3_lid, h_equals_op);
                   (FStar_Parser_Const.true_lid,
                     (const_op FStar_SMTEncoding_Term.mkTrue));
                   (FStar_Parser_Const.false_lid,

@@ -7,8 +7,8 @@ let (uu___is_Not_a_wp_implication : Prims.exn -> Prims.bool) =
     | uu___ -> false
 let (__proj__Not_a_wp_implication__item__uu___ : Prims.exn -> Prims.string) =
   fun projectee -> match projectee with | Not_a_wp_implication uu___ -> uu___
-type label = FStar_SMTEncoding_Term.error_label
-type labels = FStar_SMTEncoding_Term.error_labels
+type label = FStar_SMTEncoding_Term.error_label[@@deriving show]
+type labels = FStar_SMTEncoding_Term.error_labels[@@deriving show]
 let (sort_labels :
   (FStar_SMTEncoding_Term.error_label * Prims.bool) Prims.list ->
     ((FStar_SMTEncoding_Term.fv * Prims.string * FStar_Compiler_Range.range)
@@ -33,10 +33,10 @@ let (remove_dups :
            match (uu___, uu___1) with
            | ((uu___2, m1, r1), (uu___3, m2, r2)) -> (r1 = r2) && (m1 = m2))
       l
-type msg = (Prims.string * FStar_Compiler_Range.range)
+type msg = (Prims.string * FStar_Compiler_Range.range)[@@deriving show]
 type ranges =
   (Prims.string FStar_Pervasives_Native.option * FStar_Compiler_Range.range)
-    Prims.list
+    Prims.list[@@deriving show]
 let (fresh_label :
   Prims.string ->
     FStar_Compiler_Range.range ->

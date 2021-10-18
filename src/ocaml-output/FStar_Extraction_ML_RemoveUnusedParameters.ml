@@ -1,16 +1,16 @@
 open Prims
 type argument_tag =
   | Retain 
-  | Omit 
+  | Omit [@@deriving show]
 let (uu___is_Retain : argument_tag -> Prims.bool) =
   fun projectee -> match projectee with | Retain -> true | uu___ -> false
 let (uu___is_Omit : argument_tag -> Prims.bool) =
   fun projectee -> match projectee with | Omit -> true | uu___ -> false
-type entry = argument_tag Prims.list
+type entry = argument_tag Prims.list[@@deriving show]
 type env_t =
   {
   current_module: FStar_Extraction_ML_Syntax.mlsymbol Prims.list ;
-  tydef_map: entry FStar_Compiler_Util.psmap }
+  tydef_map: entry FStar_Compiler_Util.psmap }[@@deriving show]
 let (__proj__Mkenv_t__item__current_module :
   env_t -> FStar_Extraction_ML_Syntax.mlsymbol Prims.list) =
   fun projectee ->
@@ -42,6 +42,7 @@ let (lookup_tyname :
       let uu___ = FStar_Extraction_ML_Syntax.string_of_mlpath name in
       FStar_Compiler_Util.psmap_try_find env.tydef_map uu___
 type var_set = FStar_Extraction_ML_Syntax.mlident FStar_Compiler_Util.set
+[@@deriving show]
 let (empty_var_set : Prims.string FStar_Compiler_Util.set) =
   FStar_Compiler_Util.new_set (fun x -> fun y -> FStar_String.compare x y)
 let rec (freevars_of_mlty' :
@@ -255,7 +256,7 @@ and (elim_mlexpr :
 type tydef =
   (FStar_Extraction_ML_Syntax.mlsymbol * FStar_Extraction_ML_Syntax.metadata
     * (FStar_Extraction_ML_Syntax.mltyscheme, Prims.int)
-    FStar_Pervasives.either)
+    FStar_Pervasives.either)[@@deriving show]
 exception Drop_tydef 
 let (uu___is_Drop_tydef : Prims.exn -> Prims.bool) =
   fun projectee -> match projectee with | Drop_tydef -> true | uu___ -> false

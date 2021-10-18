@@ -495,15 +495,17 @@ let (head_and_args :
 type associativity =
   | Left 
   | Right 
-  | NonAssoc 
+  | NonAssoc [@@deriving show]
 let (uu___is_Left : associativity -> Prims.bool) =
   fun projectee -> match projectee with | Left -> true | uu___ -> false
 let (uu___is_Right : associativity -> Prims.bool) =
   fun projectee -> match projectee with | Right -> true | uu___ -> false
 let (uu___is_NonAssoc : associativity -> Prims.bool) =
   fun projectee -> match projectee with | NonAssoc -> true | uu___ -> false
-type token = (FStar_Char.char, Prims.string) FStar_Pervasives.either
-type associativity_level = (associativity * token Prims.list)
+type token = (FStar_Char.char, Prims.string) FStar_Pervasives.either[@@deriving
+                                                                    show]
+type associativity_level = (associativity * token Prims.list)[@@deriving
+                                                               show]
 let (token_to_string :
   (FStar_BaseTypes.char, Prims.string) FStar_Pervasives.either ->
     Prims.string)
@@ -687,7 +689,7 @@ let handleable_op :
       | uu___ -> false
 type annotation_style =
   | Binders of (Prims.int * Prims.int * Prims.bool) 
-  | Arrows of (Prims.int * Prims.int) 
+  | Arrows of (Prims.int * Prims.int) [@@deriving show]
 let (uu___is_Binders : annotation_style -> Prims.bool) =
   fun projectee -> match projectee with | Binders _0 -> true | uu___ -> false
 let (__proj__Binders__item___0 :
@@ -716,6 +718,7 @@ let (all_binders_annot : FStar_Parser_AST.term -> Prims.bool) =
     | (b, l) -> if b && (l > Prims.int_one) then true else false
 type catf =
   FStar_Pprint.document -> FStar_Pprint.document -> FStar_Pprint.document
+[@@deriving show]
 let (cat_with_colon :
   FStar_Pprint.document -> FStar_Pprint.document -> FStar_Pprint.document) =
   fun x ->
@@ -730,7 +733,7 @@ type decl_meta =
   {
   r: FStar_Compiler_Range.range ;
   has_qs: Prims.bool ;
-  has_attrs: Prims.bool }
+  has_attrs: Prims.bool }[@@deriving show]
 let (__proj__Mkdecl_meta__item__r : decl_meta -> FStar_Compiler_Range.range)
   = fun projectee -> match projectee with | { r; has_qs; has_attrs;_} -> r
 let (__proj__Mkdecl_meta__item__has_qs : decl_meta -> Prims.bool) =
@@ -1296,7 +1299,6 @@ and (p_pragma : FStar_Parser_AST.pragma -> FStar_Pprint.document) =
         FStar_Pprint.op_Hat_Hat uu___1 uu___2
     | FStar_Parser_AST.PopOptions -> str "#pop-options"
     | FStar_Parser_AST.RestartSolver -> str "#restart-solver"
-    | FStar_Parser_AST.PrintEffectsGraph -> str "#print-effects-graph"
     | FStar_Parser_AST.LightOff ->
         (FStar_Compiler_Effect.op_Colon_Equals should_print_fs_typ_app true;
          str "#light \"off\"")

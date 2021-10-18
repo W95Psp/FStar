@@ -27,7 +27,8 @@ type vconfig =
   z3rlimit_factor: Prims.int ;
   z3seed: Prims.int ;
   trivial_pre_for_unannotated_effectful_fns: Prims.bool ;
-  reuse_hint_for: Prims.string FStar_Pervasives_Native.option }
+  reuse_hint_for: Prims.string FStar_Pervasives_Native.option }[@@deriving
+                                                                 show]
 let (__proj__Mkvconfig__item__initial_fuel : vconfig -> Prims.int) =
   fun projectee ->
     match projectee with

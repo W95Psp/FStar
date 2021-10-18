@@ -1,5 +1,5 @@
 open Prims
-let (cache_version_number : Prims.int) = (Prims.of_int (40))
+let (cache_version_number : Prims.int) = (Prims.of_int (38))
 type tc_result =
   {
   checked_module: FStar_Syntax_Syntax.modul ;
@@ -9,7 +9,7 @@ type tc_result =
       Prims.list)
     ;
   tc_time: Prims.int ;
-  extraction_time: Prims.int }
+  extraction_time: Prims.int }[@@deriving show]
 let (__proj__Mktc_result__item__checked_module :
   tc_result -> FStar_Syntax_Syntax.modul) =
   fun projectee ->
@@ -44,7 +44,7 @@ type checked_file_entry_stage1 =
   {
   version: Prims.int ;
   digest: Prims.string ;
-  parsing_data: FStar_Parser_Dep.parsing_data }
+  parsing_data: FStar_Parser_Dep.parsing_data }[@@deriving show]
 let (__proj__Mkchecked_file_entry_stage1__item__version :
   checked_file_entry_stage1 -> Prims.int) =
   fun projectee ->
@@ -60,7 +60,7 @@ let (__proj__Mkchecked_file_entry_stage1__item__parsing_data :
 type checked_file_entry_stage2 =
   {
   deps_dig: (Prims.string * Prims.string) Prims.list ;
-  tc_res: tc_result }
+  tc_res: tc_result }[@@deriving show]
 let (__proj__Mkchecked_file_entry_stage2__item__deps_dig :
   checked_file_entry_stage2 -> (Prims.string * Prims.string) Prims.list) =
   fun projectee -> match projectee with | { deps_dig; tc_res;_} -> deps_dig
@@ -70,7 +70,7 @@ let (__proj__Mkchecked_file_entry_stage2__item__tc_res :
 type tc_result_t =
   | Unknown 
   | Invalid of Prims.string 
-  | Valid of Prims.string 
+  | Valid of Prims.string [@@deriving show]
 let (uu___is_Unknown : tc_result_t -> Prims.bool) =
   fun projectee -> match projectee with | Unknown -> true | uu___ -> false
 let (uu___is_Invalid : tc_result_t -> Prims.bool) =
@@ -83,7 +83,7 @@ let (__proj__Valid__item___0 : tc_result_t -> Prims.string) =
   fun projectee -> match projectee with | Valid _0 -> _0
 type cache_t =
   (tc_result_t * (Prims.string, FStar_Parser_Dep.parsing_data)
-    FStar_Pervasives.either)
+    FStar_Pervasives.either)[@@deriving show]
 let (mcache : cache_t FStar_Compiler_Util.smap) =
   FStar_Compiler_Util.smap_create (Prims.of_int (50))
 let (hash_dependences :

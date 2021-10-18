@@ -28,7 +28,7 @@ type goal_type =
   
   | Can_be_split_into of (FStar_Syntax_Syntax.term * FStar_Syntax_Syntax.term
   * FStar_Syntax_Syntax.ctx_uvar) 
-  | Imp of FStar_Syntax_Syntax.ctx_uvar 
+  | Imp of FStar_Syntax_Syntax.ctx_uvar [@@deriving show]
 let (uu___is_FlexRigid : goal_type -> Prims.bool) =
   fun projectee ->
     match projectee with | FlexRigid _0 -> true | uu___ -> false
@@ -61,7 +61,7 @@ type goal_dep =
   assignees: FStar_Syntax_Syntax.ctx_uvar FStar_Compiler_Util.set ;
   goal_dep_uvars: FStar_Syntax_Syntax.ctx_uvar FStar_Compiler_Util.set ;
   dependences: goal_dep Prims.list FStar_Compiler_Effect.ref ;
-  visited: Prims.int FStar_Compiler_Effect.ref }
+  visited: Prims.int FStar_Compiler_Effect.ref }[@@deriving show]
 let (__proj__Mkgoal_dep__item__goal_dep_id : goal_dep -> Prims.int) =
   fun projectee ->
     match projectee with
@@ -102,7 +102,7 @@ let (__proj__Mkgoal_dep__item__visited :
     match projectee with
     | { goal_dep_id; goal_type = goal_type1; goal_imp; assignees;
         goal_dep_uvars; dependences; visited;_} -> visited
-type goal_deps = goal_dep Prims.list
+type goal_deps = goal_dep Prims.list[@@deriving show]
 let (print_uvar_set :
   FStar_Syntax_Syntax.ctx_uvar FStar_Compiler_Util.set -> Prims.string) =
   fun s ->
@@ -288,9 +288,7 @@ let solve_goals_with_tac :
                 (env.FStar_TypeChecker_Env.erasable_types_tab);
               FStar_TypeChecker_Env.enable_defer_to_tac = false;
               FStar_TypeChecker_Env.unif_allow_ref_guards =
-                (env.FStar_TypeChecker_Env.unif_allow_ref_guards);
-              FStar_TypeChecker_Env.erase_erasable_args =
-                (env.FStar_TypeChecker_Env.erase_erasable_args)
+                (env.FStar_TypeChecker_Env.unif_allow_ref_guards)
             } in
           env1.FStar_TypeChecker_Env.try_solve_implicits_hook env1
             resolve_tac deferred_goals
@@ -413,9 +411,7 @@ let (solve_deferred_to_tactic_goals :
                              FStar_TypeChecker_Env.enable_defer_to_tac =
                                (env1.FStar_TypeChecker_Env.enable_defer_to_tac);
                              FStar_TypeChecker_Env.unif_allow_ref_guards =
-                               (env1.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                             FStar_TypeChecker_Env.erase_erasable_args =
-                               (env1.FStar_TypeChecker_Env.erase_erasable_args)
+                               (env1.FStar_TypeChecker_Env.unif_allow_ref_guards)
                            } in
                          let env_lax =
                            {
@@ -513,9 +509,7 @@ let (solve_deferred_to_tactic_goals :
                              FStar_TypeChecker_Env.enable_defer_to_tac =
                                false;
                              FStar_TypeChecker_Env.unif_allow_ref_guards =
-                               (env2.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                             FStar_TypeChecker_Env.erase_erasable_args =
-                               (env2.FStar_TypeChecker_Env.erase_erasable_args)
+                               (env2.FStar_TypeChecker_Env.unif_allow_ref_guards)
                            } in
                          let uu___5 =
                            let t =

@@ -1,5 +1,6 @@
 open Prims
-type assoct = (Prims.string * FStar_Compiler_Util.json) Prims.list
+type assoct = (Prims.string * FStar_Compiler_Util.json) Prims.list[@@deriving
+                                                                    show]
 let (try_assoc :
   Prims.string ->
     assoct -> FStar_Compiler_Util.json FStar_Pervasives_Native.option)
@@ -131,7 +132,8 @@ let (path_to_uri : Prims.string -> Prims.string) =
 type completion_context =
   {
   trigger_kind: Prims.int ;
-  trigger_char: Prims.string FStar_Pervasives_Native.option }
+  trigger_char: Prims.string FStar_Pervasives_Native.option }[@@deriving
+                                                               show]
 let (__proj__Mkcompletion_context__item__trigger_kind :
   completion_context -> Prims.int) =
   fun projectee ->
@@ -158,7 +160,7 @@ type txdoc_item =
   fname: Prims.string ;
   langId: Prims.string ;
   version: Prims.int ;
-  text: Prims.string }
+  text: Prims.string }[@@deriving show]
 let (__proj__Mktxdoc_item__item__fname : txdoc_item -> Prims.string) =
   fun projectee ->
     match projectee with | { fname; langId; version; text;_} -> fname
@@ -195,7 +197,7 @@ let (js_txdoc_item : FStar_Compiler_Util.json -> txdoc_item) =
 type txdoc_pos = {
   path: Prims.string ;
   line: Prims.int ;
-  col: Prims.int }
+  col: Prims.int }[@@deriving show]
 let (__proj__Mktxdoc_pos__item__path : txdoc_pos -> Prims.string) =
   fun projectee -> match projectee with | { path; line; col;_} -> path
 let (__proj__Mktxdoc_pos__item__line : txdoc_pos -> Prims.int) =
@@ -227,7 +229,7 @@ let (js_txdoc_pos : assoct -> txdoc_pos) =
     { path = uu___; line = uu___1; col = uu___2 }
 type workspace_folder = {
   wk_uri: Prims.string ;
-  wk_name: Prims.string }
+  wk_name: Prims.string }[@@deriving show]
 let (__proj__Mkworkspace_folder__item__wk_uri :
   workspace_folder -> Prims.string) =
   fun projectee -> match projectee with | { wk_uri; wk_name;_} -> wk_uri
@@ -236,7 +238,7 @@ let (__proj__Mkworkspace_folder__item__wk_name :
   fun projectee -> match projectee with | { wk_uri; wk_name;_} -> wk_name
 type wsch_event = {
   added: workspace_folder ;
-  removed: workspace_folder }
+  removed: workspace_folder }[@@deriving show]
 let (__proj__Mkwsch_event__item__added : wsch_event -> workspace_folder) =
   fun projectee -> match projectee with | { added; removed;_} -> added
 let (__proj__Mkwsch_event__item__removed : wsch_event -> workspace_folder) =
@@ -285,7 +287,7 @@ let (js_contentch : FStar_Compiler_Util.json -> Prims.string) =
 type rng =
   {
   rng_start: (Prims.int * Prims.int) ;
-  rng_end: (Prims.int * Prims.int) }
+  rng_end: (Prims.int * Prims.int) }[@@deriving show]
 let (__proj__Mkrng__item__rng_start : rng -> (Prims.int * Prims.int)) =
   fun projectee ->
     match projectee with | { rng_start; rng_end;_} -> rng_start
@@ -366,7 +368,7 @@ type lquery =
   | Rename 
   | PrepareRename of txdoc_pos 
   | FoldingRange 
-  | BadProtocolMsg of Prims.string 
+  | BadProtocolMsg of Prims.string [@@deriving show]
 let (uu___is_Initialize : lquery -> Prims.bool) =
   fun projectee ->
     match projectee with | Initialize _0 -> true | uu___ -> false
@@ -523,18 +525,20 @@ let (__proj__BadProtocolMsg__item___0 : lquery -> Prims.string) =
 type lsp_query =
   {
   query_id: Prims.int FStar_Pervasives_Native.option ;
-  q: lquery }
+  q: lquery }[@@deriving show]
 let (__proj__Mklsp_query__item__query_id :
   lsp_query -> Prims.int FStar_Pervasives_Native.option) =
   fun projectee -> match projectee with | { query_id; q;_} -> query_id
 let (__proj__Mklsp_query__item__q : lsp_query -> lquery) =
   fun projectee -> match projectee with | { query_id; q;_} -> q
 type repl_depth_t = (FStar_TypeChecker_Env.tcenv_depth_t * Prims.int)
+[@@deriving show]
 type optmod_t = FStar_Syntax_Syntax.modul FStar_Pervasives_Native.option
+[@@deriving show]
 type timed_fname =
   {
   tf_fname: Prims.string ;
-  tf_modtime: FStar_Compiler_Util.time }
+  tf_modtime: FStar_Compiler_Util.time }[@@deriving show]
 let (__proj__Mktimed_fname__item__tf_fname : timed_fname -> Prims.string) =
   fun projectee ->
     match projectee with | { tf_fname; tf_modtime;_} -> tf_fname
@@ -547,7 +551,7 @@ type repl_task =
   | LDSingle of timed_fname 
   | LDInterfaceOfCurrentFile of timed_fname 
   | PushFragment of FStar_Parser_ParseIt.input_frag 
-  | Noop 
+  | Noop [@@deriving show]
 let (uu___is_LDInterleaved : repl_task -> Prims.bool) =
   fun projectee ->
     match projectee with | LDInterleaved _0 -> true | uu___ -> false
@@ -583,11 +587,11 @@ type repl_state =
   repl_curmod: optmod_t ;
   repl_env: FStar_TypeChecker_Env.env ;
   repl_stdin: FStar_Compiler_Util.stream_reader ;
-  repl_names: FStar_Interactive_CompletionTable.table }
+  repl_names: FStar_Interactive_CompletionTable.table }[@@deriving show]
 and grepl_state =
   {
   grepl_repls: repl_state FStar_Compiler_Util.psmap ;
-  grepl_stdin: FStar_Compiler_Util.stream_reader }
+  grepl_stdin: FStar_Compiler_Util.stream_reader }[@@deriving show]
 let (__proj__Mkrepl_state__item__repl_line : repl_state -> Prims.int) =
   fun projectee ->
     match projectee with
@@ -640,8 +644,10 @@ let (__proj__Mkgrepl_state__item__grepl_stdin :
   grepl_state -> FStar_Compiler_Util.stream_reader) =
   fun projectee ->
     match projectee with | { grepl_repls; grepl_stdin;_} -> grepl_stdin
-type repl_stack_entry_t = (repl_depth_t * (repl_task * repl_state))
+type repl_stack_entry_t = (repl_depth_t * (repl_task * repl_state))[@@deriving
+                                                                    show]
 type repl_stack_t = (repl_depth_t * (repl_task * repl_state)) Prims.list
+[@@deriving show]
 type error_code =
   | ParseError 
   | InvalidRequest 
@@ -653,7 +659,7 @@ type error_code =
   | ServerNotInitialized 
   | UnknownErrorCode 
   | RequestCancelled 
-  | ContentModified 
+  | ContentModified [@@deriving show]
 let (uu___is_ParseError : error_code -> Prims.bool) =
   fun projectee -> match projectee with | ParseError -> true | uu___ -> false
 let (uu___is_InvalidRequest : error_code -> Prims.bool) =

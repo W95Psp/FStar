@@ -4,7 +4,7 @@ type level =
   | Expr 
   | Type_level 
   | Kind 
-  | Formula 
+  | Formula [@@deriving yojson,show]
 let (uu___is_Un : level -> Prims.bool) =
   fun projectee -> match projectee with | Un -> true | uu___ -> false
 let (uu___is_Expr : level -> Prims.bool) =
@@ -17,7 +17,7 @@ let (uu___is_Formula : level -> Prims.bool) =
   fun projectee -> match projectee with | Formula -> true | uu___ -> false
 type let_qualifier =
   | NoLetQualifier 
-  | Rec 
+  | Rec [@@deriving yojson,show]
 let (uu___is_NoLetQualifier : let_qualifier -> Prims.bool) =
   fun projectee ->
     match projectee with | NoLetQualifier -> true | uu___ -> false
@@ -25,7 +25,7 @@ let (uu___is_Rec : let_qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Rec -> true | uu___ -> false
 type quote_kind =
   | Static 
-  | Dynamic 
+  | Dynamic [@@deriving yojson,show]
 let (uu___is_Static : quote_kind -> Prims.bool) =
   fun projectee -> match projectee with | Static -> true | uu___ -> false
 let (uu___is_Dynamic : quote_kind -> Prims.bool) =
@@ -87,26 +87,27 @@ type term' =
   | ElimExists of (binder Prims.list * term * term * binder * term) 
   | ElimImplies of (term * term * term) 
   | ElimOr of (term * term * term * binder * term * binder * term) 
-  | ElimAnd of (term * term * term * binder * binder * term) 
+  | ElimAnd of (term * term * term * binder * binder * term) [@@deriving
+                                                               yojson,show]
 and term = {
   tm: term' ;
   range: FStar_Compiler_Range.range ;
-  level: level }
+  level: level }[@@deriving yojson,show]
 and calc_step =
-  | CalcStep of (term * term * term) 
+  | CalcStep of (term * term * term) [@@deriving yojson,show]
 and binder' =
   | Variable of FStar_Ident.ident 
   | TVariable of FStar_Ident.ident 
   | Annotated of (FStar_Ident.ident * term) 
   | TAnnotated of (FStar_Ident.ident * term) 
-  | NoName of term 
+  | NoName of term [@@deriving yojson,show]
 and binder =
   {
   b: binder' ;
   brange: FStar_Compiler_Range.range ;
   blevel: level ;
   aqual: arg_qualifier FStar_Pervasives_Native.option ;
-  battributes: term Prims.list }
+  battributes: term Prims.list }[@@deriving yojson,show]
 and pattern' =
   | PatWild of (arg_qualifier FStar_Pervasives_Native.option * term
   Prims.list) 
@@ -122,21 +123,21 @@ and pattern' =
   | PatRecord of (FStar_Ident.lid * pattern) Prims.list 
   | PatAscribed of (pattern * (term * term FStar_Pervasives_Native.option)) 
   | PatOr of pattern Prims.list 
-  | PatOp of FStar_Ident.ident 
+  | PatOp of FStar_Ident.ident [@@deriving yojson,show]
 and pattern = {
   pat: pattern' ;
-  prange: FStar_Compiler_Range.range }
+  prange: FStar_Compiler_Range.range }[@@deriving yojson,show]
 and arg_qualifier =
   | Implicit 
   | Equality 
-  | Meta of term 
+  | Meta of term [@@deriving yojson,show]
 and imp =
   | FsTypApp 
   | Hash 
   | UnivApp 
   | HashBrace of term 
   | Infix 
-  | Nothing 
+  | Nothing [@@deriving yojson,show]
 let (uu___is_Wild : term' -> Prims.bool) =
   fun projectee -> match projectee with | Wild -> true | uu___ -> false
 let (uu___is_Const : term' -> Prims.bool) =
@@ -536,12 +537,17 @@ let (uu___is_Infix : imp -> Prims.bool) =
 let (uu___is_Nothing : imp -> Prims.bool) =
   fun projectee -> match projectee with | Nothing -> true | uu___ -> false
 type patterns = (FStar_Ident.ident Prims.list * term Prims.list Prims.list)
-type attributes_ = term Prims.list
-type branch = (pattern * term FStar_Pervasives_Native.option * term)
-type aqual = arg_qualifier FStar_Pervasives_Native.option
-type knd = term
-type typ = term
-type expr = term
+[@@deriving yojson,show]
+type attributes_ = term Prims.list[@@deriving yojson,show]
+type branch = (pattern * term FStar_Pervasives_Native.option * term)[@@deriving
+                                                                    yojson,show]
+type aqual = arg_qualifier FStar_Pervasives_Native.option[@@deriving
+                                                           yojson,show]
+let (show_term : term -> Prims.string) =
+  fun uu___ -> failwith "Not yet implemented:show_term"
+type knd = term[@@deriving show]
+type typ = term[@@deriving show]
+type expr = term[@@deriving show]
 type tycon =
   | TyconAbstract of (FStar_Ident.ident * binder Prims.list * knd
   FStar_Pervasives_Native.option) 
@@ -552,7 +558,7 @@ type tycon =
   term) Prims.list) 
   | TyconVariant of (FStar_Ident.ident * binder Prims.list * knd
   FStar_Pervasives_Native.option * (FStar_Ident.ident * term
-  FStar_Pervasives_Native.option * Prims.bool) Prims.list) 
+  FStar_Pervasives_Native.option * Prims.bool) Prims.list) [@@deriving show]
 let (uu___is_TyconAbstract : tycon -> Prims.bool) =
   fun projectee ->
     match projectee with | TyconAbstract _0 -> true | uu___ -> false
@@ -605,7 +611,7 @@ type qualifier =
   | Reifiable 
   | Reflectable 
   | Opaque 
-  | Logic 
+  | Logic [@@deriving show]
 let (uu___is_Private : qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Private -> true | uu___ -> false
 let (uu___is_Noeq : qualifier -> Prims.bool) =
@@ -651,10 +657,10 @@ let (uu___is_Opaque : qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Opaque -> true | uu___ -> false
 let (uu___is_Logic : qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Logic -> true | uu___ -> false
-type qualifiers = qualifier Prims.list
+type qualifiers = qualifier Prims.list[@@deriving show]
 type decoration =
   | Qualifier of qualifier 
-  | DeclAttributes of term Prims.list 
+  | DeclAttributes of term Prims.list [@@deriving show]
 let (uu___is_Qualifier : decoration -> Prims.bool) =
   fun projectee ->
     match projectee with | Qualifier _0 -> true | uu___ -> false
@@ -668,7 +674,7 @@ let (__proj__DeclAttributes__item___0 : decoration -> term Prims.list) =
 type lift_op =
   | NonReifiableLift of term 
   | ReifiableLift of (term * term) 
-  | LiftForFree of term 
+  | LiftForFree of term [@@deriving show]
 let (uu___is_NonReifiableLift : lift_op -> Prims.bool) =
   fun projectee ->
     match projectee with | NonReifiableLift _0 -> true | uu___ -> false
@@ -688,7 +694,7 @@ type lift =
   {
   msource: FStar_Ident.lid ;
   mdest: FStar_Ident.lid ;
-  lift_op: lift_op }
+  lift_op: lift_op }[@@deriving show]
 let (__proj__Mklift__item__msource : lift -> FStar_Ident.lid) =
   fun projectee ->
     match projectee with | { msource; mdest; lift_op = lift_op1;_} -> msource
@@ -705,8 +711,7 @@ type pragma =
   | PushOptions of Prims.string FStar_Pervasives_Native.option 
   | PopOptions 
   | RestartSolver 
-  | LightOff 
-  | PrintEffectsGraph 
+  | LightOff [@@deriving show]
 let (uu___is_SetOptions : pragma -> Prims.bool) =
   fun projectee ->
     match projectee with | SetOptions _0 -> true | uu___ -> false
@@ -731,9 +736,6 @@ let (uu___is_RestartSolver : pragma -> Prims.bool) =
     match projectee with | RestartSolver -> true | uu___ -> false
 let (uu___is_LightOff : pragma -> Prims.bool) =
   fun projectee -> match projectee with | LightOff -> true | uu___ -> false
-let (uu___is_PrintEffectsGraph : pragma -> Prims.bool) =
-  fun projectee ->
-    match projectee with | PrintEffectsGraph -> true | uu___ -> false
 type decl' =
   | TopLevelModule of FStar_Ident.lid 
   | Open of FStar_Ident.lid 
@@ -752,17 +754,18 @@ type decl' =
   | Polymonadic_subcomp of (FStar_Ident.lid * FStar_Ident.lid * term) 
   | Pragma of pragma 
   | Assume of (FStar_Ident.ident * term) 
-  | Splice of (FStar_Ident.ident Prims.list * term) 
+  | Splice of (FStar_Ident.ident Prims.list * term) [@@deriving show]
 and decl =
   {
   d: decl' ;
   drange: FStar_Compiler_Range.range ;
   quals: qualifiers ;
-  attrs: attributes_ }
+  attrs: attributes_ }[@@deriving show]
 and effect_decl =
   | DefineEffect of (FStar_Ident.ident * binder Prims.list * term * decl
   Prims.list) 
   | RedefineEffect of (FStar_Ident.ident * binder Prims.list * term) 
+[@@deriving show]
 let (uu___is_TopLevelModule : decl' -> Prims.bool) =
   fun projectee ->
     match projectee with | TopLevelModule _0 -> true | uu___ -> false
@@ -873,7 +876,8 @@ let (__proj__RedefineEffect__item___0 :
   fun projectee -> match projectee with | RedefineEffect _0 -> _0
 type modul =
   | Module of (FStar_Ident.lid * decl Prims.list) 
-  | Interface of (FStar_Ident.lid * decl Prims.list * Prims.bool) 
+  | Interface of (FStar_Ident.lid * decl Prims.list * Prims.bool) [@@deriving
+                                                                    show]
 let (uu___is_Module : modul -> Prims.bool) =
   fun projectee -> match projectee with | Module _0 -> true | uu___ -> false
 let (__proj__Module__item___0 : modul -> (FStar_Ident.lid * decl Prims.list))
@@ -884,8 +888,9 @@ let (uu___is_Interface : modul -> Prims.bool) =
 let (__proj__Interface__item___0 :
   modul -> (FStar_Ident.lid * decl Prims.list * Prims.bool)) =
   fun projectee -> match projectee with | Interface _0 -> _0
-type file = modul
-type inputFragment = (file, decl Prims.list) FStar_Pervasives.either
+type file = modul[@@deriving show]
+type inputFragment = (file, decl Prims.list) FStar_Pervasives.either[@@deriving
+                                                                    show]
 let (decl_drange : decl -> FStar_Compiler_Range.range) =
   fun decl1 -> decl1.drange
 let (check_id : FStar_Ident.ident -> unit) =

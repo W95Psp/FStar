@@ -17,10 +17,11 @@ type decl =
   | DTypeAbstractStruct of (Prims.string Prims.list * Prims.string) 
   | DExternal of (cc FStar_Pervasives_Native.option * flag Prims.list *
   (Prims.string Prims.list * Prims.string) * typ * Prims.string Prims.list) 
+[@@deriving show]
 and cc =
   | StdCall 
   | CDecl 
-  | FastCall 
+  | FastCall [@@deriving show]
 and flag =
   | Private 
   | WipeBody 
@@ -35,11 +36,11 @@ and flag =
   | Abstract 
   | IfDef 
   | Macro 
-  | Deprecated of Prims.string 
+  | Deprecated of Prims.string [@@deriving show]
 and lifetime =
   | Eternal 
   | Stack 
-  | ManuallyManaged 
+  | ManuallyManaged [@@deriving show]
 and expr =
   | EBound of Prims.int 
   | EQualified of (Prims.string Prims.list * Prims.string) 
@@ -79,7 +80,7 @@ and expr =
   | EBufCreateNoInit of (lifetime * expr) 
   | EAbortT of (Prims.string * typ) 
   | EComment of (Prims.string * expr * Prims.string) 
-  | EStandaloneComment of Prims.string 
+  | EStandaloneComment of Prims.string [@@deriving show]
 and op =
   | Add 
   | AddW 
@@ -105,7 +106,7 @@ and op =
   | And 
   | Or 
   | Xor 
-  | Not 
+  | Not [@@deriving show]
 and pattern =
   | PUnit 
   | PBool of Prims.bool 
@@ -113,7 +114,7 @@ and pattern =
   | PCons of (Prims.string * pattern Prims.list) 
   | PTuple of pattern Prims.list 
   | PRecord of (Prims.string * pattern) Prims.list 
-  | PConstant of (width * Prims.string) 
+  | PConstant of (width * Prims.string) [@@deriving show]
 and width =
   | UInt8 
   | UInt16 
@@ -124,11 +125,11 @@ and width =
   | Int32 
   | Int64 
   | Bool 
-  | CInt 
+  | CInt [@@deriving show]
 and binder = {
   name: Prims.string ;
   typ: typ ;
-  mut: Prims.bool }
+  mut: Prims.bool }[@@deriving show]
 and typ =
   | TInt of width 
   | TBuf of typ 
@@ -140,7 +141,7 @@ and typ =
   | TBound of Prims.int 
   | TApp of ((Prims.string Prims.list * Prims.string) * typ Prims.list) 
   | TTuple of typ Prims.list 
-  | TConstBuf of typ 
+  | TConstBuf of typ [@@deriving show]
 let (uu___is_DGlobal : decl -> Prims.bool) =
   fun projectee -> match projectee with | DGlobal _0 -> true | uu___ -> false
 let (__proj__DGlobal__item___0 :
@@ -573,21 +574,23 @@ let (uu___is_TConstBuf : typ -> Prims.bool) =
     match projectee with | TConstBuf _0 -> true | uu___ -> false
 let (__proj__TConstBuf__item___0 : typ -> typ) =
   fun projectee -> match projectee with | TConstBuf _0 -> _0
-type program = decl Prims.list
-type ident = Prims.string
-type fields_t = (Prims.string * (typ * Prims.bool)) Prims.list
+type program = decl Prims.list[@@deriving show]
+type ident = Prims.string[@@deriving show]
+type fields_t = (Prims.string * (typ * Prims.bool)) Prims.list[@@deriving
+                                                                show]
 type branches_t =
   (Prims.string * (Prims.string * (typ * Prims.bool)) Prims.list) Prims.list
-type fsdoc = Prims.string
-type branch = (pattern * expr)
-type branches = (pattern * expr) Prims.list
-type constant = (width * Prims.string)
-type var = Prims.int
-type lident = (Prims.string Prims.list * Prims.string)
-type version = Prims.int
+[@@deriving show]
+type fsdoc = Prims.string[@@deriving show]
+type branch = (pattern * expr)[@@deriving show]
+type branches = (pattern * expr) Prims.list[@@deriving show]
+type constant = (width * Prims.string)[@@deriving show]
+type var = Prims.int[@@deriving show]
+type lident = (Prims.string Prims.list * Prims.string)[@@deriving show]
+type version = Prims.int[@@deriving show]
 let (current_version : version) = (Prims.of_int (28))
-type file = (Prims.string * program)
-type binary_format = (version * file Prims.list)
+type file = (Prims.string * program)[@@deriving show]
+type binary_format = (version * file Prims.list)[@@deriving show]
 let fst3 : 'uuuuu 'uuuuu1 'uuuuu2 . ('uuuuu * 'uuuuu1 * 'uuuuu2) -> 'uuuuu =
   fun uu___ -> match uu___ with | (x, uu___1, uu___2) -> x
 let snd3 : 'uuuuu 'uuuuu1 'uuuuu2 . ('uuuuu * 'uuuuu1 * 'uuuuu2) -> 'uuuuu1 =
@@ -670,9 +673,9 @@ type env =
   {
   names: name Prims.list ;
   names_t: Prims.string Prims.list ;
-  module_name: Prims.string Prims.list }
+  module_name: Prims.string Prims.list }[@@deriving show]
 and name = {
-  pretty: Prims.string }
+  pretty: Prims.string }[@@deriving show]
 let (__proj__Mkenv__item__names : env -> name Prims.list) =
   fun projectee ->
     match projectee with | { names; names_t; module_name;_} -> names

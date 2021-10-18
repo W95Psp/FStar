@@ -1440,7 +1440,25 @@ let (uu___143 : unit) =
                                                                     FStar_Tactics_Basic.t_commute_applied_match
                                                                     FStar_TypeChecker_NBETerm.e_unit
                                                                     FStar_TypeChecker_NBETerm.e_unit in
-                                                                    [uu___136] in
+                                                                    let uu___137
+                                                                    =
+                                                                    let uu___138
+                                                                    =
+                                                                    FStar_Tactics_InterpFuns.mk_tac_step_2
+                                                                    Prims.int_zero
+                                                                    "string_to_term"
+                                                                    FStar_Tactics_Basic.string_to_term
+                                                                    FStar_Reflection_Embeddings.e_env
+                                                                    FStar_Syntax_Embeddings.e_string
+                                                                    FStar_Reflection_Embeddings.e_term
+                                                                    FStar_Tactics_Basic.string_to_term
+                                                                    FStar_Reflection_NBEEmbeddings.e_env
+                                                                    FStar_TypeChecker_NBETerm.e_string
+                                                                    FStar_Reflection_NBEEmbeddings.e_term in
+                                                                    [uu___138] in
+                                                                    uu___136
+                                                                    ::
+                                                                    uu___137 in
                                                                     uu___134
                                                                     ::
                                                                     uu___135 in

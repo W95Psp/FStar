@@ -5,7 +5,7 @@ type goal =
   goal_ctx_uvar: FStar_Syntax_Syntax.ctx_uvar ;
   opts: FStar_Options.optionstate ;
   is_guard: Prims.bool ;
-  label: Prims.string }
+  label: Prims.string }[@@deriving show]
 let (__proj__Mkgoal__item__goal_main_env : goal -> FStar_TypeChecker_Env.env)
   =
   fun projectee ->
@@ -230,9 +230,7 @@ let (goal_of_implicit :
           FStar_TypeChecker_Env.enable_defer_to_tac =
             (env.FStar_TypeChecker_Env.enable_defer_to_tac);
           FStar_TypeChecker_Env.unif_allow_ref_guards =
-            (env.FStar_TypeChecker_Env.unif_allow_ref_guards);
-          FStar_TypeChecker_Env.erase_erasable_args =
-            (env.FStar_TypeChecker_Env.erase_erasable_args)
+            (env.FStar_TypeChecker_Env.unif_allow_ref_guards)
         } i.FStar_TypeChecker_Common.imp_uvar uu___ false
         i.FStar_TypeChecker_Common.imp_reason
 let (rename_binders :
@@ -312,7 +310,7 @@ type guard_policy =
   | Goal 
   | SMT 
   | Force 
-  | Drop 
+  | Drop [@@deriving show]
 let (uu___is_Goal : guard_policy -> Prims.bool) =
   fun projectee -> match projectee with | Goal -> true | uu___ -> false
 let (uu___is_SMT : guard_policy -> Prims.bool) =
@@ -335,7 +333,7 @@ type proofstate =
   freshness: Prims.int ;
   tac_verb_dbg: Prims.bool ;
   local_state: FStar_Syntax_Syntax.term FStar_Compiler_Util.psmap ;
-  urgency: Prims.int }
+  urgency: Prims.int }[@@deriving show]
 let (__proj__Mkproofstate__item__main_context :
   proofstate -> FStar_TypeChecker_Env.env) =
   fun projectee ->
@@ -561,7 +559,7 @@ let (set_label : Prims.string -> goal -> goal) =
       }
 type direction =
   | TopDown 
-  | BottomUp 
+  | BottomUp [@@deriving show]
 let (uu___is_TopDown : direction -> Prims.bool) =
   fun projectee -> match projectee with | TopDown -> true | uu___ -> false
 let (uu___is_BottomUp : direction -> Prims.bool) =
@@ -569,7 +567,7 @@ let (uu___is_BottomUp : direction -> Prims.bool) =
 type ctrl_flag =
   | Continue 
   | Skip 
-  | Abort 
+  | Abort [@@deriving show]
 let (uu___is_Continue : ctrl_flag -> Prims.bool) =
   fun projectee -> match projectee with | Continue -> true | uu___ -> false
 let (uu___is_Skip : ctrl_flag -> Prims.bool) =

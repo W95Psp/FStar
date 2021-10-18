@@ -5,7 +5,8 @@ let (rangeof : FStar_Tactics_Types.goal -> FStar_Compiler_Range.range) =
 type controller_ty =
   FStar_Syntax_Syntax.term ->
     (Prims.bool * FStar_Tactics_Types.ctrl_flag) FStar_Tactics_Monad.tac
-type rewriter_ty = unit FStar_Tactics_Monad.tac
+[@@deriving show]
+type rewriter_ty = unit FStar_Tactics_Monad.tac[@@deriving show]
 let (__do_rewrite :
   FStar_Tactics_Types.goal ->
     rewriter_ty ->
@@ -146,10 +147,7 @@ let (__do_rewrite :
                                      (env.FStar_TypeChecker_Env.enable_defer_to_tac);
                                    FStar_TypeChecker_Env.unif_allow_ref_guards
                                      =
-                                     (env.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                                   FStar_TypeChecker_Env.erase_erasable_args
-                                     =
-                                     (env.FStar_TypeChecker_Env.erase_erasable_args)
+                                     (env.FStar_TypeChecker_Env.unif_allow_ref_guards)
                                  } tm in
                              FStar_Pervasives_Native.Some uu___3)) ()
                with
@@ -239,7 +237,8 @@ let (do_rewrite :
                | FStar_Pervasives.Inl e -> FStar_Tactics_Monad.traise e
                | FStar_Pervasives.Inr tm' -> FStar_Tactics_Monad.ret tm')
 type 'a ctac =
-  'a -> ('a * FStar_Tactics_Types.ctrl_flag) FStar_Tactics_Monad.tac
+  'a -> ('a * FStar_Tactics_Types.ctrl_flag) FStar_Tactics_Monad.tac[@@deriving
+                                                                    show]
 let seq_ctac : 'a . 'a ctac -> 'a ctac -> 'a ctac =
   fun c1 ->
     fun c2 ->

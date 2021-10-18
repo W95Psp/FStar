@@ -231,10 +231,11 @@ let (repl_state_init :
         FStar_Interactive_CompletionTable.empty
     }
 type optresponse =
-  FStar_Interactive_JsonHelper.assoct FStar_Pervasives_Native.option
+  FStar_Interactive_JsonHelper.assoct FStar_Pervasives_Native.option[@@deriving
+                                                                    show]
 type either_gst_exit =
   (FStar_Interactive_JsonHelper.grepl_state, Prims.int)
-    FStar_Pervasives.either
+    FStar_Pervasives.either[@@deriving show]
 let (invoke_full_lax :
   FStar_Interactive_JsonHelper.grepl_state ->
     Prims.string ->

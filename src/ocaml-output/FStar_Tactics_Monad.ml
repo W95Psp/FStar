@@ -2,6 +2,7 @@ open Prims
 type 'a tac =
   {
   tac_f: FStar_Tactics_Types.proofstate -> 'a FStar_Tactics_Result.__result }
+[@@deriving show]
 let __proj__Mktac__item__tac_f :
   'a .
     'a tac ->

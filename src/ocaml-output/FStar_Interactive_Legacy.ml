@@ -31,9 +31,10 @@ let (tc_one_file :
         | [] -> failwith "Impossible" in
       match uu___ with
       | ((intf, impl), env1, remaining1) -> ((intf, impl), env1, remaining1)
-type env_t = FStar_TypeChecker_Env.env
+type env_t = FStar_TypeChecker_Env.env[@@deriving show]
 type modul_t = FStar_Syntax_Syntax.modul FStar_Pervasives_Native.option
-type stack_t = (env_t * modul_t) Prims.list
+[@@deriving show]
+type stack_t = (env_t * modul_t) Prims.list[@@deriving show]
 let (pop : FStar_TypeChecker_Env.env -> Prims.string -> unit) =
   fun env ->
     fun msg ->
@@ -138,9 +139,7 @@ let (push_with_kind :
               FStar_TypeChecker_Env.enable_defer_to_tac =
                 (env.FStar_TypeChecker_Env.enable_defer_to_tac);
               FStar_TypeChecker_Env.unif_allow_ref_guards =
-                (env.FStar_TypeChecker_Env.unif_allow_ref_guards);
-              FStar_TypeChecker_Env.erase_erasable_args =
-                (env.FStar_TypeChecker_Env.erase_erasable_args)
+                (env.FStar_TypeChecker_Env.unif_allow_ref_guards)
             } in
           let res = FStar_TypeChecker_Tc.push_context env1 msg in
           FStar_Options.push ();
@@ -199,7 +198,7 @@ type input_chunks =
   | Code of (Prims.string * (Prims.string * Prims.string)) 
   | Info of (Prims.string * Prims.bool * (Prims.string * Prims.int *
   Prims.int) FStar_Pervasives_Native.option) 
-  | Completions of Prims.string 
+  | Completions of Prims.string [@@deriving show]
 let (uu___is_Push : input_chunks -> Prims.bool) =
   fun projectee -> match projectee with | Push _0 -> true | uu___ -> false
 let (__proj__Push__item___0 :
@@ -237,7 +236,7 @@ type interactive_state =
   log:
     FStar_Compiler_Util.file_handle FStar_Pervasives_Native.option
       FStar_Compiler_Effect.ref
-    }
+    }[@@deriving show]
 let (__proj__Mkinteractive_state__item__chunk :
   interactive_state -> FStar_Compiler_Util.string_builder) =
   fun projectee ->
@@ -458,7 +457,7 @@ let (deps_of_our_file :
 type m_timestamps =
   (Prims.string FStar_Pervasives_Native.option * Prims.string *
     FStar_Compiler_Util.time FStar_Pervasives_Native.option *
-    FStar_Compiler_Util.time) Prims.list
+    FStar_Compiler_Util.time) Prims.list[@@deriving show]
 let rec (tc_deps :
   modul_t ->
     stack_t ->

@@ -2,7 +2,13 @@ open Prims
 type file_name = Prims.string[@@deriving yojson,show]
 type pos = {
   line: Prims.int ;
-  col: Prims.int }[@@deriving yojson,show]
+  col: Prims.int }[@@deriving yojson]
+let pp_pos (f: Ppx_deriving_runtime.Format.formatter) (p: pos)
+  = Prims.pp_int f p.line;
+    Ppx_deriving_runtime.Format.pp_print_string f ":";
+    Prims.pp_int f p.col;
+    ()
+
 let (__proj__Mkpos__item__line : pos -> Prims.int) =
   fun projectee -> match projectee with | { line; col;_} -> line
 let (__proj__Mkpos__item__col : pos -> Prims.int) =
@@ -16,7 +22,12 @@ let (pos_geq : pos -> pos -> Prims.bool) =
 type rng = {
   file_name: file_name ;
   start_pos: pos ;
-  end_pos: pos }[@@deriving yojson,show]
+  end_pos: pos }[@@deriving yojson]
+let pp_rng (f: Ppx_deriving_runtime.Format.formatter) p
+  = pp_pos f p.start_pos;
+    Ppx_deriving_runtime.Format.pp_print_string f "->";
+    pp_pos f p.end_pos
+
 let (__proj__Mkrng__item__file_name : rng -> file_name) =
   fun projectee ->
     match projectee with
@@ -31,7 +42,10 @@ let (__proj__Mkrng__item__end_pos : rng -> pos) =
     | { file_name = file_name1; start_pos; end_pos;_} -> end_pos
 type range = {
   def_range: rng ;
-  use_range: rng }[@@deriving yojson,show]
+  use_range: rng }[@@deriving yojson]
+let pp_range (f: Ppx_deriving_runtime.Format.formatter) r
+  = pp_rng f r.def_range
+
 let (__proj__Mkrange__item__def_range : range -> rng) =
   fun projectee ->
     match projectee with | { def_range; use_range;_} -> def_range

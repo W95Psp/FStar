@@ -1,7 +1,7 @@
 open Prims
 type z3_replay_result =
   (FStar_SMTEncoding_Z3.unsat_core, FStar_SMTEncoding_Term.error_labels)
-    FStar_Pervasives.either
+    FStar_Pervasives.either[@@deriving show]
 let z3_result_as_replay_result :
   'uuuuu 'uuuuu1 'uuuuu2 .
     ('uuuuu, ('uuuuu1 * 'uuuuu2)) FStar_Pervasives.either ->
@@ -248,7 +248,7 @@ type errors =
   error_fuel: Prims.int ;
   error_ifuel: Prims.int ;
   error_hint: Prims.string Prims.list FStar_Pervasives_Native.option ;
-  error_messages: FStar_Errors.error Prims.list }
+  error_messages: FStar_Errors.error Prims.list }[@@deriving show]
 let (__proj__Mkerrors__item__error_reason : errors -> Prims.string) =
   fun projectee ->
     match projectee with
@@ -313,7 +313,7 @@ type query_settings =
   query_errors: errors Prims.list ;
   query_all_labels: FStar_SMTEncoding_Term.error_labels ;
   query_suffix: FStar_SMTEncoding_Term.decl Prims.list ;
-  query_hash: Prims.string FStar_Pervasives_Native.option }
+  query_hash: Prims.string FStar_Pervasives_Native.option }[@@deriving show]
 let (__proj__Mkquery_settings__item__query_env :
   query_settings -> FStar_TypeChecker_Env.env) =
   fun projectee ->
@@ -1493,7 +1493,7 @@ type solver_cfg =
   cliopt: Prims.string Prims.list ;
   facts: (Prims.string Prims.list * Prims.bool) Prims.list ;
   valid_intro: Prims.bool ;
-  valid_elim: Prims.bool }
+  valid_elim: Prims.bool }[@@deriving show]
 let (__proj__Mksolver_cfg__item__seed : solver_cfg -> Prims.int) =
   fun projectee ->
     match projectee with

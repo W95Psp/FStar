@@ -2,7 +2,7 @@ open Prims
 type push_kind =
   | SyntaxCheck 
   | LaxCheck 
-  | FullCheck 
+  | FullCheck [@@deriving show]
 let (uu___is_SyntaxCheck : push_kind -> Prims.bool) =
   fun projectee ->
     match projectee with | SyntaxCheck -> true | uu___ -> false
@@ -12,10 +12,12 @@ let (uu___is_FullCheck : push_kind -> Prims.bool) =
   fun projectee -> match projectee with | FullCheck -> true | uu___ -> false
 type ctx_depth_t =
   (Prims.int * Prims.int * FStar_TypeChecker_Env.solver_depth_t * Prims.int)
-type deps_t = FStar_Parser_Dep.deps
+[@@deriving show]
+type deps_t = FStar_Parser_Dep.deps[@@deriving show]
 type either_replst =
   (FStar_Interactive_JsonHelper.repl_state,
-    FStar_Interactive_JsonHelper.repl_state) FStar_Pervasives.either
+    FStar_Interactive_JsonHelper.repl_state) FStar_Pervasives.either[@@deriving
+                                                                    show]
 let (repl_stack :
   FStar_Interactive_JsonHelper.repl_stack_t FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref []
@@ -101,9 +103,7 @@ let (set_check_kind :
         FStar_TypeChecker_Env.enable_defer_to_tac =
           (env.FStar_TypeChecker_Env.enable_defer_to_tac);
         FStar_TypeChecker_Env.unif_allow_ref_guards =
-          (env.FStar_TypeChecker_Env.unif_allow_ref_guards);
-        FStar_TypeChecker_Env.erase_erasable_args =
-          (env.FStar_TypeChecker_Env.erase_erasable_args)
+          (env.FStar_TypeChecker_Env.unif_allow_ref_guards)
       }
 let (repl_ld_tasks_of_deps :
   Prims.string Prims.list ->
@@ -343,7 +343,8 @@ type name_tracking_event =
   
   | NTInclude of (FStar_Ident.lid * FStar_Ident.lid) 
   | NTBinding of (FStar_Syntax_Syntax.binding,
-  FStar_TypeChecker_Env.sig_binding) FStar_Pervasives.either 
+  FStar_TypeChecker_Env.sig_binding) FStar_Pervasives.either [@@deriving
+                                                               show]
 let (uu___is_NTAlias : name_tracking_event -> Prims.bool) =
   fun projectee -> match projectee with | NTAlias _0 -> true | uu___ -> false
 let (__proj__NTAlias__item___0 :

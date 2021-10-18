@@ -1,7 +1,7 @@
 open Prims
-type name = Prims.string Prims.list
-type typ = FStar_Syntax_Syntax.term
-type binders = FStar_Syntax_Syntax.binder Prims.list
+type name = Prims.string Prims.list[@@deriving show]
+type typ = FStar_Syntax_Syntax.term[@@deriving show]
+type binders = FStar_Syntax_Syntax.binder Prims.list[@@deriving show]
 type vconst =
   | C_Unit 
   | C_Int of FStar_BigInt.t 
@@ -10,7 +10,7 @@ type vconst =
   | C_String of Prims.string 
   | C_Range of FStar_Compiler_Range.range 
   | C_Reify 
-  | C_Reflect of name 
+  | C_Reflect of name [@@deriving show]
 let (uu___is_C_Unit : vconst -> Prims.bool) =
   fun projectee -> match projectee with | C_Unit -> true | uu___ -> false
 let (uu___is_C_Int : vconst -> Prims.bool) =
@@ -44,6 +44,7 @@ type pattern =
   | Pat_Var of FStar_Syntax_Syntax.bv 
   | Pat_Wild of FStar_Syntax_Syntax.bv 
   | Pat_Dot_Term of (FStar_Syntax_Syntax.bv * FStar_Syntax_Syntax.term) 
+[@@deriving show]
 let (uu___is_Pat_Constant : pattern -> Prims.bool) =
   fun projectee ->
     match projectee with | Pat_Constant _0 -> true | uu___ -> false
@@ -70,11 +71,11 @@ let (uu___is_Pat_Dot_Term : pattern -> Prims.bool) =
 let (__proj__Pat_Dot_Term__item___0 :
   pattern -> (FStar_Syntax_Syntax.bv * FStar_Syntax_Syntax.term)) =
   fun projectee -> match projectee with | Pat_Dot_Term _0 -> _0
-type branch = (pattern * FStar_Syntax_Syntax.term)
+type branch = (pattern * FStar_Syntax_Syntax.term)[@@deriving show]
 type aqualv =
   | Q_Implicit 
   | Q_Explicit 
-  | Q_Meta of FStar_Syntax_Syntax.term 
+  | Q_Meta of FStar_Syntax_Syntax.term [@@deriving show]
 let (uu___is_Q_Implicit : aqualv -> Prims.bool) =
   fun projectee -> match projectee with | Q_Implicit -> true | uu___ -> false
 let (uu___is_Q_Explicit : aqualv -> Prims.bool) =
@@ -83,7 +84,7 @@ let (uu___is_Q_Meta : aqualv -> Prims.bool) =
   fun projectee -> match projectee with | Q_Meta _0 -> true | uu___ -> false
 let (__proj__Q_Meta__item___0 : aqualv -> FStar_Syntax_Syntax.term) =
   fun projectee -> match projectee with | Q_Meta _0 -> _0
-type argv = (FStar_Syntax_Syntax.term * aqualv)
+type argv = (FStar_Syntax_Syntax.term * aqualv)[@@deriving show]
 type term_view =
   | Tv_Var of FStar_Syntax_Syntax.bv 
   | Tv_BVar of FStar_Syntax_Syntax.bv 
@@ -106,7 +107,7 @@ type term_view =
   FStar_Syntax_Syntax.term FStar_Pervasives_Native.option) 
   | Tv_AscribedC of (FStar_Syntax_Syntax.term * FStar_Syntax_Syntax.comp *
   FStar_Syntax_Syntax.term FStar_Pervasives_Native.option) 
-  | Tv_Unknown 
+  | Tv_Unknown [@@deriving show]
 let (uu___is_Tv_Var : term_view -> Prims.bool) =
   fun projectee -> match projectee with | Tv_Var _0 -> true | uu___ -> false
 let (__proj__Tv_Var__item___0 : term_view -> FStar_Syntax_Syntax.bv) =
@@ -215,7 +216,7 @@ type qualifier =
   | ExceptionConstructor 
   | HasMaskedEffect 
   | Effect 
-  | OnlyName 
+  | OnlyName [@@deriving show]
 let (uu___is_Assumption : qualifier -> Prims.bool) =
   fun projectee -> match projectee with | Assumption -> true | uu___ -> false
 let (uu___is_New : qualifier -> Prims.bool) =
@@ -295,7 +296,7 @@ type bv_view =
   {
   bv_ppname: Prims.string ;
   bv_index: FStar_BigInt.t ;
-  bv_sort: typ }
+  bv_sort: typ }[@@deriving show]
 let (__proj__Mkbv_view__item__bv_ppname : bv_view -> Prims.string) =
   fun projectee ->
     match projectee with | { bv_ppname; bv_index; bv_sort;_} -> bv_ppname
@@ -307,13 +308,14 @@ let (__proj__Mkbv_view__item__bv_sort : bv_view -> typ) =
     match projectee with | { bv_ppname; bv_index; bv_sort;_} -> bv_sort
 type binder_view =
   (FStar_Syntax_Syntax.bv * (aqualv * FStar_Syntax_Syntax.term Prims.list))
+[@@deriving show]
 type comp_view =
   | C_Total of (typ * FStar_Syntax_Syntax.term Prims.list) 
   | C_GTotal of (typ * FStar_Syntax_Syntax.term Prims.list) 
   | C_Lemma of (FStar_Syntax_Syntax.term * FStar_Syntax_Syntax.term *
   FStar_Syntax_Syntax.term) 
   | C_Eff of (unit Prims.list * name * FStar_Syntax_Syntax.term * argv
-  Prims.list) 
+  Prims.list) [@@deriving show]
 let (uu___is_C_Total : comp_view -> Prims.bool) =
   fun projectee -> match projectee with | C_Total _0 -> true | uu___ -> false
 let (__proj__C_Total__item___0 :
@@ -338,13 +340,13 @@ let (__proj__C_Eff__item___0 :
   comp_view ->
     (unit Prims.list * name * FStar_Syntax_Syntax.term * argv Prims.list))
   = fun projectee -> match projectee with | C_Eff _0 -> _0
-type ctor = (name * typ)
+type ctor = (name * typ)[@@deriving show]
 type lb_view =
   {
   lb_fv: FStar_Syntax_Syntax.fv ;
   lb_us: FStar_Syntax_Syntax.univ_name Prims.list ;
   lb_typ: typ ;
-  lb_def: FStar_Syntax_Syntax.term }
+  lb_def: FStar_Syntax_Syntax.term }[@@deriving show]
 let (__proj__Mklb_view__item__lb_fv : lb_view -> FStar_Syntax_Syntax.fv) =
   fun projectee ->
     match projectee with | { lb_fv; lb_us; lb_typ; lb_def;_} -> lb_fv
@@ -363,7 +365,7 @@ type sigelt_view =
   | Sg_Inductive of (name * FStar_Syntax_Syntax.univ_name Prims.list *
   FStar_Syntax_Syntax.binder Prims.list * typ * ctor Prims.list) 
   | Sg_Val of (name * FStar_Syntax_Syntax.univ_name Prims.list * typ) 
-  | Unk 
+  | Unk [@@deriving show]
 let (uu___is_Sg_Let : sigelt_view -> Prims.bool) =
   fun projectee -> match projectee with | Sg_Let _0 -> true | uu___ -> false
 let (__proj__Sg_Let__item___0 :
@@ -384,11 +386,11 @@ let (__proj__Sg_Val__item___0 :
   fun projectee -> match projectee with | Sg_Val _0 -> _0
 let (uu___is_Unk : sigelt_view -> Prims.bool) =
   fun projectee -> match projectee with | Unk -> true | uu___ -> false
-type var = FStar_BigInt.t
+type var = FStar_BigInt.t[@@deriving show]
 type exp =
   | Unit 
   | Var of var 
-  | Mult of (exp * exp) 
+  | Mult of (exp * exp) [@@deriving show]
 let (uu___is_Unit : exp -> Prims.bool) =
   fun projectee -> match projectee with | Unit -> true | uu___ -> false
 let (uu___is_Var : exp -> Prims.bool) =
@@ -403,7 +405,7 @@ type refl_constant =
   {
   lid: FStar_Ident.lid ;
   fv: FStar_Syntax_Syntax.fv ;
-  t: FStar_Syntax_Syntax.term }
+  t: FStar_Syntax_Syntax.term }[@@deriving show]
 let (__proj__Mkrefl_constant__item__lid : refl_constant -> FStar_Ident.lid) =
   fun projectee -> match projectee with | { lid; fv; t;_} -> lid
 let (__proj__Mkrefl_constant__item__fv :
@@ -794,4 +796,4 @@ let (ord_Eq_fv : FStar_Syntax_Syntax.fv) =
 let (ord_Gt_fv : FStar_Syntax_Syntax.fv) =
   FStar_Syntax_Syntax.lid_as_fv ord_Gt_lid FStar_Syntax_Syntax.delta_constant
     (FStar_Pervasives_Native.Some FStar_Syntax_Syntax.Data_ctor)
-type decls = FStar_Syntax_Syntax.sigelt Prims.list
+type decls = FStar_Syntax_Syntax.sigelt Prims.list[@@deriving show]

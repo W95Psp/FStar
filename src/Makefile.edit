@@ -1,0 +1,7 @@
+FSTAR_HOME = ..
+include Makefile.boot.common
+ABS_CACHE_DIR = $(abspath $(CACHE_DIR))
+%.fsi-dev: $(ABS_CACHE_DIR)/%.fsi.checked.lax
+	@echo $(FSTAR_BOOT_OPTIONS)
+%.fs-dev: $(ABS_CACHE_DIR)/%.fs.checked.lax
+	@echo $(FSTAR_BOOT_OPTIONS)

@@ -557,8 +557,16 @@ let inspect_sigelt (se : sigelt) : sigelt_view =
         let us, ty = SS.open_univ_vars us ty in
         Sg_Val (nm, us, ty)
 
-    | _ ->
-        Unk
+    | Sig_new_effect (ed: eff_decl) -> 
+        // | Sg_New_Effect of name * list<cflag> * list<univ_name> * list<binder> * typ * list name * list name * list<attribute>
+                    // mname  cattributes   univs             binders  signature  combinators   actions    eff_attrs 
+      let mname = Ident.path_of_lid ed.mname in
+      let _ = Sg_New_Effect (mname, (*ed.cattributes,*) ed.univs, ed.binders, snd ed.signature, [], [], ed.eff_attrs) in
+      Unk
+    | Sig_sub_effect (se: sub_eff) -> Unk
+    | Sig_effect_abbrev (id, us, bds, cmp, flags) ->
+      Unk
+    | _ -> Unk
 
 let pack_sigelt (sv:sigelt_view) : sigelt =
     match sv with

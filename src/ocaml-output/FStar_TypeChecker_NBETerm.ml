@@ -1,6 +1,6 @@
 open Prims
-type var = FStar_Syntax_Syntax.bv
-type sort = Prims.int
+type var = FStar_Syntax_Syntax.bv[@@deriving show]
+type sort = Prims.int[@@deriving show]
 type constant =
   | Unit 
   | Bool of Prims.bool 
@@ -8,7 +8,7 @@ type constant =
   | String of (Prims.string * FStar_Compiler_Range.range) 
   | Char of FStar_Char.char 
   | Range of FStar_Compiler_Range.range 
-  | SConst of FStar_Const.sconst 
+  | SConst of FStar_Const.sconst [@@deriving show]
 let (uu___is_Unit : constant -> Prims.bool) =
   fun projectee -> match projectee with | Unit -> true | uu___ -> false
 let (uu___is_Bool : constant -> Prims.bool) =
@@ -47,7 +47,7 @@ type atom =
   FStar_Thunk.t * FStar_Syntax_Syntax.letbinding) 
   | UnreducedLetRec of ((var * t * t) Prims.list * t *
   FStar_Syntax_Syntax.letbinding Prims.list) 
-  | UVar of FStar_Syntax_Syntax.term FStar_Thunk.t 
+  | UVar of FStar_Syntax_Syntax.term FStar_Thunk.t [@@deriving show]
 and t' =
   | Lam of ((t Prims.list -> t) *
   ((t Prims.list * FStar_Syntax_Syntax.binders *
@@ -80,22 +80,23 @@ and t' =
   | LocalLetRec of (Prims.int * FStar_Syntax_Syntax.letbinding *
   FStar_Syntax_Syntax.letbinding Prims.list * t Prims.list * (t *
   FStar_Syntax_Syntax.aqual) Prims.list * Prims.int * Prims.bool Prims.list) 
+[@@deriving show]
 and t = {
   nbe_t: t' ;
-  nbe_r: FStar_Compiler_Range.range }
+  nbe_r: FStar_Compiler_Range.range }[@@deriving show]
 and comp =
   | Tot of (t * FStar_Syntax_Syntax.universe FStar_Pervasives_Native.option)
   
   | GTot of (t * FStar_Syntax_Syntax.universe FStar_Pervasives_Native.option)
   
-  | Comp of comp_typ 
+  | Comp of comp_typ [@@deriving show]
 and comp_typ =
   {
   comp_univs: FStar_Syntax_Syntax.universes ;
   effect_name: FStar_Ident.lident ;
   result_typ: t ;
   effect_args: (t * FStar_Syntax_Syntax.aqual) Prims.list ;
-  flags: cflag Prims.list }
+  flags: cflag Prims.list }[@@deriving show]
 and cflag =
   | TOTAL 
   | MLEFFECT 
@@ -107,12 +108,12 @@ and cflag =
   | LEMMA 
   | CPS 
   | DECREASES_lex of t Prims.list 
-  | DECREASES_wf of (t * t) 
+  | DECREASES_wf of (t * t) [@@deriving show]
 and residual_comp =
   {
   residual_effect: FStar_Ident.lident ;
   residual_typ: t FStar_Pervasives_Native.option ;
-  residual_flags: cflag Prims.list }
+  residual_flags: cflag Prims.list }[@@deriving show]
 let (uu___is_Var : atom -> Prims.bool) =
   fun projectee -> match projectee with | Var _0 -> true | uu___ -> false
 let (__proj__Var__item___0 : atom -> var) =
@@ -346,10 +347,10 @@ let (__proj__Mkresidual_comp__item__residual_flags :
   fun projectee ->
     match projectee with
     | { residual_effect; residual_typ; residual_flags;_} -> residual_flags
-type arg = (t * FStar_Syntax_Syntax.aqual)
-type args = (t * FStar_Syntax_Syntax.aqual) Prims.list
-type head = t
-type annot = t FStar_Pervasives_Native.option
+type arg = (t * FStar_Syntax_Syntax.aqual)[@@deriving show]
+type args = (t * FStar_Syntax_Syntax.aqual) Prims.list[@@deriving show]
+type head = t[@@deriving show]
+type annot = t FStar_Pervasives_Native.option[@@deriving show]
 let (isAccu : t -> Prims.bool) =
   fun trm -> match trm.nbe_t with | Accu uu___ -> true | uu___ -> false
 let (isNotAccu : t -> Prims.bool) =
@@ -695,7 +696,7 @@ let (args_to_string : args -> Prims.string) =
 type nbe_cbs =
   {
   iapp: t -> args -> t ;
-  translate: FStar_Syntax_Syntax.term -> t }
+  translate: FStar_Syntax_Syntax.term -> t }[@@deriving show]
 let (__proj__Mknbe_cbs__item__iapp : nbe_cbs -> t -> args -> t) =
   fun projectee -> match projectee with | { iapp; translate;_} -> iapp
 let (__proj__Mknbe_cbs__item__translate :
@@ -710,7 +711,7 @@ type 'a embedding =
   em: nbe_cbs -> 'a -> t ;
   un: nbe_cbs -> t -> 'a FStar_Pervasives_Native.option ;
   typ: t ;
-  emb_typ: FStar_Syntax_Syntax.emb_typ }
+  emb_typ: FStar_Syntax_Syntax.emb_typ }[@@deriving show]
 let __proj__Mkembedding__item__em : 'a . 'a embedding -> nbe_cbs -> 'a -> t =
   fun projectee -> match projectee with | { em; un; typ; emb_typ;_} -> em
 let __proj__Mkembedding__item__un :
@@ -787,8 +788,7 @@ let (lid_as_typ :
             FStar_Pervasives_Native.None in
         mkFV uu___ us args1
 let (as_iarg : t -> arg) =
-  fun a ->
-    let uu___ = FStar_Syntax_Syntax.as_aqual_implicit true in (a, uu___)
+  fun a -> (a, (FStar_Pervasives_Native.Some FStar_Syntax_Syntax.imp_tag))
 let (as_arg : t -> arg) = fun a -> (a, FStar_Pervasives_Native.None)
 let (make_arrow1 : t -> arg -> t) =
   fun t1 ->
@@ -1170,8 +1170,7 @@ let e_list : 'a . 'a embedding -> 'a Prims.list embedding =
                 (tl, FStar_Pervasives_Native.None)::(hd,
                                                      FStar_Pervasives_Native.None)::
                 (uu___1, FStar_Pervasives_Native.Some
-                 { FStar_Syntax_Syntax.aqual_implicit = true;
-                   FStar_Syntax_Syntax.aqual_attributes = uu___2;_})::[])
+                 (FStar_Syntax_Syntax.Implicit uu___2))::[])
                when
                FStar_Syntax_Syntax.fv_eq_lid fv FStar_Parser_Const.cons_lid
                ->
@@ -1664,6 +1663,23 @@ let (interp_prop_eq2 : args -> t FStar_Pervasives_Native.option) =
          | FStar_Syntax_Util.NotEqual ->
              let uu___5 = embed e_bool bogus_cbs false in
              FStar_Pervasives_Native.Some uu___5
+         | FStar_Syntax_Util.Unknown -> FStar_Pervasives_Native.None)
+    | uu___ -> failwith "Unexpected number of arguments"
+let (interp_prop_eq3 : args -> t FStar_Pervasives_Native.option) =
+  fun args1 ->
+    match args1 with
+    | (_u, uu___)::(_v, uu___1)::(t1, uu___2)::(t2, uu___3)::(a1, uu___4)::
+        (a2, uu___5)::[] ->
+        let uu___6 =
+          let uu___7 = eq_t t1 t2 in
+          let uu___8 = eq_t a1 a2 in FStar_Syntax_Util.eq_inj uu___7 uu___8 in
+        (match uu___6 with
+         | FStar_Syntax_Util.Equal ->
+             let uu___7 = embed e_bool bogus_cbs true in
+             FStar_Pervasives_Native.Some uu___7
+         | FStar_Syntax_Util.NotEqual ->
+             let uu___7 = embed e_bool bogus_cbs false in
+             FStar_Pervasives_Native.Some uu___7
          | FStar_Syntax_Util.Unknown -> FStar_Pervasives_Native.None)
     | uu___ -> failwith "Unexpected number of arguments"
 let (dummy_interp :

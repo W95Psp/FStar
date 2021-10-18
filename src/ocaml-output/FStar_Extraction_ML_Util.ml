@@ -327,7 +327,8 @@ let (mk_ty_fun :
                (t0, FStar_Extraction_ML_Syntax.E_PURE, t))
 type unfold_t =
   FStar_Extraction_ML_Syntax.mlty ->
-    FStar_Extraction_ML_Syntax.mlty FStar_Pervasives_Native.option
+    FStar_Extraction_ML_Syntax.mlty FStar_Pervasives_Native.option[@@deriving
+                                                                    show]
 let rec (type_leq_c :
   unfold_t ->
     FStar_Extraction_ML_Syntax.mlexpr FStar_Pervasives_Native.option ->
@@ -772,7 +773,7 @@ type emb_loc =
   | Syntax_term 
   | Refl_emb 
   | NBE_t 
-  | NBERefl_emb 
+  | NBERefl_emb [@@deriving show]
 let (uu___is_Syntax_term : emb_loc -> Prims.bool) =
   fun projectee ->
     match projectee with | Syntax_term -> true | uu___ -> false
@@ -785,7 +786,7 @@ let (uu___is_NBERefl_emb : emb_loc -> Prims.bool) =
     match projectee with | NBERefl_emb -> true | uu___ -> false
 type wrapped_term =
   (FStar_Extraction_ML_Syntax.mlexpr * FStar_Extraction_ML_Syntax.mlexpr *
-    Prims.int * Prims.bool)
+    Prims.int * Prims.bool)[@@deriving show]
 let (interpret_plugin_as_term_fun :
   FStar_Extraction_ML_UEnv.uenv ->
     FStar_Syntax_Syntax.fv ->

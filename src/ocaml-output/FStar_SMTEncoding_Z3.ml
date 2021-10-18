@@ -72,8 +72,9 @@ let (check_z3version : unit -> unit) =
                 _z3url "and add the bin/ subdirectory into your PATH" in
             FStar_Errors.log_issue FStar_Compiler_Range.dummyRange (e, msg1)))
     else ()
-type label = Prims.string
+type label = Prims.string[@@deriving show]
 type unsat_core = Prims.string Prims.list FStar_Pervasives_Native.option
+[@@deriving show]
 type z3status =
   | UNSAT of unsat_core 
   | SAT of (FStar_SMTEncoding_Term.error_labels * Prims.string
@@ -82,7 +83,7 @@ type z3status =
   FStar_Pervasives_Native.option) 
   | TIMEOUT of (FStar_SMTEncoding_Term.error_labels * Prims.string
   FStar_Pervasives_Native.option) 
-  | KILLED 
+  | KILLED [@@deriving show]
 let (uu___is_UNSAT : z3status -> Prims.bool) =
   fun projectee -> match projectee with | UNSAT _0 -> true | uu___ -> false
 let (__proj__UNSAT__item___0 : z3status -> unsat_core) =
@@ -110,7 +111,7 @@ let (__proj__TIMEOUT__item___0 :
   = fun projectee -> match projectee with | TIMEOUT _0 -> _0
 let (uu___is_KILLED : z3status -> Prims.bool) =
   fun projectee -> match projectee with | KILLED -> true | uu___ -> false
-type z3statistics = Prims.string FStar_Compiler_Util.smap
+type z3statistics = Prims.string FStar_Compiler_Util.smap[@@deriving show]
 let (status_tag : z3status -> Prims.string) =
   fun uu___ ->
     match uu___ with
@@ -154,7 +155,7 @@ type query_log =
   get_module_name: unit -> Prims.string ;
   set_module_name: Prims.string -> unit ;
   write_to_log: Prims.bool -> Prims.string -> Prims.string ;
-  close_log: unit -> unit }
+  close_log: unit -> unit }[@@deriving show]
 let (__proj__Mkquery_log__item__get_module_name :
   query_log -> unit -> Prims.string) =
   fun projectee ->
@@ -309,7 +310,7 @@ type bgproc =
   {
   ask: Prims.string -> Prims.string ;
   refresh: unit -> unit ;
-  restart: unit -> unit }
+  restart: unit -> unit }[@@deriving show]
 let (__proj__Mkbgproc__item__ask : bgproc -> Prims.string -> Prims.string) =
   fun projectee -> match projectee with | { ask; refresh; restart;_} -> ask
 let (__proj__Mkbgproc__item__refresh : bgproc -> unit -> unit) =
@@ -405,14 +406,15 @@ let (bg_z3_proc : bgproc FStar_Compiler_Effect.ref) =
       refresh = (FStar_Compiler_Util.with_monitor x refresh);
       restart = (FStar_Compiler_Util.with_monitor x restart)
     }
-type smt_output_section = Prims.string Prims.list
+type smt_output_section = Prims.string Prims.list[@@deriving show]
 type smt_output =
   {
   smt_result: smt_output_section ;
   smt_reason_unknown: smt_output_section FStar_Pervasives_Native.option ;
   smt_unsat_core: smt_output_section FStar_Pervasives_Native.option ;
   smt_statistics: smt_output_section FStar_Pervasives_Native.option ;
-  smt_labels: smt_output_section FStar_Pervasives_Native.option }
+  smt_labels: smt_output_section FStar_Pervasives_Native.option }[@@deriving
+                                                                   show]
 let (__proj__Mksmt_output__item__smt_result :
   smt_output -> smt_output_section) =
   fun projectee ->
@@ -704,7 +706,8 @@ type z3result =
   z3result_time: Prims.int ;
   z3result_statistics: z3statistics ;
   z3result_query_hash: Prims.string FStar_Pervasives_Native.option ;
-  z3result_log_file: Prims.string FStar_Pervasives_Native.option }
+  z3result_log_file: Prims.string FStar_Pervasives_Native.option }[@@deriving
+                                                                    show]
 let (__proj__Mkz3result__item__z3result_status : z3result -> z3status) =
   fun projectee ->
     match projectee with
@@ -735,7 +738,8 @@ let (__proj__Mkz3result__item__z3result_log_file :
         z3result_query_hash; z3result_log_file;_} -> z3result_log_file
 let (init : unit -> unit) = fun uu___ -> ()
 let (finish : unit -> unit) = fun uu___ -> ()
-type scope_t = FStar_SMTEncoding_Term.decl Prims.list Prims.list
+type scope_t = FStar_SMTEncoding_Term.decl Prims.list Prims.list[@@deriving
+                                                                  show]
 let (fresh_scope : scope_t FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref [[]]
 let (mk_fresh_scope : unit -> scope_t) =

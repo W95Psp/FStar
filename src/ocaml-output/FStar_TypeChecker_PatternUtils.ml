@@ -1,7 +1,7 @@
 open Prims
 type lcomp_with_binder =
   (FStar_Syntax_Syntax.bv FStar_Pervasives_Native.option *
-    FStar_TypeChecker_Common.lcomp)
+    FStar_TypeChecker_Common.lcomp)[@@deriving show]
 let rec (elaborate_pat :
   FStar_TypeChecker_Env.env ->
     FStar_Syntax_Syntax.pat -> FStar_Syntax_Syntax.pat)
@@ -149,7 +149,7 @@ let rec (elaborate_pat :
                            | (uu___4, imp) ->
                                let uu___5 =
                                  let uu___6 =
-                                   FStar_Syntax_Syntax.is_bqual_implicit imp in
+                                   FStar_Syntax_Syntax.is_implicit imp in
                                  (p1, uu___6) in
                                let uu___6 = aux formals' pats' in uu___5 ::
                                  uu___6) in

@@ -4,7 +4,7 @@ let profile : 'uuuuu . (unit -> 'uuuuu) -> Prims.string -> 'uuuuu =
 type verify_mode =
   | VerifyAll 
   | VerifyUserList 
-  | VerifyFigureItOut 
+  | VerifyFigureItOut [@@deriving show]
 let (uu___is_VerifyAll : verify_mode -> Prims.bool) =
   fun projectee -> match projectee with | VerifyAll -> true | uu___ -> false
 let (uu___is_VerifyUserList : verify_mode -> Prims.bool) =
@@ -15,8 +15,9 @@ let (uu___is_VerifyFigureItOut : verify_mode -> Prims.bool) =
     match projectee with | VerifyFigureItOut -> true | uu___ -> false
 type intf_and_impl =
   (Prims.string FStar_Pervasives_Native.option * Prims.string
-    FStar_Pervasives_Native.option)
-type files_for_module_name = intf_and_impl FStar_Compiler_Util.smap
+    FStar_Pervasives_Native.option)[@@deriving show]
+type files_for_module_name = intf_and_impl FStar_Compiler_Util.smap[@@deriving
+                                                                    show]
 let (intf_and_impl_to_string :
   (Prims.string FStar_Pervasives_Native.option * Prims.string
     FStar_Pervasives_Native.option) -> Prims.string)
@@ -49,7 +50,7 @@ let (files_for_module_name_to_string : files_for_module_name -> unit) =
 type color =
   | White 
   | Gray 
-  | Black 
+  | Black [@@deriving show]
 let (uu___is_White : color -> Prims.bool) =
   fun projectee -> match projectee with | White -> true | uu___ -> false
 let (uu___is_Gray : color -> Prims.bool) =
@@ -58,7 +59,7 @@ let (uu___is_Black : color -> Prims.bool) =
   fun projectee -> match projectee with | Black -> true | uu___ -> false
 type open_kind =
   | Open_module 
-  | Open_namespace 
+  | Open_namespace [@@deriving show]
 let (uu___is_Open_module : open_kind -> Prims.bool) =
   fun projectee ->
     match projectee with | Open_module -> true | uu___ -> false
@@ -137,13 +138,13 @@ let (namespace_of_module :
     | ns ->
         let uu___1 = FStar_Ident.lid_of_ids ns in
         FStar_Pervasives_Native.Some uu___1
-type file_name = Prims.string
-type module_name = Prims.string
+type file_name = Prims.string[@@deriving show]
+type module_name = Prims.string[@@deriving show]
 type dependence =
   | UseInterface of module_name 
   | PreferInterface of module_name 
   | UseImplementation of module_name 
-  | FriendImplementation of module_name 
+  | FriendImplementation of module_name [@@deriving show]
 let (uu___is_UseInterface : dependence -> Prims.bool) =
   fun projectee ->
     match projectee with | UseInterface _0 -> true | uu___ -> false
@@ -171,18 +172,18 @@ let (dep_to_string : dependence -> Prims.string) =
     | PreferInterface f -> FStar_String.op_Hat "PreferInterface " f
     | UseImplementation f -> FStar_String.op_Hat "UseImplementation " f
     | FriendImplementation f -> FStar_String.op_Hat "FriendImplementation " f
-type dependences = dependence Prims.list
+type dependences = dependence Prims.list[@@deriving show]
 let empty_dependences : 'uuuuu . unit -> 'uuuuu Prims.list = fun uu___ -> []
 type dep_node = {
   edges: dependences ;
-  color: color }
+  color: color }[@@deriving show]
 let (__proj__Mkdep_node__item__edges : dep_node -> dependences) =
   fun projectee -> match projectee with | { edges; color = color1;_} -> edges
 let (__proj__Mkdep_node__item__color : dep_node -> color) =
   fun projectee ->
     match projectee with | { edges; color = color1;_} -> color1
 type dependence_graph =
-  | Deps of dep_node FStar_Compiler_Util.smap 
+  | Deps of dep_node FStar_Compiler_Util.smap [@@deriving show]
 let (uu___is_Deps : dependence_graph -> Prims.bool) = fun projectee -> true
 let (__proj__Deps__item___0 :
   dependence_graph -> dep_node FStar_Compiler_Util.smap) =
@@ -194,7 +195,7 @@ type parsing_data_elt =
   | P_dep of (Prims.bool * FStar_Ident.lident) 
   | P_alias of (FStar_Ident.ident * FStar_Ident.lident) 
   | P_lid of FStar_Ident.lident 
-  | P_inline_for_extraction 
+  | P_inline_for_extraction [@@deriving show]
 let (uu___is_P_begin_module : parsing_data_elt -> Prims.bool) =
   fun projectee ->
     match projectee with | P_begin_module _0 -> true | uu___ -> false
@@ -234,7 +235,7 @@ let (uu___is_P_inline_for_extraction : parsing_data_elt -> Prims.bool) =
   fun projectee ->
     match projectee with | P_inline_for_extraction -> true | uu___ -> false
 type parsing_data =
-  | Mk_pd of parsing_data_elt Prims.list 
+  | Mk_pd of parsing_data_elt Prims.list [@@deriving show]
 let (uu___is_Mk_pd : parsing_data -> Prims.bool) = fun projectee -> true
 let (__proj__Mk_pd__item___0 : parsing_data -> parsing_data_elt Prims.list) =
   fun projectee -> match projectee with | Mk_pd _0 -> _0
@@ -338,7 +339,7 @@ type deps =
   cmd_line_files: file_name Prims.list ;
   all_files: file_name Prims.list ;
   interfaces_with_inlining: module_name Prims.list ;
-  parse_results: parsing_data FStar_Compiler_Util.smap }
+  parse_results: parsing_data FStar_Compiler_Util.smap }[@@deriving show]
 let (__proj__Mkdeps__item__dep_graph : deps -> dependence_graph) =
   fun projectee ->
     match projectee with
@@ -2486,8 +2487,7 @@ let (print_full : deps -> unit) =
                                                       lowercase_module_name
                                                         df in
                                                     FStar_Options.should_extract
-                                                      uu___7
-                                                      FStar_Options.OCaml))) in
+                                                      uu___7))) in
                                        FStar_Compiler_Effect.op_Bar_Greater
                                          extracted_fst_files
                                          (FStar_Compiler_List.map
@@ -2495,8 +2495,7 @@ let (print_full : deps -> unit) =
                                      let uu___7 =
                                        let uu___8 =
                                          lowercase_module_name file_name1 in
-                                       FStar_Options.should_extract uu___8
-                                         FStar_Options.OCaml in
+                                       FStar_Options.should_extract uu___8 in
                                      if uu___7
                                      then
                                        let cmx_files1 =
@@ -2555,8 +2554,7 @@ let (print_full : deps -> unit) =
             (FStar_Compiler_List.iter
                (fun fst_file ->
                   let mname = lowercase_module_name fst_file in
-                  let uu___2 =
-                    FStar_Options.should_extract mname FStar_Options.OCaml in
+                  let uu___2 = FStar_Options.should_extract mname in
                   if uu___2
                   then
                     let uu___3 = output_ml_file fst_file in
@@ -2570,13 +2568,8 @@ let (print_full : deps -> unit) =
             (FStar_Compiler_List.iter
                (fun fst_file ->
                   let mname = lowercase_module_name fst_file in
-                  let uu___2 =
-                    FStar_Options.should_extract mname FStar_Options.Kremlin in
-                  if uu___2
-                  then
-                    let uu___3 = output_krml_file fst_file in
-                    FStar_Compiler_Util.smap_add krml_file_map mname uu___3
-                  else ()));
+                  let uu___2 = output_krml_file fst_file in
+                  FStar_Compiler_Util.smap_add krml_file_map mname uu___2));
           sort_output_files krml_file_map in
         let print_all tag files =
           pr tag;

@@ -81,7 +81,7 @@ type push_query =
   push_code: Prims.string ;
   push_line: Prims.int ;
   push_column: Prims.int ;
-  push_peek_only: Prims.bool }
+  push_peek_only: Prims.bool }[@@deriving show]
 let (__proj__Mkpush_query__item__push_kind :
   push_query -> FStar_Interactive_PushHelper.push_kind) =
   fun projectee ->
@@ -108,7 +108,7 @@ let (__proj__Mkpush_query__item__push_peek_only : push_query -> Prims.bool) =
     match projectee with
     | { push_kind; push_code; push_line; push_column; push_peek_only;_} ->
         push_peek_only
-type env_t = FStar_TypeChecker_Env.env
+type env_t = FStar_TypeChecker_Env.env[@@deriving show]
 let (repl_current_qid :
   Prims.string FStar_Pervasives_Native.option FStar_Compiler_Effect.ref) =
   FStar_Compiler_Util.mk_ref FStar_Pervasives_Native.None
@@ -345,7 +345,7 @@ let (js_reductionrule :
 type completion_context =
   | CKCode 
   | CKOption of Prims.bool 
-  | CKModuleOrNamespace of (Prims.bool * Prims.bool) 
+  | CKModuleOrNamespace of (Prims.bool * Prims.bool) [@@deriving show]
 let (uu___is_CKCode : completion_context -> Prims.bool) =
   fun projectee -> match projectee with | CKCode -> true | uu___ -> false
 let (uu___is_CKOption : completion_context -> Prims.bool) =
@@ -385,7 +385,7 @@ type lookup_context =
   | LKSymbolOnly 
   | LKModule 
   | LKOption 
-  | LKCode 
+  | LKCode [@@deriving show]
 let (uu___is_LKSymbolOnly : lookup_context -> Prims.bool) =
   fun projectee ->
     match projectee with | LKSymbolOnly -> true | uu___ -> false
@@ -416,7 +416,7 @@ let (js_optional_lookup_context :
              FStar_Interactive_JsonHelper.js_fail
                "lookup context (symbol-only, code, set-options, reset-options, open, let-open, include, module-alias)"
                k1)
-type position = (Prims.string * Prims.int * Prims.int)
+type position = (Prims.string * Prims.int * Prims.int)[@@deriving show]
 type query' =
   | Exit 
   | DescribeProtocol 
@@ -432,10 +432,10 @@ type query' =
   FStar_Pervasives_Native.option) 
   | Search of Prims.string 
   | GenericError of Prims.string 
-  | ProtocolViolation of Prims.string 
+  | ProtocolViolation of Prims.string [@@deriving show]
 and query = {
   qq: query' ;
-  qid: Prims.string }
+  qid: Prims.string }[@@deriving show]
 let (uu___is_Exit : query' -> Prims.bool) =
   fun projectee -> match projectee with | Exit -> true | uu___ -> false
 let (uu___is_DescribeProtocol : query' -> Prims.bool) =
@@ -543,7 +543,7 @@ let (interactive_protocol_features : Prims.string Prims.list) =
 type query_status =
   | QueryOK 
   | QueryNOK 
-  | QueryViolatesProtocol 
+  | QueryViolatesProtocol [@@deriving show]
 let (uu___is_QueryOK : query_status -> Prims.bool) =
   fun projectee -> match projectee with | QueryOK -> true | uu___ -> false
 let (uu___is_QueryNOK : query_status -> Prims.bool) =
@@ -901,7 +901,7 @@ let (alist_of_protocol_info :
   [("version", js_version); ("features", js_features)]
 type fstar_option_permission_level =
   | OptSet 
-  | OptReadOnly 
+  | OptReadOnly [@@deriving show]
 let (uu___is_OptSet : fstar_option_permission_level -> Prims.bool) =
   fun projectee -> match projectee with | OptSet -> true | uu___ -> false
 let (uu___is_OptReadOnly : fstar_option_permission_level -> Prims.bool) =
@@ -919,7 +919,7 @@ type fstar_option =
   opt_type: FStar_Options.opt_type ;
   opt_snippets: Prims.string Prims.list ;
   opt_documentation: Prims.string FStar_Pervasives_Native.option ;
-  opt_permission_level: fstar_option_permission_level }
+  opt_permission_level: fstar_option_permission_level }[@@deriving show]
 let (__proj__Mkfstar_option__item__opt_name : fstar_option -> Prims.string) =
   fun projectee ->
     match projectee with
@@ -1605,9 +1605,7 @@ let run_push_without_deps :
                FStar_TypeChecker_Env.enable_defer_to_tac =
                  (uu___.FStar_TypeChecker_Env.enable_defer_to_tac);
                FStar_TypeChecker_Env.unif_allow_ref_guards =
-                 (uu___.FStar_TypeChecker_Env.unif_allow_ref_guards);
-               FStar_TypeChecker_Env.erase_erasable_args =
-                 (uu___.FStar_TypeChecker_Env.erase_erasable_args)
+                 (uu___.FStar_TypeChecker_Env.unif_allow_ref_guards)
              });
           FStar_Interactive_JsonHelper.repl_stdin =
             (st1.FStar_Interactive_JsonHelper.repl_stdin);
@@ -2205,10 +2203,10 @@ let run_compute :
                (QueryOK, uu___))
 type search_term' =
   | NameContainsStr of Prims.string 
-  | TypeContainsLid of FStar_Ident.lid 
+  | TypeContainsLid of FStar_Ident.lid [@@deriving show]
 and search_term = {
   st_negate: Prims.bool ;
-  st_term: search_term' }
+  st_term: search_term' }[@@deriving show]
 let (uu___is_NameContainsStr : search_term' -> Prims.bool) =
   fun projectee ->
     match projectee with | NameContainsStr _0 -> true | uu___ -> false
@@ -2239,7 +2237,7 @@ type search_candidate =
   sc_fvars:
     FStar_Ident.lid FStar_Compiler_Util.set FStar_Pervasives_Native.option
       FStar_Compiler_Effect.ref
-    }
+    }[@@deriving show]
 let (__proj__Mksearch_candidate__item__sc_lid :
   search_candidate -> FStar_Ident.lid) =
   fun projectee ->

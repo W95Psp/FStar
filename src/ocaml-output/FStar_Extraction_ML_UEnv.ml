@@ -2,7 +2,7 @@ open Prims
 type ty_binding =
   {
   ty_b_name: FStar_Extraction_ML_Syntax.mlident ;
-  ty_b_ty: FStar_Extraction_ML_Syntax.mlty }
+  ty_b_ty: FStar_Extraction_ML_Syntax.mlty }[@@deriving show]
 let (__proj__Mkty_binding__item__ty_b_name :
   ty_binding -> FStar_Extraction_ML_Syntax.mlident) =
   fun projectee ->
@@ -14,7 +14,7 @@ type exp_binding =
   {
   exp_b_name: FStar_Extraction_ML_Syntax.mlident ;
   exp_b_expr: FStar_Extraction_ML_Syntax.mlexpr ;
-  exp_b_tscheme: FStar_Extraction_ML_Syntax.mltyscheme }
+  exp_b_tscheme: FStar_Extraction_ML_Syntax.mltyscheme }[@@deriving show]
 let (__proj__Mkexp_binding__item__exp_b_name :
   exp_binding -> FStar_Extraction_ML_Syntax.mlident) =
   fun projectee ->
@@ -30,11 +30,12 @@ let (__proj__Mkexp_binding__item__exp_b_tscheme :
   fun projectee ->
     match projectee with
     | { exp_b_name; exp_b_expr; exp_b_tscheme;_} -> exp_b_tscheme
-type ty_or_exp_b = (ty_binding, exp_binding) FStar_Pervasives.either
+type ty_or_exp_b = (ty_binding, exp_binding) FStar_Pervasives.either[@@deriving
+                                                                    show]
 type binding =
   | Bv of (FStar_Syntax_Syntax.bv * ty_or_exp_b) 
   | Fv of (FStar_Syntax_Syntax.fv * exp_binding) 
-  | ErasedFv of FStar_Syntax_Syntax.fv 
+  | ErasedFv of FStar_Syntax_Syntax.fv [@@deriving show]
 let (uu___is_Bv : binding -> Prims.bool) =
   fun projectee -> match projectee with | Bv _0 -> true | uu___ -> false
 let (__proj__Bv__item___0 :
@@ -56,7 +57,7 @@ type tydef =
   tydef_mlmodule_name: FStar_Extraction_ML_Syntax.mlsymbol Prims.list ;
   tydef_name: FStar_Extraction_ML_Syntax.mlsymbol ;
   tydef_meta: FStar_Extraction_ML_Syntax.metadata ;
-  tydef_def: FStar_Extraction_ML_Syntax.mltyscheme }
+  tydef_def: FStar_Extraction_ML_Syntax.mltyscheme }[@@deriving show]
 let (__proj__Mktydef__item__tydef_fv : tydef -> FStar_Syntax_Syntax.fv) =
   fun projectee ->
     match projectee with
@@ -109,7 +110,7 @@ type uenv =
   type_names:
     (FStar_Syntax_Syntax.fv * FStar_Extraction_ML_Syntax.mlpath) Prims.list ;
   tydef_declarations: Prims.bool FStar_Compiler_Util.psmap ;
-  currentModule: FStar_Extraction_ML_Syntax.mlpath }
+  currentModule: FStar_Extraction_ML_Syntax.mlpath }[@@deriving show]
 let (__proj__Mkuenv__item__env_tcenv : uenv -> FStar_TypeChecker_Env.env) =
   fun projectee ->
     match projectee with

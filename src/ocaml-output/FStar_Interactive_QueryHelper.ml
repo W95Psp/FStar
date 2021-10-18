@@ -1,12 +1,12 @@
 open Prims
-type position = (Prims.string * Prims.int * Prims.int)
+type position = (Prims.string * Prims.int * Prims.int)[@@deriving show]
 type sl_reponse =
   {
   slr_name: Prims.string ;
   slr_def_range: FStar_Compiler_Range.range FStar_Pervasives_Native.option ;
   slr_typ: Prims.string FStar_Pervasives_Native.option ;
   slr_doc: Prims.string FStar_Pervasives_Native.option ;
-  slr_def: Prims.string FStar_Pervasives_Native.option }
+  slr_def: Prims.string FStar_Pervasives_Native.option }[@@deriving show]
 let (__proj__Mksl_reponse__item__slr_name : sl_reponse -> Prims.string) =
   fun projectee ->
     match projectee with

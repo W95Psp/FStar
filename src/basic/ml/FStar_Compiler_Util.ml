@@ -12,7 +12,8 @@ let is_punctuation c = List.mem c [33; 34; 35; 37; 38; 39; 40; 41; 42; 44; 45; 4
 
 let return_all x = x
 
-type time = float
+type time = float[@@deriving show]
+(* let pp_time _ _ = fun _ -> () *)
 let now () = BatUnix.gettimeofday ()
 let now_ms () = Z.of_int (int_of_float (now () *. 1000.0))
 let time_diff (t1:time) (t2:time) : float * Prims.int =
@@ -284,6 +285,8 @@ let normalize_file_path (path_str:string) =
            pwd //@ path))
 
 type stream_reader = BatIO.input
+let pp_stream_reader _ _ = ()
+
 let open_stdin () = BatIO.stdin
 let read_line s =
   try
@@ -297,6 +300,8 @@ let nread (s:stream_reader) (n:Z.t) =
     _ -> None
 
 type string_builder = BatBuffer.t
+let pp_string_builder _ _ = fun _ -> ()
+
 let new_string_builder () = BatBuffer.create 256
 let clear_string_builder b = BatBuffer.clear b
 let string_of_string_builder b = BatBuffer.contents b
@@ -357,7 +362,13 @@ module StringOps =
 module StringHashtbl = BatHashtbl.Make(StringOps)
 module StringMap = BatMap.Make(StringOps)
 
+
 type 'value smap = 'value StringHashtbl.t
+
+(* val pp_smap: Ppx_deriving_runtime.Format.formatter ->
+ *          option_val -> Ppx_deriving_runtime.unit *)
+let pp_smap _ _ = fun _ -> ()
+
 let smap_create (i:Z.t) : 'value smap = StringHashtbl.create (Z.to_int i)
 let smap_clear (s:('value smap)) = StringHashtbl.clear s
 let smap_add (m:'value smap) k (v:'value) = StringHashtbl.replace m k v
@@ -375,6 +386,8 @@ let smap_iter (m:'value smap) f = StringHashtbl.iter f m
 
 exception PSMap_Found
 type 'value psmap = 'value StringMap.t
+let pp_psmap _ _ = fun _ -> ()
+
 let psmap_empty (_: unit) : 'value psmap = StringMap.empty
 let psmap_add (map: 'value psmap) (key: string) (value: 'value) = StringMap.add key value map
 let psmap_find_default (map: 'value psmap) (key: string) (dflt: 'value) =
@@ -413,6 +426,8 @@ let imap_keys (m:'value imap) = imap_fold m (fun k _ acc -> k::acc) []
 let imap_copy (m:'value imap) = ZHashtbl.copy m
 
 type 'value pimap = 'value ZMap.t
+let pp_pimap _ _ = fun _ -> ()
+
 let pimap_empty (_: unit) : 'value pimap = ZMap.empty
 let pimap_add (map: 'value pimap) (key: Z.t) (value: 'value) = ZMap.add key value map
 let pimap_find_default (map: 'value pimap) (key: Z.t) (dflt: 'value) =
@@ -478,13 +493,15 @@ type json =
 | JsonStr of string
 | JsonList of json list
 | JsonAssoc of (string * json) list
+let pp_json _ _ = fun _ -> ()
+
 
 type printer = {
   printer_prinfo: string -> unit;
   printer_prwarning: string -> unit;
   printer_prerror: string -> unit;
   printer_prgeneric: string -> (unit -> string) -> (unit -> json) -> unit
-}
+} [@@deriving show]
 
 let default_printer =
   { printer_prinfo = (fun s -> pr "%s" s; flush stdout);
@@ -800,6 +817,8 @@ let rec stfold (init:'b) (l:'a list) (f: 'b -> 'a -> ('s,'b) state) : ('s,'b) st
   | hd::tl -> (f init hd) >> (fun next -> stfold next tl f)
 
 type file_handle = out_channel
+let pp_file_handle _ _ = ()
+
 let open_file_for_writing (fn:string) : file_handle = open_out_bin fn
 let append_to_file (fh:file_handle) s = fpr fh "%s\n" s; flush fh
 let close_file (fh:file_handle) = close_out fh

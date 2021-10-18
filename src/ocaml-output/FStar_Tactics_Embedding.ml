@@ -1,5 +1,5 @@
 open Prims
-type name = FStar_Syntax_Syntax.bv
+type name = FStar_Syntax_Syntax.bv[@@deriving show]
 let (fstar_tactics_lid' : Prims.string Prims.list -> FStar_Ident.lid) =
   fun s -> FStar_Parser_Const.fstar_tactics_lid' s
 let (lid_as_tm : FStar_Ident.lident -> FStar_Syntax_Syntax.term) =
@@ -14,7 +14,7 @@ type tac_constant =
   {
   lid: FStar_Ident.lid ;
   fv: FStar_Syntax_Syntax.fv ;
-  t: FStar_Syntax_Syntax.term }
+  t: FStar_Syntax_Syntax.term }[@@deriving show]
 let (__proj__Mktac_constant__item__lid : tac_constant -> FStar_Ident.lid) =
   fun projectee -> match projectee with | { lid; fv; t;_} -> lid
 let (__proj__Mktac_constant__item__fv :

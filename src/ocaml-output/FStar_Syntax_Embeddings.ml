@@ -1,7 +1,7 @@
 open Prims
 type norm_cb =
   (FStar_Ident.lid, FStar_Syntax_Syntax.term) FStar_Pervasives.either ->
-    FStar_Syntax_Syntax.term
+    FStar_Syntax_Syntax.term[@@deriving show]
 let (id_norm_cb : norm_cb) =
   fun uu___ ->
     match uu___ with
@@ -21,6 +21,7 @@ let (uu___is_Unembedding_failure : Prims.exn -> Prims.bool) =
     match projectee with | Unembedding_failure -> true | uu___ -> false
 type shadow_term =
   FStar_Syntax_Syntax.term FStar_Thunk.t FStar_Pervasives_Native.option
+[@@deriving show]
 let (map_shadow :
   shadow_term ->
     (FStar_Syntax_Syntax.term -> FStar_Syntax_Syntax.term) -> shadow_term)
@@ -30,19 +31,20 @@ let (force_shadow :
   fun s -> FStar_Compiler_Util.map_opt s FStar_Thunk.force
 type embed_t =
   FStar_Compiler_Range.range ->
-    shadow_term -> norm_cb -> FStar_Syntax_Syntax.term
+    shadow_term -> norm_cb -> FStar_Syntax_Syntax.term[@@deriving show]
 type 'a unembed_t =
-  Prims.bool -> norm_cb -> 'a FStar_Pervasives_Native.option
-type 'a raw_embedder = 'a -> embed_t
-type 'a raw_unembedder = FStar_Syntax_Syntax.term -> 'a unembed_t
-type 'a printer = 'a -> Prims.string
+  Prims.bool -> norm_cb -> 'a FStar_Pervasives_Native.option[@@deriving show]
+type 'a raw_embedder = 'a -> embed_t[@@deriving show]
+type 'a raw_unembedder = FStar_Syntax_Syntax.term -> 'a unembed_t[@@deriving
+                                                                   show]
+type 'a printer = 'a -> Prims.string[@@deriving show]
 type 'a embedding =
   {
   em: 'a -> embed_t ;
   un: FStar_Syntax_Syntax.term -> 'a unembed_t ;
   typ: FStar_Syntax_Syntax.typ ;
   print: 'a printer ;
-  emb_typ: FStar_Syntax_Syntax.emb_typ }
+  emb_typ: FStar_Syntax_Syntax.emb_typ }[@@deriving show]
 let __proj__Mkembedding__item__em : 'a . 'a embedding -> 'a -> embed_t =
   fun projectee ->
     match projectee with | { em; un; typ; print; emb_typ;_} -> em
@@ -1048,11 +1050,9 @@ let e_list : 'a . 'a embedding -> 'a Prims.list embedding =
                     -> FStar_Pervasives_Native.Some []
                 | (FStar_Syntax_Syntax.Tm_fvar fv,
                    (uu___2, FStar_Pervasives_Native.Some
-                    { FStar_Syntax_Syntax.aqual_implicit = true;
-                      FStar_Syntax_Syntax.aqual_attributes = uu___3;_})::
-                   (hd1, FStar_Pervasives_Native.None)::(tl,
-                                                         FStar_Pervasives_Native.None)::[])
-                    when
+                    (FStar_Syntax_Syntax.Implicit uu___3))::(hd1,
+                                                             FStar_Pervasives_Native.None)::
+                   (tl, FStar_Pervasives_Native.None)::[]) when
                     FStar_Syntax_Syntax.fv_eq_lid fv
                       FStar_Parser_Const.cons_lid
                     ->
@@ -1109,7 +1109,7 @@ type norm_step =
   | UnfoldAttr of Prims.string Prims.list 
   | UnfoldQual of Prims.string Prims.list 
   | NBE 
-  | Unmeta 
+  | Unmeta [@@deriving show]
 let (uu___is_Simpl : norm_step -> Prims.bool) =
   fun projectee -> match projectee with | Simpl -> true | uu___ -> false
 let (uu___is_Weak : norm_step -> Prims.bool) =

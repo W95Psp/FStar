@@ -2,7 +2,7 @@ open Prims
 type vops_t =
   {
   next_major: unit -> FStar_Syntax_Syntax.version ;
-  next_minor: unit -> FStar_Syntax_Syntax.version }
+  next_minor: unit -> FStar_Syntax_Syntax.version }[@@deriving show]
 let (__proj__Mkvops_t__item__next_major :
   vops_t -> unit -> FStar_Syntax_Syntax.version) =
   fun projectee ->
@@ -29,17 +29,19 @@ let (vops : vops_t) =
     { FStar_Syntax_Syntax.major = uu___1; FStar_Syntax_Syntax.minor = uu___2
     } in
   { next_major; next_minor }
+
 type tgraph =
   FStar_Syntax_Syntax.term FStar_Pervasives_Native.option FStar_Unionfind.puf
+[@@deriving show]
 type ugraph =
   FStar_Syntax_Syntax.universe FStar_Pervasives_Native.option
-    FStar_Unionfind.puf
+    FStar_Unionfind.puf[@@deriving show]
 type uf =
   {
   term_graph: tgraph ;
   univ_graph: ugraph ;
   version: FStar_Syntax_Syntax.version ;
-  ro: Prims.bool }
+  ro: Prims.bool }[@@deriving show]
 let (__proj__Mkuf__item__term_graph : uf -> tgraph) =
   fun projectee ->
     match projectee with
@@ -70,7 +72,7 @@ let (state : uf FStar_Compiler_Effect.ref) =
   let uu___ = let uu___1 = vops.next_major () in empty uu___1 in
   FStar_Compiler_Util.mk_ref uu___
 type tx =
-  | TX of uf 
+  | TX of uf [@@deriving show]
 let (uu___is_TX : tx -> Prims.bool) = fun projectee -> true
 let (__proj__TX__item___0 : tx -> uf) =
   fun projectee -> match projectee with | TX _0 -> _0

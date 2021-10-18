@@ -48,7 +48,7 @@ type prims_t =
         (FStar_SMTEncoding_Term.term * Prims.int *
           FStar_SMTEncoding_Term.decl Prims.list)
     ;
-  is: FStar_Ident.lident -> Prims.bool }
+  is: FStar_Ident.lident -> Prims.bool }[@@deriving show]
 let (__proj__Mkprims_t__item__mk :
   prims_t ->
     FStar_Ident.lident ->
@@ -1259,6 +1259,37 @@ let (primitive_type_axioms :
           "eq2-interp") in
       FStar_SMTEncoding_Util.mkAssume uu___1 in
     [uu___] in
+  let mk_eq3_interp env eq3 tt =
+    let aa =
+      FStar_SMTEncoding_Term.mk_fv ("a", FStar_SMTEncoding_Term.Term_sort) in
+    let bb =
+      FStar_SMTEncoding_Term.mk_fv ("b", FStar_SMTEncoding_Term.Term_sort) in
+    let xx1 =
+      FStar_SMTEncoding_Term.mk_fv ("x", FStar_SMTEncoding_Term.Term_sort) in
+    let yy1 =
+      FStar_SMTEncoding_Term.mk_fv ("y", FStar_SMTEncoding_Term.Term_sort) in
+    let a = FStar_SMTEncoding_Util.mkFreeV aa in
+    let b = FStar_SMTEncoding_Util.mkFreeV bb in
+    let x1 = FStar_SMTEncoding_Util.mkFreeV xx1 in
+    let y1 = FStar_SMTEncoding_Util.mkFreeV yy1 in
+    let eq3_x_y = FStar_SMTEncoding_Util.mkApp (eq3, [a; b; x1; y1]) in
+    let valid = FStar_SMTEncoding_Util.mkApp ("Valid", [eq3_x_y]) in
+    let uu___ =
+      let uu___1 =
+        let uu___2 =
+          let uu___3 = FStar_TypeChecker_Env.get_range env in
+          let uu___4 =
+            let uu___5 =
+              let uu___6 =
+                let uu___7 = FStar_SMTEncoding_Util.mkEq (x1, y1) in
+                (uu___7, valid) in
+              FStar_SMTEncoding_Util.mkIff uu___6 in
+            ([[eq3_x_y]], [aa; bb; xx1; yy1], uu___5) in
+          FStar_SMTEncoding_Term.mkForall uu___3 uu___4 in
+        (uu___2, (FStar_Pervasives_Native.Some "Eq3 interpretation"),
+          "eq3-interp") in
+      FStar_SMTEncoding_Util.mkAssume uu___1 in
+    [uu___] in
   let mk_imp_interp env imp tt =
     let aa =
       FStar_SMTEncoding_Term.mk_fv ("a", FStar_SMTEncoding_Term.Term_sort) in
@@ -1417,6 +1448,7 @@ let (primitive_type_axioms :
     (FStar_Parser_Const.and_lid, mk_and_interp);
     (FStar_Parser_Const.or_lid, mk_or_interp);
     (FStar_Parser_Const.eq2_lid, mk_eq2_interp);
+    (FStar_Parser_Const.eq3_lid, mk_eq3_interp);
     (FStar_Parser_Const.imp_lid, mk_imp_interp);
     (FStar_Parser_Const.iff_lid, mk_iff_interp);
     (FStar_Parser_Const.not_lid, mk_not_interp);
@@ -1662,10 +1694,7 @@ let (encode_free_var :
                                        (uu___8.FStar_TypeChecker_Env.enable_defer_to_tac);
                                      FStar_TypeChecker_Env.unif_allow_ref_guards
                                        =
-                                       (uu___8.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                                     FStar_TypeChecker_Env.erase_erasable_args
-                                       =
-                                       (uu___8.FStar_TypeChecker_Env.erase_erasable_args)
+                                       (uu___8.FStar_TypeChecker_Env.unif_allow_ref_guards)
                                    }) comp FStar_Syntax_Syntax.U_unknown in
                               FStar_Syntax_Syntax.mk_Total uu___7
                             else comp in
@@ -2562,9 +2591,7 @@ let (encode_top_level_let :
                   FStar_TypeChecker_Env.enable_defer_to_tac =
                     (uu___1.FStar_TypeChecker_Env.enable_defer_to_tac);
                   FStar_TypeChecker_Env.unif_allow_ref_guards =
-                    (uu___1.FStar_TypeChecker_Env.unif_allow_ref_guards);
-                  FStar_TypeChecker_Env.erase_erasable_args =
-                    (uu___1.FStar_TypeChecker_Env.erase_erasable_args)
+                    (uu___1.FStar_TypeChecker_Env.unif_allow_ref_guards)
                 } in
               let subst_comp formals actuals comp =
                 let subst =
@@ -2879,18 +2906,32 @@ let (encode_top_level_let :
                                                                 -> true
                                                             | uu___17 ->
                                                                 false in
-                                                          let is_smt_theory_symbol
-                                                            =
-                                                            let fv =
-                                                              FStar_Compiler_Util.right
-                                                                lbn in
-                                                            FStar_TypeChecker_Env.fv_has_attr
-                                                              env2.FStar_SMTEncoding_Env.tcenv
-                                                              fv
-                                                              FStar_Parser_Const.smt_theory_symbol_attr_lid in
+                                                          let is_prims =
+                                                            let uu___16 =
+                                                              let uu___17 =
+                                                                FStar_Compiler_Effect.op_Bar_Greater
+                                                                  lbn
+                                                                  FStar_Compiler_Util.right in
+                                                              FStar_Compiler_Effect.op_Bar_Greater
+                                                                uu___17
+                                                                FStar_Syntax_Syntax.lid_of_fv in
+                                                            FStar_Compiler_Effect.op_Bar_Greater
+                                                              uu___16
+                                                              (fun lid ->
+                                                                 let uu___17
+                                                                   =
+                                                                   let uu___18
+                                                                    =
+                                                                    FStar_Ident.ns_of_lid
+                                                                    lid in
+                                                                   FStar_Ident.lid_of_ids
+                                                                    uu___18 in
+                                                                 FStar_Ident.lid_equals
+                                                                   uu___17
+                                                                   FStar_Parser_Const.prims_lid) in
                                                           let uu___16 =
                                                             (Prims.op_Negation
-                                                               is_smt_theory_symbol)
+                                                               is_prims)
                                                               &&
                                                               ((FStar_Compiler_Effect.op_Bar_Greater
                                                                   quals
@@ -3252,6 +3293,12 @@ let (encode_top_level_let :
                                                                     "Fuel-instrumented function name")) in
                                                                     FStar_SMTEncoding_Term.DeclFun
                                                                     uu___20 in
+                                                                    let env02
+                                                                    =
+                                                                    FStar_SMTEncoding_Env.push_zfuel_name
+                                                                    env01
+                                                                    fvb.FStar_SMTEncoding_Env.fvar_lid
+                                                                    g in
                                                                     let decl_g_tok
                                                                     =
                                                                     FStar_SMTEncoding_Term.DeclFun
@@ -3260,12 +3307,6 @@ let (encode_top_level_let :
                                                                     FStar_SMTEncoding_Term.Term_sort,
                                                                     (FStar_Pervasives_Native.Some
                                                                     "Token for fuel-instrumented partial applications")) in
-                                                                    let env02
-                                                                    =
-                                                                    FStar_SMTEncoding_Env.push_zfuel_name
-                                                                    env01
-                                                                    fvb.FStar_SMTEncoding_Env.fvar_lid
-                                                                    g gtok in
                                                                     let vars_tm
                                                                     =
                                                                     FStar_Compiler_List.map
@@ -4309,10 +4350,6 @@ and (encode_sigelt' :
                 let b2t_x = FStar_SMTEncoding_Util.mkApp ("Prims.b2t", [x]) in
                 let valid_b2t_x =
                   FStar_SMTEncoding_Util.mkApp ("Valid", [b2t_x]) in
-                let bool_ty =
-                  let uu___10 =
-                    FStar_Syntax_Syntax.withsort FStar_Parser_Const.bool_lid in
-                  FStar_SMTEncoding_Env.lookup_free_var env1 uu___10 in
                 let decls =
                   let uu___10 =
                     let uu___11 =
@@ -4334,30 +4371,7 @@ and (encode_sigelt' :
                         (uu___13, (FStar_Pervasives_Native.Some "b2t def"),
                           "b2t_def") in
                       FStar_SMTEncoding_Util.mkAssume uu___12 in
-                    let uu___12 =
-                      let uu___13 =
-                        let uu___14 =
-                          let uu___15 =
-                            let uu___16 = FStar_Syntax_Syntax.range_of_fv b2t in
-                            let uu___17 =
-                              let uu___18 =
-                                let uu___19 =
-                                  let uu___20 =
-                                    FStar_SMTEncoding_Term.mk_HasType x
-                                      bool_ty in
-                                  let uu___21 =
-                                    FStar_SMTEncoding_Term.mk_HasType b2t_x
-                                      FStar_SMTEncoding_Term.mk_Term_type in
-                                  (uu___20, uu___21) in
-                                FStar_SMTEncoding_Util.mkImp uu___19 in
-                              ([[b2t_x]], [xx], uu___18) in
-                            FStar_SMTEncoding_Term.mkForall uu___16 uu___17 in
-                          (uu___15,
-                            (FStar_Pervasives_Native.Some "b2t typing"),
-                            "b2t_typing") in
-                        FStar_SMTEncoding_Util.mkAssume uu___14 in
-                      [uu___13] in
-                    uu___11 :: uu___12 in
+                    [uu___11] in
                   (FStar_SMTEncoding_Term.DeclFun
                      (tname, [FStar_SMTEncoding_Term.Term_sort],
                        FStar_SMTEncoding_Term.Term_sort,

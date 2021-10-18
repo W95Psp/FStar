@@ -4,14 +4,14 @@ open FStar_Syntax_Syntax
 open Lexing
 open FStar_Sedlexing
 
-type filename = string
+type filename = string[@@deriving show]
 
 type input_frag = {
     frag_fname:filename;
     frag_text:string;
     frag_line:Prims.int;
     frag_col:Prims.int
-}
+} [@@deriving show]
 
 let resetLexbufPos filename lexbuf =
   lexbuf.cur_p <- {
@@ -92,12 +92,12 @@ let check_extension fn =
 type parse_frag =
     | Filename of filename
     | Toplevel of input_frag
-    | Fragment of input_frag
+    | Fragment of input_frag [@@deriving show]
 
 type parse_result =
     | ASTFragment of (FStar_Parser_AST.inputFragment * (string * FStar_Compiler_Range.range) list)
     | Term of FStar_Parser_AST.term
-    | ParseError of (FStar_Errors.raw_error * string * FStar_Compiler_Range.range)
+    | ParseError of (FStar_Errors.raw_error * string * FStar_Compiler_Range.range) [@@deriving show]
 
 let parse fn =
   FStar_Parser_Util.warningHandler := (function

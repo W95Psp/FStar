@@ -2,7 +2,7 @@ open Prims
 type printing_mode =
   | ToTempFile 
   | FromTempToStdout 
-  | FromTempToFile 
+  | FromTempToFile [@@deriving show]
 let (uu___is_ToTempFile : printing_mode -> Prims.bool) =
   fun projectee -> match projectee with | ToTempFile -> true | uu___ -> false
 let (uu___is_FromTempToStdout : printing_mode -> Prims.bool) =

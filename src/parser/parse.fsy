@@ -930,7 +930,10 @@ subEffect:
 | quident SQUIGGLY_RARROW quident LBRACE IDENT EQUALS simpleTerm RBRACE
     {let (src_eff, _2, tgt_eff, _4, x, _2_inlined1, y, _7) = ($1, (), $3, (), $5, (), $7, ()) in
 let lift2_opt =     ( None ) in
-let lift1 =     ( (x, y) ) in
+let lift1 =
+  let _2 = _2_inlined1 in
+      ( (x, y) )
+in
      (
        match lift2_opt with
        | None ->
@@ -954,14 +957,17 @@ let lift1 =     ( (x, y) ) in
 | quident SQUIGGLY_RARROW quident LBRACE IDENT EQUALS simpleTerm SEMICOLON IDENT EQUALS simpleTerm RBRACE
     {let (src_eff, _2, tgt_eff, _4, x, _2_inlined1, y, _1, id, _2_inlined2, y_inlined1, _7) = ($1, (), $3, (), $5, (), $7, (), $9, (), $11, ()) in
 let lift2_opt =
-  let y = y_inlined1 in
+  let (y, _2) = (y_inlined1, _2_inlined2) in
   let x =
     let x =                                                           (id) in
         ( (x, y) )
   in
       ( Some x )
 in
-let lift1 =     ( (x, y) ) in
+let lift1 =
+  let _2 = _2_inlined1 in
+      ( (x, y) )
+in
      (
        match lift2_opt with
        | None ->
@@ -1414,7 +1420,10 @@ noSeqTerm:
       ( mk_term (Ascribed(e,{t with level=Expr},tactic_opt)) (rhs2 parseState 1 4) Expr )}
 | atomicTermNotQUident DOT_LPAREN term RPAREN LARROW noSeqTerm
     {let (e1, _1, e, _3_inlined1, _3, e3) = ($1, (), $3, (), (), $6) in
-let op_expr =                              ( mk_ident (".()", rhs parseState 1), e, rhs2 parseState 1 3 ) in
+let op_expr =
+  let _3 = _3_inlined1 in
+                               ( mk_ident (".()", rhs parseState 1), e, rhs2 parseState 1 3 )
+in
       (
         let (op, e2, _) = op_expr in
         let opid = mk_ident (string_of_id op ^ "<-", range_of_id op) in
@@ -1422,7 +1431,10 @@ let op_expr =                              ( mk_ident (".()", rhs parseState 1),
       )}
 | atomicTermNotQUident DOT_LBRACK term RBRACK LARROW noSeqTerm
     {let (e1, _1, e, _3_inlined1, _3, e3) = ($1, (), $3, (), (), $6) in
-let op_expr =                              ( mk_ident (".[]", rhs parseState 1), e, rhs2 parseState 1 3 ) in
+let op_expr =
+  let _3 = _3_inlined1 in
+                               ( mk_ident (".[]", rhs parseState 1), e, rhs2 parseState 1 3 )
+in
       (
         let (op, e2, _) = op_expr in
         let opid = mk_ident (string_of_id op ^ "<-", range_of_id op) in
@@ -1430,7 +1442,10 @@ let op_expr =                              ( mk_ident (".[]", rhs parseState 1),
       )}
 | atomicTermNotQUident DOT_LBRACK_BAR term BAR_RBRACK LARROW noSeqTerm
     {let (e1, _1, e, _3_inlined1, _3, e3) = ($1, (), $3, (), (), $6) in
-let op_expr =                                      ( mk_ident (".[||]", rhs parseState 1), e, rhs2 parseState 1 3 ) in
+let op_expr =
+  let _3 = _3_inlined1 in
+                                       ( mk_ident (".[||]", rhs parseState 1), e, rhs2 parseState 1 3 )
+in
       (
         let (op, e2, _) = op_expr in
         let opid = mk_ident (string_of_id op ^ "<-", range_of_id op) in
@@ -1438,7 +1453,10 @@ let op_expr =                                      ( mk_ident (".[||]", rhs pars
       )}
 | atomicTermNotQUident DOT_LENS_PAREN_LEFT term LENS_PAREN_RIGHT LARROW noSeqTerm
     {let (e1, _1, e, _3_inlined1, _3, e3) = ($1, (), $3, (), (), $6) in
-let op_expr =                                                 ( mk_ident (".(||)", rhs parseState 1), e, rhs2 parseState 1 3 ) in
+let op_expr =
+  let _3 = _3_inlined1 in
+                                                  ( mk_ident (".(||)", rhs parseState 1), e, rhs2 parseState 1 3 )
+in
       (
         let (op, e2, _) = op_expr in
         let opid = mk_ident (string_of_id op ^ "<-", range_of_id op) in
