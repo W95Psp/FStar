@@ -25,6 +25,16 @@
       defaultPackage = fstar;
       hydraJobs = {
         fstar-build = fstar;
+        doc = pkgs.stdenv.mkDerivation {
+          name = "fstar-book";
+          src = ./doc/book;
+          buildInputs = with pkgs; [ sphinx python39Packages.sphinx_rtd_theme ];
+          installPhase = ''
+            mkdir -p "$out"/nix-support
+            echo "doc manual $out/book" >> $out/nix-support/hydra-build-products
+            mv _build/html $out/book
+          '';
+        };
       };
     }
   );
