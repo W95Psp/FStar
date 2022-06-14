@@ -6019,3 +6019,112 @@ let (proofstate_of_all_implicits :
             FStar_Tactics_Types.urgency = Prims.int_one
           } in
         (ps, w)
+let (with_fuel_and_diagnostics :
+  FStar_SMTEncoding_Term.decl Prims.list ->
+    FStar_SMTEncoding_Term.decl Prims.list ->
+      FStar_SMTEncoding_Term.decl Prims.list)
+  =
+  fun decls ->
+    fun suffix ->
+      let n = (Prims.of_int (2)) in
+      let i = Prims.int_one in
+      let rlimit = (Prims.parse_int "2723280") in
+      let uu___ =
+        let uu___1 =
+          let uu___2 =
+            let uu___3 = FStar_Compiler_Util.string_of_int n in
+            let uu___4 = FStar_Compiler_Util.string_of_int i in
+            FStar_Compiler_Util.format2 "<fuel='%s' ifuel='%s'>" uu___3
+              uu___4 in
+          FStar_SMTEncoding_Term.Caption uu___2 in
+        let uu___2 =
+          let uu___3 =
+            let uu___4 =
+              let uu___5 =
+                let uu___6 =
+                  let uu___7 = FStar_SMTEncoding_Util.mkApp ("MaxFuel", []) in
+                  let uu___8 = FStar_SMTEncoding_Term.n_fuel n in
+                  (uu___7, uu___8) in
+                FStar_SMTEncoding_Util.mkEq uu___6 in
+              (uu___5, FStar_Pervasives_Native.None, "@MaxFuel_assumption") in
+            FStar_SMTEncoding_Util.mkAssume uu___4 in
+          let uu___4 =
+            let uu___5 =
+              let uu___6 =
+                let uu___7 =
+                  let uu___8 =
+                    let uu___9 =
+                      FStar_SMTEncoding_Util.mkApp ("MaxIFuel", []) in
+                    let uu___10 = FStar_SMTEncoding_Term.n_fuel i in
+                    (uu___9, uu___10) in
+                  FStar_SMTEncoding_Util.mkEq uu___8 in
+                (uu___7, FStar_Pervasives_Native.None,
+                  "@MaxIFuel_assumption") in
+              FStar_SMTEncoding_Util.mkAssume uu___6 in
+            [uu___5] in
+          uu___3 :: uu___4 in
+        uu___1 :: uu___2 in
+      let uu___1 =
+        let uu___2 =
+          let uu___3 =
+            let uu___4 =
+              let uu___5 =
+                let uu___6 = FStar_Compiler_Util.string_of_int rlimit in
+                ("rlimit", uu___6) in
+              FStar_SMTEncoding_Term.SetOption uu___5 in
+            [uu___4;
+            FStar_SMTEncoding_Term.CheckSat;
+            FStar_SMTEncoding_Term.SetOption ("rlimit", "0");
+            FStar_SMTEncoding_Term.GetReasonUnknown;
+            FStar_SMTEncoding_Term.GetUnsatCore] in
+          let uu___4 =
+            let uu___5 =
+              let uu___6 =
+                (FStar_Options.print_z3_statistics ()) ||
+                  (FStar_Options.query_stats ()) in
+              if uu___6 then [FStar_SMTEncoding_Term.GetStatistics] else [] in
+            FStar_Compiler_List.op_At uu___5 suffix in
+          FStar_Compiler_List.op_At uu___3 uu___4 in
+        FStar_Compiler_List.op_At decls uu___2 in
+      FStar_Compiler_List.op_At uu___ uu___1
+let (run_smt :
+  env -> FStar_Syntax_Syntax.term -> Prims.string FStar_Tactics_Monad.tac) =
+  fun e ->
+    fun t ->
+      (let uu___1 =
+         let uu___2 =
+           let uu___3 = FStar_TypeChecker_Env.get_range e in
+           FStar_Compiler_Effect.op_Less_Bar
+             FStar_Compiler_Range.string_of_range uu___3 in
+         FStar_Compiler_Util.format1 "Starting query at %s" uu___2 in
+       FStar_SMTEncoding_Encode.push uu___1);
+      (let pop uu___1 =
+         let uu___2 =
+           let uu___3 =
+             let uu___4 = FStar_TypeChecker_Env.get_range e in
+             FStar_Compiler_Effect.op_Less_Bar
+               FStar_Compiler_Range.string_of_range uu___4 in
+           FStar_Compiler_Util.format1 "Ending query at %s" uu___3 in
+         FStar_SMTEncoding_Encode.pop uu___2 in
+       let uu___1 =
+         FStar_SMTEncoding_Encode.encode_query FStar_Pervasives_Native.None e
+           t in
+       match uu___1 with
+       | (prelude, error_labels, q, suffix) ->
+           (FStar_SMTEncoding_Z3.giveZ3 prelude;
+            (let q1 = with_fuel_and_diagnostics [q] suffix in
+             let res =
+               let uu___3 =
+                 let uu___4 = FStar_SMTEncoding_Z3.mk_fresh_scope () in
+                 FStar_Pervasives_Native.Some uu___4 in
+               FStar_SMTEncoding_Z3.ask FStar_Compiler_Range.dummyRange
+                 (fun d -> (d, false)) FStar_Pervasives_Native.None
+                 error_labels q1 uu___3 true in
+             pop ();
+             (let uu___4 =
+                let uu___5 =
+                  FStar_SMTEncoding_Z3.status_string_and_errors
+                    res.FStar_SMTEncoding_Z3.z3result_status in
+                FStar_Pervasives_Native.fst uu___5 in
+              FStar_Compiler_Effect.op_Less_Bar FStar_Tactics_Monad.ret
+                uu___4))))

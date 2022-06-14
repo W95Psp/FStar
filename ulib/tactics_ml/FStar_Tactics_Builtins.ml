@@ -147,6 +147,7 @@ let pack                    = from_tac_1 B.pack
 let curms                   = from_tac_1 B.curms
 let set_urgency             = from_tac_1 B.set_urgency
 let t_commute_applied_match = from_tac_1 B.t_commute_applied_match
+let run_smt                 = from_tac_2 B.run_smt
 
 (* sigh *)
 let fix_either (s : ('a, 'b) either) : ('a, 'b) either =

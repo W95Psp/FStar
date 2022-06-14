@@ -1787,3 +1787,56 @@ let proofstate_of_all_implicits rng env imps =
     }
     in
     (ps, w)
+
+
+module Term = FStar.SMTEncoding.Term
+open FStar.SMTEncoding.Util
+module Util = FStar.SMTEncoding.Util
+module Encode = FStar.SMTEncoding.Encode
+
+
+let with_fuel_and_diagnostics decls suffix =
+    let n = 2 in
+    let i = 1 in
+    let rlimit = 2723280 in
+    [  //fuel and ifuel settings
+        Term.Caption (BU.format2 "<fuel='%s' ifuel='%s'>"
+                        (string_of_int n)
+                        (string_of_int i));
+        Util.mkAssume(mkEq(mkApp("MaxFuel", []), Term.n_fuel n), None, "@MaxFuel_assumption");
+        Util.mkAssume(mkEq(mkApp("MaxIFuel", []), Term.n_fuel i), None, "@MaxIFuel_assumption");
+        // settings.query_decl        //the query itself
+    ]
+    @decls
+    // @label_assumptions         //the sub-goals that are currently disabled
+    @[  Term.SetOption ("rlimit", string_of_int rlimit); //the rlimit setting for the check-sat
+        Term.CheckSat; //go Z3!
+        Term.SetOption ("rlimit", "0"); //back to using infinite rlimit
+        Term.GetReasonUnknown; //explain why it failed
+        Term.GetUnsatCore; //for proof profiling, recording hints etc
+    ]
+    @(if (Options.print_z3_statistics() ||
+          Options.query_stats ()) then [Term.GetStatistics] else []) //stats
+    @suffix
+
+let run_smt (e: env) (t: term): tac string
+  =
+    Encode.push (BU.format1 "Starting query at %s" (Range.string_of_range <| Env.get_range e));
+    let pop () = Encode.pop (BU.format1 "Ending query at %s" (Range.string_of_range <| Env.get_range e)) in
+    let prelude, error_labels, q, suffix = FStar.SMTEncoding.Encode.encode_query None e t in
+    FStar.SMTEncoding.Z3.giveZ3 prelude;
+    //let q = prelude @ q::suffix in
+    // let q = e.solver.solve None e t in
+    let q = with_fuel_and_diagnostics ([q]) suffix in
+    let res
+    = FStar.SMTEncoding.Z3.ask FStar.Compiler.Range.dummyRange
+          (fun d -> d, false) None error_labels
+          q
+          (Some (FStar.SMTEncoding.Z3.mk_fresh_scope()))
+          true
+    in
+      pop ();
+      ret <| fst (FStar.SMTEncoding.Z3.status_string_and_errors res.z3result_status)
+      //FStar.SMTEncoding.Z3.SAT? res.z3result_status
+
+
