@@ -318,7 +318,7 @@ letbinding:
 	let wrap tm = match withlbs with
 	    | None | Some (_,[]) -> tm
 	    | Some (q, withlbs) -> let withlbs = map (fun (_, x) -> (None, x)) withlbs in
-                                   mk_term (Let(q, withlbs, tm)) pos Expr
+                                   fold_left (fun tm lb -> mk_term (Let(q, [lb], tm)) pos Expr) tm withlbs
 	in
 	let tm = wrap tm in
 	match ascr_opt with
