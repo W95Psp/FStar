@@ -305,20 +305,40 @@ attr_letbinding:
   | attr=ioption(attribute) AND lb=letbinding
     { attr, lb }
 
+letbinding_withClause:
+  | WITH LPAREN LET q=letqualifier lb=letbinding lbs=list(AND l=letbinding {l}) RPAREN
+    { (q, lb::lbs) }
+
 letbinding:
-  | focus_opt=maybeFocus lid=lidentOrOperator lbp=nonempty_list(patternOrMultibinder) ascr_opt=ascribeTyp? EQUALS tm=term
+  | focus_opt=maybeFocus lid=lidentOrOperator lbp=nonempty_list(patternOrMultibinder) withlbs=letbinding_withClause? ascr_opt=ascribeTyp? EQUALS tm=term
       {
         let pat = mk_pattern (PatVar(lid, None, [])) (rhs parseState 2) in
         let pat = mk_pattern (PatApp (pat, flatten lbp)) (rhs2 parseState 1 3) in
-        let pos = rhs2 parseState 1 6 in
-        match ascr_opt with
+        let pos = rhs2 parseState 1 7 in
+	let wrap tm = match withlbs with
+	    | None | Some (_,[]) -> tm
+	    | Some (q, withlbs) -> let withlbs = map (fun (_, x) -> (None, x)) withlbs in
+                                   mk_term (Let(q, withlbs, tm)) pos Expr
+	in
+	let tm = wrap tm in
+	match ascr_opt with
         | None -> (focus_opt, (pat, tm))
-        | Some t -> (focus_opt, (mk_pattern (PatAscribed(pat, t)) pos, tm))
+        | Some (t, ttac) ->
+	   (
+	     let t = match t.tm with
+               | Construct (e, indexes) ->
+		  { t with tm = Construct (e, map (fun (t, i) -> (wrap t, i)) indexes) }
+	       | _ -> t
+	     in
+	     (focus_opt, (mk_pattern (PatAscribed(pat, (t, ttac))) pos, tm))
+	   )
       }
   | focus_opt=maybeFocus pat=tuplePattern ascr=ascribeTyp EQUALS tm=term
       { focus_opt, (mk_pattern (PatAscribed(pat, ascr)) (rhs2 parseState 1 4), tm) }
   | focus_opt=maybeFocus pat=tuplePattern EQUALS tm=term
       { focus_opt, (pat, tm) }
+
+(* let_qualifier * list (option attributes_ * (pattern * term)) * term *)
 
 /******************************************************************************/
 /*                                Effects                                     */
