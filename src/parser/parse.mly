@@ -38,7 +38,7 @@ let none_to_empty_list x =
 
 %}
 
-%token <bytes> BYTEARRAY
+%token <FStar_Parser_Util.bytes> BYTEARRAY
 %token <string> STRING
 %token <string> IDENT
 %token <string> NAME
@@ -59,7 +59,7 @@ let none_to_empty_list x =
 %token <string> UINT64
 %token <float> IEEE64
 %token <string> REAL
-%token <char> CHAR
+%token <FStar_String.char> CHAR
 %token <bool> LET
 %token <string> LET_OP
 %token <string> AND_OP

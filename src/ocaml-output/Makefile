@@ -103,22 +103,6 @@ install-compiler-lib: $(FSTAR_MAIN_NATIVE)
 	touch $@
 
 FStar_Parser_Parse.ml: parse.mly
-	@# We are opening the same module twice but we need these modules
-	@# open for the definition of tokens
-	$(Q)echo "open Prims" > $@
-	$(Q)echo "open FStar_Errors" >> $@
-	$(Q)echo "open FStar_Compiler_List" >> $@
-	$(Q)echo "open FStar_Compiler_Util" >> $@
-	$(Q)echo "open FStar_Compiler_Range" >> $@
-	$(Q)echo "open FStar_Options" >> $@
-	$(Q)echo "open FStar_Syntax_Syntax" >> $@
-	$(Q)echo "open FStar_Parser_Const" >> $@
-	$(Q)echo "open FStar_Syntax_Util" >> $@
-	$(Q)echo "open FStar_Parser_AST" >> $@
-	$(Q)echo "open FStar_Parser_Util" >> $@
-	$(Q)echo "open FStar_Const" >> $@
-	$(Q)echo "open FStar_Ident" >> $@
-	$(Q)echo "open FStar_String" >> $@
 	@# TODO: create a proper OCamlbuild rule for this production so that
 	@# OCamlbuild knows how to generate parse.mly first (possibly using
 	@# menhir) and removes the production as needed.
