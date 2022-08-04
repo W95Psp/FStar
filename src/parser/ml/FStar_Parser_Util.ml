@@ -17,20 +17,11 @@ let pos_of_lexpos (p:position) =
 let mksyn_range (p1:position) p2 =
   mk_range p1.pos_fname (pos_of_lexpos p1) (pos_of_lexpos p2)
 
+let locRng (p: position * position) =
+  mksyn_range (fst p) (snd p)
+
 let getLexerRange (lexbuf:lexbuf) =
   mksyn_range lexbuf.lex_start_p lexbuf.lex_curr_p
-
-let lhs () =
-  mksyn_range (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ())
-
-let rhs () n =
-  mksyn_range (Parsing.rhs_start_pos n) (Parsing.rhs_end_pos n)
-
-let rhspos () n =
-  pos_of_lexpos (Parsing.rhs_start_pos n)
-
-let rhs2 () n m =
-  mksyn_range (Parsing.rhs_start_pos n) (Parsing.rhs_end_pos m)
 
 exception WrappedError of exn * range
 exception ReportedError
