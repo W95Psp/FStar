@@ -37,7 +37,7 @@ COMPILER_ML_LIB=FStar_Util.cmx FStar_Compiler_Bytes.cmx			\
 		FStar_Unionfind.cmx
 PARSER_ML_LIB=FStar_Parser_Util.cmx
 PRETTYPRINT_ML_LIB=FStar_Pprint.cmx
-GENERATED_FILES=parse.mly FStar_Parser_Parse.ml FStar_Version.ml intfiles
+GENERATED_FILES=FStar_Parser_Parse.ml FStar_Version.ml intfiles
 
 # The directory where we install files when doing "make install".
 # Overridden via the command-line by the OPAM invocation.
@@ -63,21 +63,6 @@ OCAML_BRANCH=$(shell ocaml get_branch.ml)
 # possible).
 all:  ../../bin/fstar.exe ../../bin/fstar.ocaml ../../bin/tests.exe install-compiler-lib
 
-# We derive parse.mly in two ways:
-# - if we have menhir, we generate it from from the Menhir parser
-#   ../parser/parse.mly (and save a copy of the generated mly in ../parser/ml)
-# - if we don't have menhir, we take the saved copy above that is under version
-#   control
-parse.mly: ../parser/parse.mly
-ifeq ($(HAS_VALID_MENHIR), 1)
-	@# TODO : call menhir directly when positions are fixed instead of
-	@# letting OCamlbuild go through ocamlyacc
-	@echo "[MENHIR PREPROCESS]"
-	$(Q)$(MENHIR) --only-preprocess-for-ocamlyacc $< > $@
-else
-	$(error Correct version of menhir not found (needs a version newer than $(MENHIR_MIN_VERSION)))
-endif
-
 # https://stackoverflow.com/questions/38294095/ocaml-how-to-solve-findlib-warnings-of-multiple-cmis
 FSTAR_MAIN_NATIVE=_build/src/fstar/ml/main.native
 $(FSTAR_MAIN_NATIVE): export OCAMLFIND_IGNORE_DUPS_IN = $(shell ocamlfind query compiler-libs)
@@ -102,21 +87,21 @@ install-compiler-lib: $(FSTAR_MAIN_NATIVE)
 	sed "s/__FSTAR_VERSION__/$$(cat ../../version.txt)/" <../../ulib/ml/fstar-compiler-lib-META >../../bin/fstar-compiler-lib/META
 	touch $@
 
-FStar_Parser_Parse.ml: parse.mly
+FStar_Parser_Parse.ml: ../parser/parse.mly
 	@# TODO: create a proper OCamlbuild rule for this production so that
 	@# OCamlbuild knows how to generate parse.mly first (possibly using
 	@# menhir) and removes the production as needed.
-	@echo "[OCAMLYACC]"
-	$(Q)ocamlyacc parse.mly 2> yac-log
+	@echo "[MENHIR]"
+	$(Q)menhir ../parser/parse.mly 2> yac-log
 	$(Q)cat yac-log
-	@if [ "0$$(grep "shift/reduce" yac-log | sed 's/^\([0-9]\+\).*/\1/')" -gt 6 ]; then \
+	@if [ "0$$(grep "have shift/reduce" yac-log | sed 's/^Warning: \([0-9]\+\).*/\1/')" -gt 6 ]; then \
 	  echo "shift-reduce conflicts have increased; please fix" && rm -f $@ && false; \
 	fi
 	@if grep -q "reduce/reduce" yac-log ; then \
 	  echo "A reduce-reduce conflict was introduced; please fix" && rm -f $@ && false; \
 	fi
-	$(Q)cat parse.ml >> $@
-	$(Q)rm parse.ml parse.mli
+	$(Q)cat ../parser/parse.ml >> $@
+	$(Q)rm ../parser/parse.ml ../parser/parse.mli
 
 ../../bin/tests.exe: export OCAMLFIND_IGNORE_DUPS_IN = $(shell ocamlfind query compiler-libs)
 ../../bin/tests.exe: ../../bin/fstar.exe

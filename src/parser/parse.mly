@@ -1371,7 +1371,7 @@ atomicUniverse:
       }
   | u=lident { mk_term (Uvar u) (range_of_id u) Expr }
   | LPAREN u=universeFrom RPAREN
-    { u (*mk_term (Paren u) (rhs2 parseState 1 3) Expr*) }
+    { u }
 
 warn_error_list:
   | e=warn_error EOF { e }
