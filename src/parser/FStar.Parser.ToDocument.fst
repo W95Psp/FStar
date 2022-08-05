@@ -691,8 +691,10 @@ and p_list f sep l =
     str "[" ^^ p_list' l ^^ str "]"
 
 and p_rawDecl d = match d.d with
-  | Open uid ->
+  | Open (uid, None) ->
     group (str "open" ^/^ p_quident uid)
+  | Open (uid, _) ->
+    group (str "open" ^/^ p_quident uid ^/^ str "(.. TODO PP)")
   | Include uid ->
     group (str "include" ^/^ p_quident uid)
   | Friend uid ->

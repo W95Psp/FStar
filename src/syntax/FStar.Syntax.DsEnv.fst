@@ -290,6 +290,12 @@ let try_lookup_id''
         used_marker := true;
         k_rec_binding r
 
+      | Open_module_or_namespace (ns, Open_module_partial whitelist) ->
+      	// todo exists insead of mem + map
+        if mem (string_of_id id) (List.map string_of_id whitelist)
+        then find_in_module_with_includes eikind find_in_module Cont_ignore env ns id
+        else Cont_ignore
+        
       | Open_module_or_namespace (ns, Open_module) ->
         find_in_module_with_includes eikind find_in_module Cont_ignore env ns id
 
@@ -958,6 +964,20 @@ let push_sigelt' fail_on_dup env s =
 
 let push_sigelt       env se = push_sigelt' true  env se
 let push_sigelt_force env se = push_sigelt' false env se
+
+let push_open_partial env (ns: lident) (idents: list (ident * option (option (list ident))))
+ = let (ns', kd) = match resolve_module_name env ns false with
+  | None ->
+     let modules = env.modules in
+     if modules |> BU.for_some (fun (m, _) ->
+      BU.starts_with (Ident.string_of_lid m ^ ".") (Ident.string_of_lid ns ^ "."))
+     then (ns, Open_module_partial idents)
+     else raise_error (Errors.Fatal_NameSpaceNotFound, (BU.format1 "Namespace %s cannot be found" (Ident.string_of_lid ns))) ( Ident.range_of_lid ns)
+  | Some ns' ->
+     (ns', Open_module_partial idents)
+  in
+     env.ds_hooks.ds_push_open_hook env (ns', kd);
+     push_scope_mod env (Open_module_or_namespace (ns', kd))
 
 let push_namespace env ns =
   (* namespace resolution disabled, but module abbrevs enabled *)

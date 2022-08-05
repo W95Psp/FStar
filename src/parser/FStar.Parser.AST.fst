@@ -206,7 +206,7 @@ type pragma =
 
 type decl' =
   | TopLevelModule of lid
-  | Open of lid
+  | Open of (lid * option (list (ident * option (option (list ident)))))
   | Friend of lid
   | Include of lid
   | ModuleAbbrev of ident * lid
@@ -897,7 +897,19 @@ let id_of_tycon = function
 
 let decl_to_string (d:decl) = match d.d with
   | TopLevelModule l -> "module " ^ (string_of_lid l)
-  | Open l -> "open " ^ (string_of_lid l)
+  | Open (l, None) -> "open " ^ (string_of_lid l)
+  // | Open of (lid * option (list (ident * option (option (list ident)))))
+  | Open (l, Some imports) -> 
+    	 "open " ^ (string_of_lid l)
+       ^ "(" ^ String.concat ", " (List.map (fun (name, cons) -> 
+       	   name ^ ( match cons with
+	   	  | Some cons -> "(" ^ ( match cons with
+		    	      	      | Some cons -> String.concat ", " cons
+				      | None      -> ".."
+				      ) ^ ")"
+	   	  | None -> ""
+		  )
+       ) imports)  ^ ")"
   | Friend l -> "friend " ^ (string_of_lid l)
   | Include l -> "include " ^ (string_of_lid l)
   | ModuleAbbrev (i, l) -> Util.format2 "module %s = %s" (string_of_id i) (string_of_lid l)

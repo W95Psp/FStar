@@ -3391,8 +3391,12 @@ and desugar_decl_noattrs env (d:decl) : (env_t * sigelts) =
 
   | TopLevelModule id -> env, []
 
-  | Open lid ->
+  | Open (lid, None) ->
     let env = Env.push_namespace env lid in
+    env, []
+
+  | Open (lid, Some l) ->
+    let env = Env.push_open_partial env lid (List.map fst l) in
     env, []
 
   | Friend lid ->
@@ -3830,8 +3834,8 @@ let desugar_decls env decls =
   env, sigelts
 
 let open_prims_all =
-    [AST.mk_decl (AST.Open C.prims_lid) Range.dummyRange;
-     AST.mk_decl (AST.Open C.all_lid) Range.dummyRange]
+    [AST.mk_decl (AST.Open (C.prims_lid, None)) Range.dummyRange;
+     AST.mk_decl (AST.Open (C.all_lid, None)) Range.dummyRange]
 
 (* Top-level functionality: from AST to a module
    Keeps track of the name of variables and so on (in the context)

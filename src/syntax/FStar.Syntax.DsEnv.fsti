@@ -34,6 +34,7 @@ type used_marker = ref bool
 type open_kind =                                          (* matters only for resolving names with some module qualifier *)
 | Open_module                                             (* only opens the module, not the namespace *)
 | Open_namespace                                          (* opens the whole namespace *)
+| Open_module_partial: list ident -> open_kind
 
 type open_module_or_namespace = (lident * open_kind)      (* lident fully qualified name, already resolved. *)
 
@@ -117,6 +118,7 @@ val push_bv': env -> ident -> env * bv * used_marker
 val push_bv: env -> ident -> env * bv
 val push_top_level_rec_binding: env -> ident -> S.delta_depth -> env * ref bool
 val push_sigelt: env -> sigelt -> env
+val push_open_partial: env -> lident -> list (ident * option (option (list ident))) -> env
 val push_namespace: env -> lident -> env
 val push_include: env -> lident -> env
 val push_module_abbrev : env -> ident -> lident -> env

@@ -215,7 +215,22 @@ rawDecl:
   | p=pragma
       { Pragma p }
   | OPEN uid=quident
-      { Open uid }
+      { Open (uid, None) }
+  | OPEN uid=quident q=option(IDENT)
+    LPAREN
+      l=separated_nonempty_list(COMMA,
+        i=lidentOrOperator cons=option( LPAREN l=separated_nonempty_list(COMMA, i=uident {i}) RPAREN {Some l}
+                                      | LPAREN DOT DOT RPAREN {None}
+                                      ) {i, cons}
+      )
+    RPAREN
+    { match q with
+      | Some "hiding" -> Open (uid, None (* TODO! *))
+      | Some _ -> raise_error (Fatal_SyntaxError, "Syntax error: expected keyword \"hiding\" or an opening parenthesis") (rhs parseState 2)
+      | None   -> Open (uid, Some l)
+    }
+  /* | OPEN LPAREN separated_nonempty_list(COMMA, lidentOrOperator) RPAREN OF uid=quident */
+  /*     { Open uid } */
   | FRIEND uid=quident
       { Friend uid }
   | INCLUDE uid=quident
