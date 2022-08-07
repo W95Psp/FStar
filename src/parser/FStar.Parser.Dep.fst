@@ -565,7 +565,8 @@ let enter_namespace
     it depends on
  *)
 
-let collect_one
+
+let collect_one'
   (original_map: files_for_module_name)
   (filename: string)
   (get_parsing_data_from_cache:string -> option parsing_data)
@@ -1135,6 +1136,22 @@ let collect_one
       pd, deps, has_inline_for_extraction, mo_roots
 
 
+let collect_one
+  (original_map: files_for_module_name)
+  (filename: string)
+  (get_parsing_data_from_cache:string -> option parsing_data)
+  : parsing_data *
+    list dependence *  //direct dependence
+    bool *  //has_inline_for_extraction
+    list dependence  //additional roots
+                      //that used to be part of parsing_data earlier
+                      //removing it from the cache (#1657)
+                      //this always returns a single element, remove the list?
+= print_endline ("[+collect_one] " ^ filename);
+  let r = collect_one' original_map filename get_parsing_data_from_cache in
+  print_endline ("[-collect_one] " ^ filename);
+  r
+
 (* JP: it looks like the code was changed but the comments were never updated.
  * In particular, we no longer compute transitive dependencies, and we no longer
  * map lowercase module names to filenames. *)
@@ -1348,7 +1365,7 @@ let topological_dependences_of
  *   to read the parsing data from checked files
  *)
 (* In public interface *)
-let collect (all_cmd_line_files: list file_name)
+let collect' (all_cmd_line_files: list file_name)
             (get_parsing_data_from_cache:string -> option parsing_data)
     : list file_name
     * deps //topologically sorted transitive dependences of all_cmd_line_files
@@ -1530,6 +1547,17 @@ let collect (all_cmd_line_files: list file_name)
   then BU.print1 "Interfaces needing inlining: %s\n" (String.concat ", " inlining_ifaces);
   all_files,
   mk_deps dep_graph file_system_map all_cmd_line_files all_files inlining_ifaces parse_results
+
+
+let collect (all_cmd_line_files: list file_name)
+            (get_parsing_data_from_cache:string -> option parsing_data)
+    : list file_name
+    * deps //topologically sorted transitive dependences of all_cmd_line_files
+    = 
+      print_endline ("[+collect]" ^ String.concat ", " all_cmd_line_files);
+      let r = collect' all_cmd_line_files get_parsing_data_from_cache in
+      print_endline ("[-collect]" ^ String.concat ", " all_cmd_line_files);
+      r
 
 (* In public interface *)
 let deps_of deps (f:file_name)

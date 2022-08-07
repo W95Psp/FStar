@@ -965,19 +965,28 @@ let push_sigelt' fail_on_dup env s =
 let push_sigelt       env se = push_sigelt' true  env se
 let push_sigelt_force env se = push_sigelt' false env se
 
+// let constructors_of_lident (e: env) (v: lident)
+//  = find_all_datacons
+
 let push_open_partial env (ns: lident) (idents: list (ident * option (option (list ident))))
- = let (ns', kd) = match resolve_module_name env ns false with
+ = let ns = match resolve_module_name env ns false with
   | None ->
      let modules = env.modules in
      if modules |> BU.for_some (fun (m, _) ->
       BU.starts_with (Ident.string_of_lid m ^ ".") (Ident.string_of_lid ns ^ "."))
-     then (ns, Open_module_partial idents)
+     then ns
      else raise_error (Errors.Fatal_NameSpaceNotFound, (BU.format1 "Namespace %s cannot be found" (Ident.string_of_lid ns))) ( Ident.range_of_lid ns)
-  | Some ns' ->
-     (ns', Open_module_partial idents)
+  | Some ns' -> ns'
   in
-     env.ds_hooks.ds_push_open_hook env (ns', kd);
-     push_scope_mod env (Open_module_or_namespace (ns', kd))
+     let kd = Open_module_partial idents in
+     env.ds_hooks.ds_push_open_hook env (ns, Open_namespace);
+     let env' = push_scope_mod env (Open_module_or_namespace (ns, Open_namespace)) in
+     let cons: option (list ident) = find_all_datacons env' ns in
+     match cons with
+     | Some x -> failwith (String.concat "; " (List.map string_of_id x))
+     | _ -> failwith "x";
+     // Open_module_partial idents
+     push_scope_mod env (Open_module_or_namespace (ns, kd))
 
 let push_namespace env ns =
   (* namespace resolution disabled, but module abbrevs enabled *)

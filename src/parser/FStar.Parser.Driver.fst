@@ -42,6 +42,7 @@ let parse_fragment (frag: ParseIt.input_frag) : fragment =
 
 (* Returns a non-desugared AST (as in [parser/ast.fs]) or aborts. *)
 let parse_file fn =
+    print_endline ("[Parser.Driver.parse_file] fn=" ^ fn);
     match ParseIt.parse (Filename fn) with
     | ASTFragment (Inl ast, comments) ->
         ast, comments

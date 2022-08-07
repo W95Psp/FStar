@@ -3396,7 +3396,7 @@ and desugar_decl_noattrs env (d:decl) : (env_t * sigelts) =
     env, []
 
   | Open (lid, Some l) ->
-    let env = Env.push_open_partial env lid (List.map fst l) in
+    let env = Env.push_open_partial env lid l in
     env, []
 
   | Friend lid ->

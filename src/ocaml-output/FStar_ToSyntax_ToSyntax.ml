@@ -7803,8 +7803,11 @@ and (desugar_decl_noattrs :
               } in
             (env, [se])))
       | FStar_Parser_AST.TopLevelModule id -> (env, [])
-      | FStar_Parser_AST.Open lid ->
+      | FStar_Parser_AST.Open (lid, FStar_Pervasives_Native.None) ->
           let env1 = FStar_Syntax_DsEnv.push_namespace env lid in (env1, [])
+      | FStar_Parser_AST.Open (lid, FStar_Pervasives_Native.Some l) ->
+          let env1 = FStar_Syntax_DsEnv.push_open_partial env lid l in
+          (env1, [])
       | FStar_Parser_AST.Friend lid ->
           let uu___ = FStar_Syntax_DsEnv.iface env in
           if uu___
@@ -8640,9 +8643,12 @@ let (open_prims_all :
     Prims.list)
   =
   [FStar_Parser_AST.mk_decl
-     (FStar_Parser_AST.Open FStar_Parser_Const.prims_lid)
+     (FStar_Parser_AST.Open
+        (FStar_Parser_Const.prims_lid, FStar_Pervasives_Native.None))
      FStar_Compiler_Range.dummyRange;
-  FStar_Parser_AST.mk_decl (FStar_Parser_AST.Open FStar_Parser_Const.all_lid)
+  FStar_Parser_AST.mk_decl
+    (FStar_Parser_AST.Open
+       (FStar_Parser_Const.all_lid, FStar_Pervasives_Native.None))
     FStar_Compiler_Range.dummyRange]
 let (desugar_modul_common :
   FStar_Syntax_Syntax.modul FStar_Pervasives_Native.option ->

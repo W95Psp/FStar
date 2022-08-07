@@ -939,7 +939,7 @@ let (enter_namespace :
                      FStar_Compiler_Effect.op_Colon_Equals found true))
                  else ());
           FStar_Compiler_Effect.op_Bang found
-let (collect_one :
+let (collect_one' :
   files_for_module_name ->
     Prims.string ->
       (Prims.string -> parsing_data FStar_Pervasives_Native.option) ->
@@ -1208,7 +1208,7 @@ let (collect_one :
              match d with
              | FStar_Parser_AST.Include lid ->
                  add_to_parsing_data (P_open (false, lid))
-             | FStar_Parser_AST.Open lid ->
+             | FStar_Parser_AST.Open (lid, uu___2) ->
                  add_to_parsing_data (P_open (false, lid))
              | FStar_Parser_AST.Friend lid ->
                  let uu___2 =
@@ -1733,6 +1733,23 @@ let (collect_one :
                  match uu___5 with
                  | (deps1, has_inline_for_extraction, mo_roots) ->
                      (pd1, deps1, has_inline_for_extraction, mo_roots))))
+let (collect_one :
+  files_for_module_name ->
+    Prims.string ->
+      (Prims.string -> parsing_data FStar_Pervasives_Native.option) ->
+        (parsing_data * dependence Prims.list * Prims.bool * dependence
+          Prims.list))
+  =
+  fun original_map ->
+    fun filename ->
+      fun get_parsing_data_from_cache ->
+        (let uu___1 = FStar_String.op_Hat "[+collect_one] " filename in
+         FStar_Compiler_Util.print_endline uu___1);
+        (let r =
+           collect_one' original_map filename get_parsing_data_from_cache in
+         (let uu___2 = FStar_String.op_Hat "[-collect_one] " filename in
+          FStar_Compiler_Util.print_endline uu___2);
+         r)
 let (collect_one_cache :
   (dependence Prims.list * dependence Prims.list * Prims.bool)
     FStar_Compiler_Util.smap FStar_Compiler_Effect.ref)
@@ -1950,10 +1967,10 @@ let (topological_dependences_of :
             | (widened, dep_graph1) ->
                 topological_dependences_of' file_system_map dep_graph1
                   interfaces_needing_inlining root_files widened
-let (collect :
-  Prims.string Prims.list ->
+let (collect' :
+  file_name Prims.list ->
     (Prims.string -> parsing_data FStar_Pervasives_Native.option) ->
-      (Prims.string Prims.list * deps))
+      (file_name Prims.list * deps))
   =
   fun all_cmd_line_files ->
     fun get_parsing_data_from_cache ->
@@ -2150,6 +2167,23 @@ let (collect :
              (all_files,
                (mk_deps dep_graph file_system_map all_cmd_line_files1
                   all_files inlining_ifaces parse_results)))))
+let (collect :
+  Prims.string Prims.list ->
+    (Prims.string -> parsing_data FStar_Pervasives_Native.option) ->
+      (Prims.string Prims.list * deps))
+  =
+  fun all_cmd_line_files ->
+    fun get_parsing_data_from_cache ->
+      (let uu___1 =
+         FStar_String.op_Hat "[+collect]"
+           (FStar_String.concat ", " all_cmd_line_files) in
+       FStar_Compiler_Util.print_endline uu___1);
+      (let r = collect' all_cmd_line_files get_parsing_data_from_cache in
+       (let uu___2 =
+          FStar_String.op_Hat "[-collect]"
+            (FStar_String.concat ", " all_cmd_line_files) in
+        FStar_Compiler_Util.print_endline uu___2);
+       r)
 let (deps_of : deps -> Prims.string -> Prims.string Prims.list) =
   fun deps1 ->
     fun f ->

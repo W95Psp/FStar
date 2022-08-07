@@ -38,17 +38,20 @@ let (parse_file :
       Prims.list))
   =
   fun fn ->
-    let uu___ = FStar_Parser_ParseIt.parse (FStar_Parser_ParseIt.Filename fn) in
-    match uu___ with
-    | FStar_Parser_ParseIt.ASTFragment (FStar_Pervasives.Inl ast, comments)
-        -> (ast, comments)
-    | FStar_Parser_ParseIt.ASTFragment (FStar_Pervasives.Inr uu___1, uu___2)
-        ->
-        let msg = FStar_Compiler_Util.format1 "%s: expected a module\n" fn in
-        let r = FStar_Compiler_Range.dummyRange in
-        FStar_Errors.raise_error (FStar_Errors.Fatal_ModuleExpected, msg) r
-    | FStar_Parser_ParseIt.ParseError (e, msg, r) ->
-        FStar_Errors.raise_error (e, msg) r
-    | FStar_Parser_ParseIt.Term uu___1 ->
-        failwith
-          "Impossible: parsing a Filename always results in an ASTFragment"
+    FStar_Compiler_Util.print_endline
+      (Prims.op_Hat "[Parser.Driver.parse_file] fn=" fn);
+    (let uu___1 =
+       FStar_Parser_ParseIt.parse (FStar_Parser_ParseIt.Filename fn) in
+     match uu___1 with
+     | FStar_Parser_ParseIt.ASTFragment (FStar_Pervasives.Inl ast, comments)
+         -> (ast, comments)
+     | FStar_Parser_ParseIt.ASTFragment (FStar_Pervasives.Inr uu___2, uu___3)
+         ->
+         let msg = FStar_Compiler_Util.format1 "%s: expected a module\n" fn in
+         let r = FStar_Compiler_Range.dummyRange in
+         FStar_Errors.raise_error (FStar_Errors.Fatal_ModuleExpected, msg) r
+     | FStar_Parser_ParseIt.ParseError (e, msg, r) ->
+         FStar_Errors.raise_error (e, msg) r
+     | FStar_Parser_ParseIt.Term uu___2 ->
+         failwith
+           "Impossible: parsing a Filename always results in an ASTFragment")

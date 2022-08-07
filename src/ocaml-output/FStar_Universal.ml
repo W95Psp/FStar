@@ -175,39 +175,43 @@ let (parse :
   fun env ->
     fun pre_fn ->
       fun fn ->
-        let uu___ = FStar_Parser_Driver.parse_file fn in
-        match uu___ with
-        | (ast, uu___1) ->
-            let uu___2 =
-              match pre_fn with
-              | FStar_Pervasives_Native.None -> (ast, env)
-              | FStar_Pervasives_Native.Some pre_fn1 ->
-                  let uu___3 = FStar_Parser_Driver.parse_file pre_fn1 in
-                  (match uu___3 with
-                   | (pre_ast, uu___4) ->
-                       (match (pre_ast, ast) with
-                        | (FStar_Parser_AST.Interface (lid1, decls1, uu___5),
-                           FStar_Parser_AST.Module (lid2, decls2)) when
-                            FStar_Ident.lid_equals lid1 lid2 ->
-                            let uu___6 =
-                              let uu___7 =
-                                FStar_ToSyntax_Interleave.initialize_interface
-                                  lid1 decls1 in
-                              with_dsenv_of_env env uu___7 in
-                            (match uu___6 with
-                             | (uu___7, env1) ->
-                                 let uu___8 =
-                                   FStar_ToSyntax_Interleave.interleave_module
-                                     ast true in
-                                 with_dsenv_of_env env1 uu___8)
-                        | uu___5 ->
-                            FStar_Errors.raise_err
-                              (FStar_Errors.Fatal_PreModuleMismatch,
-                                "mismatch between pre-module and module\n"))) in
-            (match uu___2 with
-             | (ast1, env1) ->
-                 let uu___3 = FStar_ToSyntax_ToSyntax.ast_modul_to_modul ast1 in
-                 with_dsenv_of_env env1 uu___3)
+        FStar_Compiler_Util.print_endline
+          (Prims.op_Hat "[Universal.parse] fn=" fn);
+        (let uu___1 = FStar_Parser_Driver.parse_file fn in
+         match uu___1 with
+         | (ast, uu___2) ->
+             let uu___3 =
+               match pre_fn with
+               | FStar_Pervasives_Native.None -> (ast, env)
+               | FStar_Pervasives_Native.Some pre_fn1 ->
+                   let uu___4 = FStar_Parser_Driver.parse_file pre_fn1 in
+                   (match uu___4 with
+                    | (pre_ast, uu___5) ->
+                        (match (pre_ast, ast) with
+                         | (FStar_Parser_AST.Interface
+                            (lid1, decls1, uu___6), FStar_Parser_AST.Module
+                            (lid2, decls2)) when
+                             FStar_Ident.lid_equals lid1 lid2 ->
+                             let uu___7 =
+                               let uu___8 =
+                                 FStar_ToSyntax_Interleave.initialize_interface
+                                   lid1 decls1 in
+                               with_dsenv_of_env env uu___8 in
+                             (match uu___7 with
+                              | (uu___8, env1) ->
+                                  let uu___9 =
+                                    FStar_ToSyntax_Interleave.interleave_module
+                                      ast true in
+                                  with_dsenv_of_env env1 uu___9)
+                         | uu___6 ->
+                             FStar_Errors.raise_err
+                               (FStar_Errors.Fatal_PreModuleMismatch,
+                                 "mismatch between pre-module and module\n"))) in
+             (match uu___3 with
+              | (ast1, env1) ->
+                  let uu___4 =
+                    FStar_ToSyntax_ToSyntax.ast_modul_to_modul ast1 in
+                  with_dsenv_of_env env1 uu___4))
 let (init_env : FStar_Parser_Dep.deps -> FStar_TypeChecker_Env.env) =
   fun deps ->
     let solver =

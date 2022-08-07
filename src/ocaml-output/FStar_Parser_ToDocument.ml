@@ -1077,12 +1077,21 @@ and (p_list :
 and (p_rawDecl : FStar_Parser_AST.decl -> FStar_Pprint.document) =
   fun d ->
     match d.FStar_Parser_AST.d with
-    | FStar_Parser_AST.Open uid ->
+    | FStar_Parser_AST.Open (uid, FStar_Pervasives_Native.None) ->
         let uu___ =
           let uu___1 = str "open" in
           let uu___2 = p_quident uid in
           FStar_Pprint.op_Hat_Slash_Hat uu___1 uu___2 in
         FStar_Pprint.group uu___
+    | FStar_Parser_AST.Open (uid, uu___) ->
+        let uu___1 =
+          let uu___2 = str "open" in
+          let uu___3 =
+            let uu___4 = p_quident uid in
+            let uu___5 = str "(.. TODO PP)" in
+            FStar_Pprint.op_Hat_Slash_Hat uu___4 uu___5 in
+          FStar_Pprint.op_Hat_Slash_Hat uu___2 uu___3 in
+        FStar_Pprint.group uu___1
     | FStar_Parser_AST.Include uid ->
         let uu___ =
           let uu___1 = str "include" in

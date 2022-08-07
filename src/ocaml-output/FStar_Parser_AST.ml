@@ -750,7 +750,9 @@ let (uu___is_PrintEffectsGraph : pragma -> Prims.bool) =
     match projectee with | PrintEffectsGraph -> true | uu___ -> false
 type decl' =
   | TopLevelModule of FStar_Ident.lid 
-  | Open of FStar_Ident.lid 
+  | Open of (FStar_Ident.lid * (FStar_Ident.ident * FStar_Ident.ident
+  Prims.list FStar_Pervasives_Native.option FStar_Pervasives_Native.option)
+  Prims.list FStar_Pervasives_Native.option) 
   | Friend of FStar_Ident.lid 
   | Include of FStar_Ident.lid 
   | ModuleAbbrev of (FStar_Ident.ident * FStar_Ident.lid) 
@@ -784,8 +786,12 @@ let (__proj__TopLevelModule__item___0 : decl' -> FStar_Ident.lid) =
   fun projectee -> match projectee with | TopLevelModule _0 -> _0
 let (uu___is_Open : decl' -> Prims.bool) =
   fun projectee -> match projectee with | Open _0 -> true | uu___ -> false
-let (__proj__Open__item___0 : decl' -> FStar_Ident.lid) =
-  fun projectee -> match projectee with | Open _0 -> _0
+let (__proj__Open__item___0 :
+  decl' ->
+    (FStar_Ident.lid * (FStar_Ident.ident * FStar_Ident.ident Prims.list
+      FStar_Pervasives_Native.option FStar_Pervasives_Native.option)
+      Prims.list FStar_Pervasives_Native.option))
+  = fun projectee -> match projectee with | Open _0 -> _0
 let (uu___is_Friend : decl' -> Prims.bool) =
   fun projectee -> match projectee with | Friend _0 -> true | uu___ -> false
 let (__proj__Friend__item___0 : decl' -> FStar_Ident.lid) =
@@ -2205,8 +2211,36 @@ let (decl_to_string : decl -> Prims.string) =
     | TopLevelModule l ->
         let uu___ = FStar_Ident.string_of_lid l in
         Prims.op_Hat "module " uu___
-    | Open l ->
+    | Open (l, FStar_Pervasives_Native.None) ->
         let uu___ = FStar_Ident.string_of_lid l in Prims.op_Hat "open " uu___
+    | Open (l, FStar_Pervasives_Native.Some imports) ->
+        let uu___ =
+          let uu___1 = FStar_Ident.string_of_lid l in
+          let uu___2 =
+            let uu___3 =
+              let uu___4 =
+                let uu___5 =
+                  FStar_Compiler_List.map
+                    (fun uu___6 ->
+                       match uu___6 with
+                       | (name, cons) ->
+                           Prims.op_Hat name
+                             (match cons with
+                              | FStar_Pervasives_Native.Some cons1 ->
+                                  Prims.op_Hat "("
+                                    (Prims.op_Hat
+                                       (match cons1 with
+                                        | FStar_Pervasives_Native.Some cons2
+                                            -> FStar_String.concat ", " cons2
+                                        | FStar_Pervasives_Native.None ->
+                                            "..") ")")
+                              | FStar_Pervasives_Native.None -> ""))
+                    (Obj.magic imports) in
+                FStar_String.concat ", " uu___5 in
+              Prims.op_Hat uu___4 ")" in
+            Prims.op_Hat "(" uu___3 in
+          Prims.op_Hat uu___1 uu___2 in
+        Prims.op_Hat "open " uu___
     | Friend l ->
         let uu___ = FStar_Ident.string_of_lid l in
         Prims.op_Hat "friend " uu___

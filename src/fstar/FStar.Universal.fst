@@ -87,6 +87,7 @@ let env_of_tcenv (env:TcEnv.env) =
 let parse (env:uenv) (pre_fn: option string) (fn:string)
   : Syntax.modul
   * uenv =
+  print_endline ("[Universal.parse] fn=" ^ fn);
   let ast, _ = Parser.Driver.parse_file fn in
   let ast, env = match pre_fn with
     | None ->

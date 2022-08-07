@@ -3,12 +3,19 @@ type used_marker = Prims.bool FStar_Compiler_Effect.ref
 type open_kind =
   | Open_module 
   | Open_namespace 
+  | Open_module_partial of FStar_Ident.ident Prims.list 
 let (uu___is_Open_module : open_kind -> Prims.bool) =
   fun projectee ->
     match projectee with | Open_module -> true | uu___ -> false
 let (uu___is_Open_namespace : open_kind -> Prims.bool) =
   fun projectee ->
     match projectee with | Open_namespace -> true | uu___ -> false
+let (uu___is_Open_module_partial : open_kind -> Prims.bool) =
+  fun projectee ->
+    match projectee with | Open_module_partial _0 -> true | uu___ -> false
+let (__proj__Open_module_partial__item___0 :
+  open_kind -> FStar_Ident.ident Prims.list) =
+  fun projectee -> match projectee with | Open_module_partial _0 -> _0
 type open_module_or_namespace = (FStar_Ident.lident * open_kind)
 type record_or_dc =
   {
@@ -832,6 +839,19 @@ let try_lookup_id'' :
                              (FStar_Compiler_Effect.op_Colon_Equals
                                 used_marker1 true;
                               k_rec_binding r))
+                    | Open_module_or_namespace
+                        (ns, Open_module_partial whitelist) ->
+                        let uu___1 =
+                          let uu___2 = FStar_Ident.string_of_id id in
+                          let uu___3 =
+                            FStar_Compiler_List.map FStar_Ident.string_of_id
+                              whitelist in
+                          FStar_Compiler_List.mem uu___2 uu___3 in
+                        if uu___1
+                        then
+                          find_in_module_with_includes eikind find_in_module
+                            Cont_ignore env1 ns id
+                        else Cont_ignore
                     | Open_module_or_namespace (ns, Open_module) ->
                         find_in_module_with_includes eikind find_in_module
                           Cont_ignore env1 ns id
@@ -2497,6 +2517,62 @@ let (push_sigelt : env -> FStar_Syntax_Syntax.sigelt -> env) =
   fun env1 -> fun se -> push_sigelt' true env1 se
 let (push_sigelt_force : env -> FStar_Syntax_Syntax.sigelt -> env) =
   fun env1 -> fun se -> push_sigelt' false env1 se
+let (push_open_partial :
+  env ->
+    FStar_Ident.lident ->
+      (FStar_Ident.ident * FStar_Ident.ident Prims.list
+        FStar_Pervasives_Native.option FStar_Pervasives_Native.option)
+        Prims.list -> env)
+  =
+  fun env1 ->
+    fun ns ->
+      fun idents ->
+        let ns1 =
+          let uu___ = resolve_module_name env1 ns false in
+          match uu___ with
+          | FStar_Pervasives_Native.None ->
+              let modules = env1.modules in
+              let uu___1 =
+                FStar_Compiler_Effect.op_Bar_Greater modules
+                  (FStar_Compiler_Util.for_some
+                     (fun uu___2 ->
+                        match uu___2 with
+                        | (m, uu___3) ->
+                            let uu___4 =
+                              let uu___5 = FStar_Ident.string_of_lid m in
+                              Prims.op_Hat uu___5 "." in
+                            let uu___5 =
+                              let uu___6 = FStar_Ident.string_of_lid ns in
+                              Prims.op_Hat uu___6 "." in
+                            FStar_Compiler_Util.starts_with uu___4 uu___5)) in
+              if uu___1
+              then ns
+              else
+                (let uu___3 =
+                   let uu___4 =
+                     let uu___5 = FStar_Ident.string_of_lid ns in
+                     FStar_Compiler_Util.format1
+                       "Namespace %s cannot be found" uu___5 in
+                   (FStar_Errors.Fatal_NameSpaceNotFound, uu___4) in
+                 let uu___4 = FStar_Ident.range_of_lid ns in
+                 FStar_Errors.raise_error uu___3 uu___4)
+          | FStar_Pervasives_Native.Some ns' -> ns' in
+        let kd = Open_module_partial (Obj.magic idents) in
+        (env1.ds_hooks).ds_push_open_hook env1 (ns1, Open_namespace);
+        (let env' =
+           push_scope_mod env1
+             (Open_module_or_namespace (ns1, Open_namespace)) in
+         let cons = Obj.magic (find_all_datacons env' ns1) in
+         match cons with
+         | FStar_Pervasives_Native.Some x ->
+             let uu___1 =
+               let uu___2 =
+                 FStar_Compiler_List.map FStar_Ident.string_of_id x in
+               FStar_String.concat "; " uu___2 in
+             failwith uu___1
+         | uu___1 ->
+             (failwith "x";
+              push_scope_mod env1 (Open_module_or_namespace (ns1, kd))))
 let (push_namespace : env -> FStar_Ident.lident -> env) =
   fun env1 ->
     fun ns ->
