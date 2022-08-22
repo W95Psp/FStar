@@ -695,7 +695,7 @@ let desugar_universe t : Syntax.universe =
 let check_no_aq (aq : antiquotations) : unit =
     match aq with
     | [] -> ()
-    | (bv, { n = Tm_quoted (e, { qkind = Quote_dynamic })})::_ ->
+    | (bv, { n = Tm_quoted (e, { qkind = Quote_dynamic true })})::_ ->
         raise_error (Errors.Fatal_UnexpectedAntiquotation,
                       BU.format1 "Unexpected antiquotation: `@(%s)" (Print.term_to_string e)) e.pos
     | (bv, e)::_ ->
@@ -1811,8 +1811,8 @@ and desugar_term_maybe_top (top_level:bool) (env:env_t) (top:term) : S.term * an
         (* We use desugar_term, so the there can be double antiquotations *)
         S.bv_to_name bv, [(bv, desugar_term env e)]
 
-    | Quote (e, Dynamic) ->
-      let qi = { qkind = Quote_dynamic
+    | Quote (e, Dynamic typed) ->
+      let qi = { qkind = Quote_dynamic typed
                ; antiquotes = []
                } in
       mk <| Tm_quoted (desugar_term env e, qi), noaqs

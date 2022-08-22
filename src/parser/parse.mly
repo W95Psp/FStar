@@ -88,7 +88,7 @@ let none_to_empty_list x =
 %token PRIVATE REIFIABLE REFLECTABLE REIFY RANGE_OF SET_RANGE_OF LBRACE_COLON_PATTERN PIPE_RIGHT
 %token NEW_EFFECT SUB_EFFECT LAYERED_EFFECT POLYMONADIC_BIND POLYMONADIC_SUBCOMP SPLICE SQUIGGLY_RARROW TOTAL
 %token REQUIRES ENSURES DECREASES LBRACE_COLON_WELL_FOUNDED
-%token MINUS COLON_EQUALS QUOTE BACKTICK_AT BACKTICK_HASH
+%token MINUS COLON_EQUALS QUOTE UNTYPED_QUOTE BACKTICK_AT BACKTICK_HASH
 %token BACKTICK UNIV_HASH
 %token BACKTICK_PERC
 
@@ -112,7 +112,7 @@ let none_to_empty_list x =
 %left     OPINFIX0d
 %left     PIPE_RIGHT
 %right    OPINFIX1
-%left     OPINFIX2 MINUS QUOTE
+%left     OPINFIX2 MINUS QUOTE UNTYPED_QUOTE
 %left     OPINFIX3
 %left     BACKTICK
 %right    OPINFIX4
@@ -1062,11 +1062,13 @@ tmEqWith(X):
   | MINUS e=tmEqWith(X)
       { mk_uminus e (rhs parseState 1) (rhs2 parseState 1 2) Expr }
   | QUOTE e=tmEqWith(X)
-      { mk_term (Quote (e, Dynamic)) (rhs2 parseState 1 3) Un }
+      { mk_term (Quote (e, Dynamic(true))) (rhs2 parseState 1 3) Un }
+  | UNTYPED_QUOTE e=tmEqWith(X)
+      { mk_term (Quote (e, Dynamic(false))) (rhs2 parseState 1 3) Un }
   | BACKTICK e=tmEqWith(X)
       { mk_term (Quote (e, Static)) (rhs2 parseState 1 3) Un }
   | BACKTICK_AT e=atomicTerm
-      { let q = mk_term (Quote (e, Dynamic)) (rhs2 parseState 1 3) Un in
+      { let q = mk_term (Quote (e, Dynamic true)) (rhs2 parseState 1 3) Un in
         mk_term (Antiquote q) (rhs2 parseState 1 3) Un }
   | BACKTICK_HASH e=atomicTerm
       { mk_term (Antiquote e) (rhs2 parseState 1 3) Un }

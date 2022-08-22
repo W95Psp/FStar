@@ -477,7 +477,7 @@ let rec push_subst s t =
 
     | Tm_quoted (tm, qi) ->
         begin match qi.qkind with
-        | Quote_dynamic -> mk (Tm_quoted (subst' s tm, qi))
+        | Quote_dynamic _ -> mk (Tm_quoted (subst' s tm, qi))
         | Quote_static ->
             let qi = on_antiquoted (subst' s) qi in
             mk (Tm_quoted (tm, qi))

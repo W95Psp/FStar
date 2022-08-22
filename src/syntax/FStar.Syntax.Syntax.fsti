@@ -96,7 +96,7 @@ type monad_name    = lident
 // IN F*: [@@ PpxDerivingYoJson; PpxDerivingShow ]
 type quote_kind =
   | Quote_static
-  | Quote_dynamic
+  | Quote_dynamic of bool // should we typecheck this?
 
 // IN F*: [@@ PpxDerivingYoJson; PpxDerivingShow ]
 type maybe_set_use_range =

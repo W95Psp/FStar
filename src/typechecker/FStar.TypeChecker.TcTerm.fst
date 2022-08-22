@@ -738,16 +738,19 @@ and tc_maybe_toplevel_term env (e:term) : term                  (* type-checked 
         let tm = mk (Tm_quoted (qt, qi)) top.pos in
         value_check_expected_typ env tm (Inl S.t_term) guard
 
-    | Quote_dynamic ->
+    | Quote_dynamic tc ->
         let c = mk_Tac S.t_term in
 
-        (* Typechecked the quoted term just to elaborate it *)
-        let env', _ = Env.clear_expected_typ env in
-        let env' = { env' with lax = true } in
-        let qt, _, g = tc_term env' qt in
-        let g0 = { g with guard_f = Trivial } in //explicitly dropping the logical guard; this is just a quotation
-        let g0 = Rel.resolve_implicits env' g0 in
-
+        let qt, g0 = match tc with
+          | true -> (* Typechecked the quoted term just to elaborate it *)
+                   let env', _ = Env.clear_expected_typ env in
+                   let env' = { env' with lax = true } in
+                   let qt, _, g = tc_term env' qt in
+                   let g0 = { g with guard_f = Trivial } in //explicitly dropping the logical guard; this is just a quotation
+                   let g0 = Rel.resolve_implicits env' g0 in
+                   qt, g0
+          | false -> qt, Env.trivial_guard
+        in
 
         let t = mk (Tm_quoted (qt, qi)) top.pos in
 

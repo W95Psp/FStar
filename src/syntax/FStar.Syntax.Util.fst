@@ -2079,7 +2079,7 @@ let rec unbound_variables tm :  list bv =
       | Tm_quoted (tm, qi) ->
         begin match qi.qkind with
         | Quote_static  -> []
-        | Quote_dynamic -> unbound_variables tm
+        | Quote_dynamic _ -> unbound_variables tm
         end
 
       | Tm_meta(t, m) ->

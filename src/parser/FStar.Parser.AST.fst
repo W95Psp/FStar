@@ -38,7 +38,7 @@ type let_qualifier =
 
 type quote_kind =
   | Static
-  | Dynamic
+  | Dynamic of bool
 
 type term' =
   | Wild
@@ -719,8 +719,9 @@ let rec term_to_string (x:term) = match x.tm with
   | Quote (t, Static) ->
     Util.format1 "(`(%s))" (term_to_string t)
 
-  | Quote (t, Dynamic) ->
-    Util.format1 "quote (%s)" (term_to_string t)
+  | Quote (t, Dynamic(typed)) ->
+    Util.format2 "%squote (%s)"
+      (if typed then "" else "untyped_") (term_to_string t)
 
   | VQuote t ->
     Util.format1 "`%%%s" (term_to_string t)

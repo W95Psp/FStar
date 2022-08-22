@@ -733,7 +733,7 @@ let rec resugar_term' (env: DsEnv.env) (t : S.term) : A.term =
     | Tm_quoted (tm, qi) ->
       let qi = match qi.qkind with
                | Quote_static -> Static
-               | Quote_dynamic -> Dynamic
+               | Quote_dynamic typed -> Dynamic typed
       in
       mk (A.Quote (resugar_term' env tm, qi))
 

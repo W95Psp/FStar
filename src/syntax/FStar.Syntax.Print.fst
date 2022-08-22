@@ -235,7 +235,7 @@ let rec tag_of_term (t:term) = match t.n with
   | Tm_constant _ -> "Tm_constant"
   | Tm_type _ -> "Tm_type"
   | Tm_quoted (_, {qkind=Quote_static}) -> "Tm_quoted (static)"
-  | Tm_quoted (_, {qkind=Quote_dynamic}) -> "Tm_quoted (dynamic)"
+  | Tm_quoted (_, {qkind=Quote_dynamic _}) -> "Tm_quoted (dynamic)"
   | Tm_abs _ -> "Tm_abs"
   | Tm_arrow _ -> "Tm_arrow"
   | Tm_refine _ -> "Tm_refine"
@@ -279,7 +279,7 @@ and term_to_string x =
             in
             U.format2 "`(%s)%s" (term_to_string tm)
                                 (FStar.Common.string_of_list print_aq qi.antiquotes)
-        | Quote_dynamic ->
+        | Quote_dynamic _ ->
             U.format1 "quote (%s)" (term_to_string tm)
         end
 

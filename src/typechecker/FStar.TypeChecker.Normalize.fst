@@ -360,7 +360,7 @@ let rec inline_closure_env cfg (env:env) stack t =
       | Tm_quoted (t', qi) ->
         let t =
             match qi.qkind with
-            | Quote_dynamic ->
+            | Quote_dynamic _ ->
               mk (Tm_quoted(non_tail_inline_closure_env cfg env t', qi)) t.pos
             | Quote_static  ->
               let qi = S.on_antiquoted (non_tail_inline_closure_env cfg env) qi in

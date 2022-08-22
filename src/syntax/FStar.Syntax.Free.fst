@@ -159,7 +159,7 @@ let rec free_names_and_uvs' tm (use_cache:use_cache_t) : free_vars_and_fvars =
       | Tm_quoted (tm, qi) ->
         begin match qi.qkind with
         | Quote_static  -> no_free_vars
-        | Quote_dynamic -> free_names_and_uvars tm use_cache
+        | Quote_dynamic _ -> free_names_and_uvars tm use_cache
         end
 
       | Tm_meta(t, m) ->
