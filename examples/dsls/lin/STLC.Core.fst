@@ -183,14 +183,21 @@ let add_lin (l1 l2: linearity): linearity
   | Zero, x | x, Zero -> x
   | _ -> Any
 
-let mul_env (l: linearity) (e: stlc_env)
-  = L.map (fun (v, (l', t)) -> (v, (mul_lin l l', t))) e
-
 open FStar.List.Tot
 
+let forget_lin (e: stlc_env): list (var * stlc_ty)
+  = map (fun (v, (_, t)) -> (v, t)) e
+
+let ( ≌ ) (e1 e2: stlc_env) = forget_lin e1 = forget_lin e2
+
+let rec mul_env (l: linearity) (e: stlc_env): r: stlc_env {e ≌ r}
+  = admit ();
+    L.map (fun (v, (l', t)) -> (v, (mul_lin l l', t))) e
+    
 let rec union_env (e1: stlc_env) 
-                  (e2: stlc_env)
-  = match e1, e1 with
+                  (e2: stlc_env {e1 ≌ e2})
+  : r: option stlc_env {match r with | Some r -> e1 ≌ r | None -> True}
+  = match e1, e2 with
   | (v1, (l1, t1))::te1, (v2, (l2, t2))::te2 ->
        if v1 = v2 && t1 = t2
        then ( match union_env te1 te2 with
@@ -202,14 +209,14 @@ let rec union_env (e1: stlc_env)
   | [], [] -> Some []
   | _ -> None
 
-let x 
-  = let e_f = [ (0, (One, TArrow One TUnit TUnit))
-              ; (1, (Zero, TUnit))
-              ] in
-    let e_x = [ (0, (Zero, TArrow One TUnit TUnit))
-              ; (1, (One, TUnit))
-              ] in
-    union_env e_f e_x //(mul_env One e_x)
+// let x 
+//   = let e_f = [ (0, (One, TArrow One TUnit TUnit))
+//               ; (1, (Zero, TUnit))
+//               ] in
+//     let e_x = [ (0, (Zero, TArrow One TUnit TUnit))
+//               ; (1, (One, TUnit))
+//               ] in
+//     union_env e_f e_x //(mul_env One e_x)
 
 [@@erasable]
 noeq
@@ -239,8 +246,8 @@ type stlc_typing : stlc_env -> stlc_exp -> stlc_ty -> Type =
   | T_App  :
       l:linearity ->
       g_lam:stlc_env ->
-      g_arg:stlc_env ->
-      g_res:stlc_env { Some g_res == union_env g_lam (mul_env l g_arg) } ->
+      g_arg:stlc_env { g_lam ≌ g_arg } ->
+      g_res:stlc_env { g_res ≌ g_lam /\ Some g_res == union_env g_lam (mul_env l g_arg) } ->
       
       e1:stlc_exp ->
       e2:stlc_exp ->
@@ -284,19 +291,36 @@ let ty_to_string = ty_to_string' false
 //     // TODO check sanity
 //   = zip (map fst env_type) (zip (map snd env_lin) (map snd env_type))
 
+let map'' f l = map (fun (v, t) -> (v, (f v t, t))) l
+
+let rec lemma_map (g:list (var & stlc_ty)) f
+  : Lemma (forget_lin (map'' f g) == g)
+  // : Lemma (forget_lin (map (fun (v, t) -> (v, (f v t, t))) g) == g)
+  = match g with
+  | [] -> ()
+  | hd::tl -> lemma_map tl f
+
+let map' f l
+  : r:stlc_env {forget_lin r == l} 
+  = let r: stlc_env = map'' f l in
+    lemma_map l f;
+    r
+
 let rec check //(g:R.env)
               (sg:list (var & stlc_ty))
               (e:stlc_exp { ln e })
-  : T.Tac (el_res:stlc_env & t:stlc_ty & stlc_typing el_res e t)
+  : T.Tac (el_res:stlc_env {forget_lin el_res == sg} & t:stlc_ty & stlc_typing el_res e t)
   = match e with
     | EUnit ->
-      let g' = map (fun (v, t) -> (v, (Zero, t))) sg in
+      // let g' = map (fun (v, t) -> (v, (Zero, t))) sg in
+      let g': stlc_env = map' (fun v t -> Zero) sg in
       let d = T_Unit g' in
       (| g', TUnit, d |)
     
     | EVar n ->
       begin
-      let g' = map (fun (v, t) -> (v, ((if v = n then One else Zero), t))) sg in
+      // let g' = map (fun (v, t) -> (v, ((if v = n then One else Zero), t))) sg in
+      let g' = map' (fun v t -> if v = n then One else Zero) sg in
       match lookup g' n with
       | Some (One, t) ->
         let d = T_Var g' n in
@@ -323,6 +347,7 @@ let rec check //(g:R.env)
     | EApp e1 e2 ->
       let (| g1, t1, d1 |) = check  sg e1 in
       let (| g2, t2, d2 |) = check  sg e2 in
+      if not (g1 ≌ g2) then T.fail "imcompatible envs";
       match t1 with
       | TArrow l t2' t ->
         if t2' = t2
@@ -337,16 +362,6 @@ let rec check //(g:R.env)
         T.fail (Printf.sprintf "Expected an arrow, got %s"
                                (ty_to_string t1))
 
-// let e = ELam TUnit (EBVar 0)
-let e = ELam TUnit (
-    EApp (EVar 123) (EBVar 0)
-  )
-
-let r: (el_res:stlc_env & t:stlc_ty & stlc_typing el_res e t) = _ by (
-  let r = check [(123, TArrow One TUnit TUnit)] e in
-  T.exact (quote r)
-)
-
 let rec elab_ty (t:stlc_ty) 
   : R.term 
   = let open R in
@@ -354,7 +369,7 @@ let rec elab_ty (t:stlc_ty)
     | TUnit -> 
       R.pack_ln (R.Tv_FVar (R.pack_fv unit_lid))
       
-    | TArrow t1 t2 ->
+    | TArrow _ t1 t2 ->
       let t1 = elab_ty t1 in
       let t2 = elab_ty t2 in
 
@@ -390,21 +405,20 @@ let rec elab_exp (e:stlc_exp)
       R.pack_ln (Tv_App e1 (e2, Q_Explicit))
 
 let extend_env_l (g:R.env) (sg:stlc_env) = 
-  L.fold_right (fun (x, t) g -> RT.extend_env g x (elab_ty t)) sg g
+  L.fold_right (fun (x, t) g -> RT.extend_env g x (elab_ty t)) (forget_lin sg) g
   
 let rec extend_env_l_lookup_bvar (g:R.env) (sg:stlc_env) (x:var)
   : Lemma 
     (requires (forall x. RT.lookup_bvar g x == None))
     (ensures (
       match lookup sg x with
-      | Some t -> RT.lookup_bvar (extend_env_l g sg) x == Some (elab_ty t)
+      | Some (_, t) -> RT.lookup_bvar (extend_env_l g sg) x == Some (elab_ty t)
       | None -> RT.lookup_bvar (extend_env_l g sg) x == None))
     (decreases sg)
     [SMTPat (RT.lookup_bvar (extend_env_l g sg) x)]
   = match sg with
     | [] -> ()
     | hd :: tl -> extend_env_l_lookup_bvar g tl x
-
 
 open FStar.Calc
 
@@ -416,7 +430,7 @@ let rec stlc_types_are_closed_core (ty:stlc_ty) (x:RT.open_or_close) (n:nat)
 
   = match ty with
     | TUnit -> ()
-    | TArrow t1 t2 ->
+    | TArrow _ t1 t2 ->
       stlc_types_are_closed_core t1 x n;
       stlc_types_are_closed_core t2 x (n + 1)
 
@@ -492,11 +506,11 @@ let rec elab_ty_soundness (g:RT.fstar_top_env)
     | TUnit -> 
       RT.T_FVar _ RT.unit_fv
       
-    | TArrow t1 t2 ->
+    | TArrow l t1 t2 ->
       let t1_ok = elab_ty_soundness g sg t1 in
       let x = fresh sg in
       fresh_is_fresh sg;
-      let t2_ok = elab_ty_soundness g ((x, t1)::sg) t2 in
+      let t2_ok = elab_ty_soundness g ((x, (l, t1))::sg) t2 in
       let arr_max 
         : RT.typing 
                (extend_env_l g sg)
@@ -523,8 +537,8 @@ let rec soundness (#sg:stlc_env)
     | T_Var _ x ->
       RT.T_Var _ (R.pack_bv (RT.make_bv x tun))
 
-    | T_Lam _ t e t' x de ->
-      let de : RT.typing (extend_env_l g ((x,t)::sg))
+    | T_Lam _ l t e t' x de ->
+      let de : RT.typing (extend_env_l g ((x,(l,t))::sg))
                          (elab_exp (open_exp e x))
                          (elab_ty t')
             = soundness de g 
@@ -538,7 +552,7 @@ let rec soundness (#sg:stlc_env)
       let dd
         : RT.typing (extend_env_l g sg)
                     (R.pack_ln (R.Tv_Abs (RT.as_binder 0 (elab_ty t)) (elab_exp e)))
-                    (elab_ty (TArrow t t'))
+                    (elab_ty (TArrow l t t'))
         = RT.T_Abs (extend_env_l g sg)
                    x
                    (elab_ty t) 
@@ -551,28 +565,27 @@ let rec soundness (#sg:stlc_env)
                    de
       in
       dd
-
-    | T_App _ e1 e2 t t' d1 d2 ->
+    | T_App l g_lam g_arg g_res e1 e2 t t' d1 d2 ->
       let dt1 
-        : RT.typing (extend_env_l g sg)
+        : RT.typing (extend_env_l g g_lam)
                     (elab_exp e1)
-                    (elab_ty (TArrow t t'))
+                    (elab_ty (TArrow l t t'))
         = soundness d1 g
       in
       let dt2
-        : RT.typing (extend_env_l g sg)
+        : RT.typing (extend_env_l g g_arg)
                     (elab_exp e2)
                     (elab_ty t)
         = soundness d2 g
       in
       let dt :
-        RT.typing (extend_env_l g sg)
+        RT.typing (extend_env_l g g_res)
                   (elab_exp (EApp e1 e2))
                   (RT.open_with (elab_ty t') (elab_exp e2))
         = RT.T_App _ _ _ _ _ dt1 dt2
       in
       dt
-
+  
 let soundness_lemma (sg:stlc_env) 
                     (se:stlc_exp)
                     (st:stlc_ty)
@@ -591,20 +604,32 @@ let main (src:stlc_exp) : RT.dsl_tac_t =
   fun g ->
   if ln src
   then
-    let (| src_ty, d |) = check g [] src in
+    let (| g', src_ty, d |) = check [] src in
     soundness_lemma [] src src_ty g;
     elab_exp src, elab_ty src_ty
   else T.fail "Not locally nameless"
+
+let e = ELam TUnit (EBVar 0)
+// let e = ELam TUnit (
+//     EApp (
+//          EApp (EVar 123) (EBVar 0)
+//       ) (EBVar 0)
+//   )
+
+// let r: (el_res:stlc_env & t:stlc_ty & stlc_typing el_res e t) = _ by (
+//   let r = check [(123, TArrow One TUnit (TArrow One TUnit TUnit))] e in
+//   T.exact (quote r)
+// )
 
 (***** Tests *****)
 
 // #set-options "--ugly"
 
-// %splice_t[foo] (main (ELam TUnit (EBVar 0)))
+%splice_t[foo] (main e)
 
-// #push-options "--no_smt"
-// let test_id () = assert (foo () == ()) by (T.compute ())
-// #pop-options
+#push-options "--no_smt"
+let test_id () = assert (foo () == ()) by (T.compute ())
+#pop-options
 
 // let bar_s = (ELam TUnit (ELam TUnit (EBVar 1)))
 // %splice_t[bar] (main bar_s)
