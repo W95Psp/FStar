@@ -61,10 +61,23 @@
         };
         devShells.default = pkgs.mkShell {
           name = "${packages.fstar.name}-dev";
-          inputsFrom = [ packages.fstar ];
+          inputsFrom = [
+            # packages.fstar
+          ];
+          packages = [
+            (pkgs.writeScriptBin "fstar.exe"
+              ''#!${pkgs.bash}/bin/bash
+                      if test -f "$FSTAR_SOURCES_ROOT"/bin/fstar.exe; then
+                         "$FSTAR_SOURCES_ROOT"/bin/fstar.exe "$@"
+                      else
+                        echo "WARNING: NOT USING LOCAL FSTAR.EXE"
+                        # $ {packages.fstar}/bin/fstar.exe "$@"
+                      fi
+                    '')
+          ];
           shellHook = ''
             export FSTAR_SOURCES_ROOT="$(pwd)"
-            export PATH="$FSTAR_SOURCES_ROOT/bin:$PATH"
+            # export PATH="$PATH:$FSTAR_SOURCES_ROOT/bin"
           '';
         };
         inherit lib;

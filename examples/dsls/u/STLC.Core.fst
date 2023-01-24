@@ -236,6 +236,11 @@ let fresh_is_fresh (e:list (var & 'a))
 
 open FStar.List.Tot
 
+let forget_lin (g: stlc_env): list (var & stlc_ty)
+  = map (fun (v, (_, t)) -> v, t) g
+
+let (≡) g1 g2 = forget_lin g1 = forget_lin g2
+
 let dom (e: stlc_env): list var = map fst e
 let (∩) (#a:eqtype) (l1 l2: list a): list a
   = filter (fun x -> mem x l2) l1
@@ -397,7 +402,80 @@ let rec ty_to_string' should_paren (t:stlc_ty)
 
 let ty_to_string = ty_to_string' false
 
-let rec check //(g:R.env)
+let rec emap (f: var -> stlc_ty -> is_linear) 
+         (l: list (var & stlc_ty))
+         : r:stlc_env {
+           forget_lin r == l
+         } 
+  = match l with
+  | (v, t)::tl -> (v, (f v t, t))::emap f tl
+  | [] -> []
+
+let rec as_non_linear_env (l: list (var & stlc_ty))
+                          : r:stlc_env{non_linear_env r /\ forget_lin r == l}
+  = match l with
+  | (v, t)::tl -> (v, (false, t))::as_non_linear_env tl
+  | [] -> []
+
+let some_of (x: option 'a): T.Tac 'a
+  = match x with
+  | Some x -> x
+  | None   -> T.fail "Expected (Some _) got None"
+
+let rec check (g:R.env)
+              (sg:list (var & stlc_ty))
+              (e:stlc_exp { ln e })
+  : T.Tac ( r:stlc_env {forget_lin r == sg}
+          & t:stlc_ty 
+          & stlc_typing r e t)
+  = match e with
+    | EUnit ->
+      let sg = as_non_linear_env sg in
+      let d = T_Unit sg in
+      (| sg, TUnit, d |)
+    | EVar n ->
+      let sg = as_non_linear_env sg in
+      begin
+      match lookup sg n with
+      | None -> T.fail "Ill-typed"
+      | Some (_, t) ->
+        let d = T_Var sg n in
+        (| sg, t, d |)
+      end
+    | EApp e1 e2 ->
+      let (| g1, t1, d1 |) = check g sg e1 in
+      let (| g2, t2, d2 |) = check g sg e2 in
+      let g3 = some_of (g1 ⊕ g2) in
+      (|g3, TLinArr t1 t2, T_App g1 g2 g3 e1 e2 t1 t2 d1 d2|)
+    | _ -> admit ()
+      
+    | _ -> admit ()
+
+    | ELam t e ->
+      let x = fresh sg in
+      fresh_is_fresh sg;
+      let (| tbody, dbody |) = check g ((x,t)::sg) (open_exp e x) in
+      (| TArrow t tbody, 
+         T_Lam sg t e tbody x dbody |)
+           
+    | EApp e1 e2 ->
+      let (| t1, d1 |) = check g sg e1 in
+      let (| t2, d2 |) = check g sg e2 in
+      match t1 with
+      | TArrow t2' t ->
+        if t2' = t2
+        then (| t, T_App _ _ _ _ _ d1 d2 |)
+        else T.fail 
+               (Printf.sprintf "Expected argument of type %s got %s"
+                               (ty_to_string t2')
+                               (ty_to_string t2))
+        
+      | _ -> 
+        T.fail (Printf.sprintf "Expected an arrow, got %s"
+                               (ty_to_string t1))
+
+
+let rec check (g:R.env)
               (sg:list (var & stlc_ty))
               (e:stlc_exp { ln e })
   : T.Tac (el_res:stlc_env {forget_lin el_res == sg} & t:stlc_ty & stlc_typing el_res e t)
