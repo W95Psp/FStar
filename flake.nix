@@ -13,8 +13,7 @@
         ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14;
         z3 = pkgs.callPackage (import ./.nix/z3.nix) { };
         version = self.rev or "dirty";
-        fstar-pre = pkgs.callPackage ./.nix/fstar-pre.nix { inherit version; };
-        fstar-dune = ocamlPackages.callPackage ./ocaml { inherit fstar-pre version; };
+        fstar-dune = ocamlPackages.callPackage ./ocaml { inherit version; };
         ulib = pkgs.callPackage ./ulib { inherit z3 fstar-dune version; };
         fstar = pkgs.callPackage ./.nix/fstar.nix {
           inherit z3 fstar-dune version ulib;

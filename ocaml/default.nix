@@ -1,7 +1,6 @@
 { batteries, buildDunePackage
-, fstar-pre
 , includeBinaryAnnotations ? false
-, installShellFiles, makeWrapper, menhirLib, ocaml, pprint, ppxlib, ppx_deriving
+, installShellFiles, lib, makeWrapper, menhirLib, ocaml, pprint, ppxlib, ppx_deriving
 , ppx_deriving_yojson, process, removeReferencesTo, sedlex, stdint, version
 , yojson, zarith }:
 
@@ -11,10 +10,10 @@ buildDunePackage {
 
   duneVersion = "3";
 
-  src = ./.;
+  src = lib.sourceByRegex ../. ["ocaml.*" "version.txt"];
 
   prePatch = ''
-    cp ${fstar-pre}/lib/fstar/version.txt ./
+    cd ocaml
     patchShebangs fstar-lib/make_fstar_version.sh
   '';
 

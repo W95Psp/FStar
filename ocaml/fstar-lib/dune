@@ -21,8 +21,11 @@
 
 (rule
   (target FStar_Version.ml)
-  (deps ./make_fstar_version.sh ../version.txt)
+  (deps (:script make_fstar_version.sh)
+        (:version ../../version.txt))
   (action
-    (with-stdout-to
-      FStar_Version.ml
-      (system ./make_fstar_version.sh))))
+    (progn
+      (copy %{version} version.txt)
+      (with-stdout-to
+        FStar_Version.ml
+        (run %{script})))))

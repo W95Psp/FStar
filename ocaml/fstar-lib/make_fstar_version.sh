@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=$(head -n 1 ../version.txt)
+VERSION=$(head -n 1 version.txt)
 if [ "$OS" = "Windows_NT" ]
 then
    if [ "$PROCESSOR_ARCHITECTURE" = "AMD64" ]
