@@ -50,7 +50,7 @@
         };
         devShells.default = pkgs.mkShell {
           name = "${packages.fstar.name}-dev";
-          inputsFrom = [ packages.fstar ];
+          inputsFrom = [ packages.fstar packages.fstar-dune ];
           shellHook = ''
             export FSTAR_SOURCES_ROOT="$(pwd)"
             export PATH="$FSTAR_SOURCES_ROOT/bin/:$PATH"
