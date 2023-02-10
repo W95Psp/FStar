@@ -19,7 +19,13 @@
           inherit z3 fstar-dune version ulib;
         };
         fstar-ocaml-snapshot =
-          pkgs.callPackage ./src { inherit ocamlPackages fstar version; };
+          pkgs.callPackage ./src {
+            inherit ocamlPackages version;
+            # extracting F* doesn't require ulib to be typechecked
+            fstar = fstar.override (_: {
+              ulib = pkgs.lib.sourceByRegex ./. ["ulib.*"];
+            });
+          };
         fstar-bootstrap = fstar.override (_:
           let
             fstar-dune-bootstrap =
