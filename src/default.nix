@@ -7,8 +7,13 @@ stdenv.mkDerivation {
     src = ./..;
     filter = path: _:
       let relPath = lib.removePrefix (toString ./.. + "/") (toString path);
-      in lib.hasPrefix "src" relPath || lib.hasPrefix "ulib" relPath
-      || lib.hasPrefix "ocaml" relPath || lib.hasSuffix ".common.mk" relPath;
+      in lib.any (lib.flip lib.hasPrefix relPath) ["src" "ulib"]
+         || (
+           lib.hasPrefix "ocaml" relPath &&
+           !(lib.hasInfix "/generated/" relPath) &&
+           !(lib.hasInfix "/dynamic/" relPath)
+         )
+      || lib.hasSuffix ".common.mk" relPath;
   };
 
   preConfigure = ''

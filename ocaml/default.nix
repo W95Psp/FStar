@@ -33,10 +33,6 @@ buildDunePackage {
     zarith
   ];
 
-  #postInstall = ''
-  #  wrapProgram $out/bin/fstar.exe --prefix PATH ":" ${z3}/bin
-  #'';
-
   postFixup = ''
     # OCaml leaves it's full store path in produced binaries
     # Thus we need to remove every reference to the path of OCaml
