@@ -9,7 +9,7 @@ stdenv.mkDerivation {
 
   src = ./..;
 
-  buildPhase = "true";
+  dontBuild = true;
 
   installPhase = ''
     mkdir $out
@@ -18,7 +18,7 @@ stdenv.mkDerivation {
     $CP ${fstar-dune}/* $out
     $CP ${ulib}/* $out
 
-    PREFIX=$out make -C src/ocaml-output install-sides -j $NIX_BUILD_CORES
+    PREFIX=$out make -C src/ocaml-output install-sides
 
     for binary in $out/bin/*
     do

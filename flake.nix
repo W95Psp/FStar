@@ -18,22 +18,11 @@
         fstar = pkgs.callPackage ./.nix/fstar.nix {
           inherit z3 fstar-dune version ulib;
         };
-        fstar-ocaml-snapshot = pkgs.callPackage ./src {
-          inherit ocamlPackages version;
-          # extracting F* doesn't require ulib to be typechecked
-          fstar = fstar.override (_: {
-            ulib = pkgs.lib.sourceByRegex ./. [ "ulib.*" ];
-
-          });
+        fstar-ocaml-snapshot =
+          pkgs.callPackage ./src { inherit ocamlPackages version fstar; };
+        fstar-bootstrap = pkgs.callPackage ./.nix/bootstrap.nix {
+          inherit fstar fstar-dune fstar-ocaml-snapshot ulib;
         };
-        fstar-bootstrap = fstar.override (_:
-          let
-            fstar-dune-bootstrap =
-              fstar-dune.overrideAttrs (_: { src = fstar-ocaml-snapshot; });
-          in {
-            fstar-dune = fstar-dune-bootstrap;
-            ulib = ulib.override (_: { fstar-dune = fstar-dune-bootstrap; });
-          });
         emacs = pkgs.writeScriptBin "emacs-fstar" ''
           #!${pkgs.stdenv.shell}
           export PATH="${fstar}/bin:$PATH"

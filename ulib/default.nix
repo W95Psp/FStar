@@ -16,12 +16,10 @@ stdenv.mkDerivation {
     cp ${fstar-dune}/bin/fstar.exe bin
     export PATH="$(pwd)/bin:${z3}/bin:$PATH"
     patchShebangs ulib/install-ulib.sh
+    cd ulib
   '';
 
-  buildPhase = "make -C ulib -j $NIX_BUILD_CORES";
+  enableParallelBuilding = true;
 
-  installPhase = ''
-    mkdir -p $out
-    PREFIX=$out make -C ulib install
-  '';
+  preInstall = "export PREFIX=$out";
 }
