@@ -1,4 +1,4 @@
-{ callPackage, fstar-dune, installShellFiles, makeWrapper, stdenv, ulib, version
+{ callPackage, fstar-dune, installShellFiles, lib, makeWrapper, stdenv, ulib, version
 , z3 }:
 
 stdenv.mkDerivation {
@@ -7,7 +7,10 @@ stdenv.mkDerivation {
 
   buildInputs = [ installShellFiles makeWrapper ];
 
-  src = ./..;
+  src = lib.sourceByRegex ./.. [
+    "doc.*" "ucontrib.*" "examples.*"
+    "src(/ocaml-output(/Makefile)?)?" "[.]common.mk"
+  ];
 
   dontBuild = true;
 
