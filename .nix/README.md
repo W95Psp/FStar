@@ -37,10 +37,10 @@ cached locally) a build of F\* from sources, which takes some time.*
 
 The `flake.nix` at the root of this repository builds the current
 OCaml snapshot by default (package named `fstar`), but also exposes
-the full bootsrap build via a package named `fstar-bootsrap`.
+the full bootstrap build via a package named `fstar-bootstrap`.
 
-To build/run/install/... `fstar-bootsrap`, just use
-`github:FStarLang/FStar#fstar-bootsrap` instead of
+To build/run/install/... `fstar-bootstrap`, just use
+`github:FStarLang/FStar#fstar-bootstrap` instead of
 `github:FStarLang/FStar`.
 
 ## Hacking on F\*

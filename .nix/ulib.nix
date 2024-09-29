@@ -4,6 +4,7 @@
   stdenv,
   version,
   z3,
+  admit_queries ? false,
 }:
 stdenv.mkDerivation {
   pname = "fstar-ulib";
@@ -23,7 +24,7 @@ stdenv.mkDerivation {
     cd ulib
   '';
 
-  makeFlags = [ "PREFIX=$(out)" ];
+  makeFlags = [ "PREFIX=$(out)" ] ++ (if admit_queries then [ "ADMIT=1" ] else [ ]);
 
   enableParallelBuilding = true;
 }

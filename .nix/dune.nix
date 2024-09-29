@@ -1,3 +1,8 @@
+/**
+  Compiles an OCaml extraction of F* into a native binary.  Please
+   override the `src` of this derivation to use a different OCaml
+   extraction (by default it is using `../ocaml`).
+*/
 {
   batteries,
   buildDunePackage,

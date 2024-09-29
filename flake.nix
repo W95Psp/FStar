@@ -22,9 +22,20 @@
         packages = rec {
           z3 = pkgs.z3_4_8_5;
           ocamlPackages = pkgs.ocaml-ng.ocamlPackages_4_14;
+          /** Dune build of the ocaml snapshot */
           fstar-dune = ocamlPackages.callPackage .nix/dune.nix { inherit version; };
+          /** Checked `ulib` */
           fstar-ulib = pkgs.callPackage .nix/ulib.nix { inherit fstar-dune version z3; };
-          fstar = pkgs.callPackage .nix/fstar.nix {
+          /** OCaml extraction of F*'s own sources */
+          fstar-ocaml-snapshot = pkgs.callPackage .nix/ocaml-snapshot.nix {
+            inherit ocamlPackages version z3;
+            fstar = fstar-dune;
+          };
+          /** Bootstraps F* `stage` times */
+          staged-fstar-bootstrap = {admit_queries, stage}:
+              pkgs.callPackage .nix/bootstrap.nix {
+                inherit fstar-dune fstar-ocaml-snapshot fstar-ulib admit_queries stage;
+                fstar = pkgs.callPackage .nix/fstar.nix {
             inherit
               fstar-dune
               fstar-ulib
@@ -33,16 +44,23 @@
               z3
               ;
           };
-          fstar-ocaml-snapshot = pkgs.callPackage .nix/ocaml-snapshot.nix {
-            inherit fstar ocamlPackages version;
+              };
+          /** Bootstraps F* fully 3 times */
+          fstar-bootstrap-stage-3 = staged-fstar-bootstrap {
+            stage = 3;
+            admit_queries = true;
           };
-          fstar-bootstrap = pkgs.callPackage .nix/bootstrap.nix {
-            inherit
-              fstar
-              fstar-dune
-              fstar-ocaml-snapshot
-              fstar-ulib
-              ;
+          /** Bootstraps F* fully 1 time */
+          fstar-bootstrap = staged-fstar-bootstrap {
+            stage = 1;
+            admit_queries = false;
+          };
+          /** Bootstraps F* 1 time, admitting SMT queries.
+              This compiles F* quickly, but does not verify `ulib`.
+          */
+          fstar-bootstrap-fast = staged-fstar-bootstrap {
+            stage = 1;
+            admit_queries = true;
           };
           emacs-fstar = pkgs.writeScriptBin "emacs-fstar" ''
             #!${pkgs.stdenv.shell}
@@ -54,6 +72,7 @@
               )
             }/bin/emacs -q "$@"
           '';
+          fstar = fstar-bootstrap-fast;
           default = fstar;
         };
 
@@ -70,6 +89,8 @@
             export PATH="$FSTAR_SOURCES_ROOT/bin/:$PATH"
           '';
         };
+
+        formatter = pkgs.nixfmt-rfc-style;
       }
     );
 }

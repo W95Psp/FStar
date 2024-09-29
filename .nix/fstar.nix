@@ -1,3 +1,7 @@
+/**
+  Packages together a cleaned up and wrapped `fstar.exe` (given by
+   `fstar-dune`) with a checked `ulib` (given by `fstar-ulib`).
+*/
 {
   fstar-dune,
   fstar-ulib,

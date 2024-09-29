@@ -1,13 +1,20 @@
+/**
+  Given a `fstar.exe` (via input `fstar`), this derivation runs F*
+   to extract itself. As a result, this derivation produces one
+   folder `ocaml` that contains a full extration of F*.
+*/
 {
   fstar,
   lib,
   ocamlPackages,
   stdenv,
   version,
+  z3,
+  pname ? "fstar-ocaml-snapshot",
+  admit_queries ? false,
 }:
 stdenv.mkDerivation {
-  pname = "fstar-ocaml-snapshot";
-  inherit version;
+  inherit pname version;
 
   src = lib.cleanSourceWith {
     src = ./..;
@@ -37,7 +44,10 @@ stdenv.mkDerivation {
   nativeBuildInputs = with ocamlPackages; [
     ocaml
     menhir
+    z3
   ];
+
+  buildFlags = if admit_queries then [ "ADMIT=1" ] else [ ];
 
   installPhase = "mv ../../ocaml $out";
 

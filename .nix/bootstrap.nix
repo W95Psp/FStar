@@ -1,37 +1,55 @@
+/**
+  Given an OCaml extraction of the F* compiler (via
+   `fstar-ocaml-snapshot`), this derivation compiles a native
+   `fstar.exe` binary and a checked `ulib`.
+*/
 {
   fstar,
   fstar-dune,
   fstar-ocaml-snapshot,
   fstar-ulib,
   stdenv,
+  admit_queries,
+  stage,
 }:
 let
-  ocaml-src = stdenv.mkDerivation {
-    name = "src";
-    src = fstar-ocaml-snapshot;
-    dontBuild = true;
-    installPhase = ''
-      mkdir -p $out/ocaml
-      mv ./* $out/ocaml
-      cp ${../version.txt} $out/version.txt
-    '';
-  };
-  fstar-dune-bootstrap = fstar-dune.overrideAttrs (_: {
-    pname = "fstar-bootstrap-dune";
-    src = ocaml-src;
-  });
+  /** Compiles `fstar.exe` by bootstrapping `stage` times */
+  bootstrap = stage:
+    if stage <= 0
+    then fstar-dune
+    else
+    let
+      pname = "fstar-bootstrap-stage-${toString stage}";
+      ocaml-src = stdenv.mkDerivation {
+        name = "${pname}-src";
+        src = fstar-ocaml-snapshot.override {
+          inherit admit_queries;
+          pname = "${pname}-ocaml";
+          fstar = bootstrap (stage - 1);
+        };
+        dontBuild = true;
+        installPhase = ''
+          mkdir -p $out/ocaml
+          mv ./* $out/ocaml
+          cp ${../version.txt} $out/version.txt
+        '';
+      };
+    in
+      fstar-dune.overrideAttrs (_: {
+        pname = "${pname}-dune";
+        src = ocaml-src;
+      });
+  bootstrapped = bootstrap stage;
   fstar-ulib-bootstrap =
     (fstar-ulib.override (_: {
-      fstar-dune = fstar-dune-bootstrap;
+      inherit admit_queries;
+      fstar-dune = bootstrapped;
     })).overrideAttrs
       (_: {
-        pname = "fstar-bootstrap-ulib";
+        pname = "fstar-ulib";
       });
 in
-(fstar.override (_: {
-  fstar-dune = fstar-dune-bootstrap;
+fstar.override (_: {
+  fstar-dune = bootstrapped;
   fstar-ulib = fstar-ulib-bootstrap;
-})).overrideAttrs
-  (_: {
-    pname = "fstar-bootstrap";
-  })
+})
